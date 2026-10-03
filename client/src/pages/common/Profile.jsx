@@ -341,53 +341,10 @@ export const Profile = () => {
           </div>
 
           {/* Action CTAs in Header */}
-          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
-            {/* Quick Link to Dashboard depending on role */}
-            {isOwner && (
-              <Link
-                to="/owner"
-                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:brightness-105"
-              >
-                <BarChart3 className="w-4 h-4" /> Go to Owner Dashboard &rarr;
-              </Link>
-            )}
-
-            {isStaff && (
-              <Link
-                to="/staff"
-                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 hover:brightness-105"
-              >
-                <Calendar className="w-4 h-4" /> Go to Staff Dashboard &rarr;
-              </Link>
-            )}
-
-            {isMember && (
-              <Link
-                to="/app"
-                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs bg-white text-[#1B4D2E] hover:bg-emerald-50"
-              >
-                <LayoutDashboard className="w-4 h-4" /> Member Home &rarr;
-              </Link>
-            )}
-
-            <button
-              onClick={() => setEditMode(!editMode)}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs bg-white/15 text-white hover:bg-white/25 border border-white/20"
-            >
-              {editMode ? (
-                <>
-                  <X className="w-4 h-4" /> Cancel
-                </>
-              ) : (
-                <>
-                  <Edit3 className="w-4 h-4" /> Edit
-                </>
-              )}
-            </button>
-
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors border border-white/20"
+              className="p-2.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors border border-white/20 shadow-xs"
               title="Change Password"
             >
               <KeyRound className="w-4 h-4" />
