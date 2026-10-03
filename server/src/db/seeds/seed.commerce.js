@@ -19,26 +19,26 @@ export const seedCommerce = async () => {
 
   // 2. Products (~20 SKUs, some at or below low stock threshold)
   const products = [
-    { id: 'prd-01', name: 'Wilson Pro Staff 97 v14', sku: 'WIL-PS97-01', category_id: 'cat-01', price: 21990, stock_qty: 6, low_stock_threshold: 5, is_active: true },
-    { id: 'prd-02', name: 'Babolat Pure Aero 2023', sku: 'BAB-PA23-01', category_id: 'cat-01', price: 19990, stock_qty: 3, low_stock_threshold: 5, is_active: true }, // LOW STOCK
-    { id: 'prd-03', name: 'Head Speed MP 2024', sku: 'HED-SMP24-01', category_id: 'cat-01', price: 18500, stock_qty: 8, low_stock_threshold: 4, is_active: true },
-    { id: 'prd-04', name: 'Yonex Astrox 88D Pro', sku: 'YNX-AX88D-01', category_id: 'cat-01', price: 15490, stock_qty: 2, low_stock_threshold: 4, is_active: true }, // LOW STOCK
-    { id: 'prd-05', name: 'Bullpadel Hack 03 Padel Racket', sku: 'BUL-HACK3-01', category_id: 'cat-01', price: 24900, stock_qty: 5, low_stock_threshold: 3, is_active: true },
-    { id: 'prd-06', name: 'Dunlop Fort All Court Balls (Can of 3)', sku: 'DUN-FORT-3', category_id: 'cat-02', price: 450, stock_qty: 48, low_stock_threshold: 15, is_active: true },
-    { id: 'prd-07', name: 'Head Tour XT Balls (Can of 3)', sku: 'HED-TXT-3', category_id: 'cat-02', price: 420, stock_qty: 30, low_stock_threshold: 10, is_active: true },
-    { id: 'prd-08', name: 'Yonex Aerosensa 30 Feather Shuttles', sku: 'YNX-AS30-TUBE', category_id: 'cat-02', price: 2100, stock_qty: 4, low_stock_threshold: 8, is_active: true }, // LOW STOCK
-    { id: 'prd-09', name: 'Head Padel Pro S (Can of 3)', sku: 'HED-PADEL-3', category_id: 'cat-02', price: 650, stock_qty: 24, low_stock_threshold: 8, is_active: true },
-    { id: 'prd-10', name: 'SG Club Leather Cricket Ball', sku: 'SG-CLUB-BALL', category_id: 'cat-02', price: 550, stock_qty: 20, low_stock_threshold: 6, is_active: true },
-    { id: 'prd-11', name: 'Nike Dri-FIT Court Tennis Polo (M)', sku: 'NKE-DF-POLO-M', category_id: 'cat-03', price: 2995, stock_qty: 12, low_stock_threshold: 5, is_active: true },
-    { id: 'prd-12', name: 'Nike Dri-FIT Court Tennis Polo (L)', sku: 'NKE-DF-POLO-L', category_id: 'cat-03', price: 2995, stock_qty: 10, low_stock_threshold: 5, is_active: true },
-    { id: 'prd-13', name: 'Adidas Club Tennis Shorts (M)', sku: 'ADI-SHRT-M', category_id: 'cat-03', price: 2199, stock_qty: 8, low_stock_threshold: 4, is_active: true },
-    { id: 'prd-14', name: 'Yonex Team Badminton Tee (L)', sku: 'YNX-TEE-L', category_id: 'cat-03', price: 1290, stock_qty: 15, low_stock_threshold: 5, is_active: true },
-    { id: 'prd-15', name: 'Asics Gel Resolution 9 Clay (UK 9)', sku: 'ASC-GELR9-09', category_id: 'cat-04', price: 11999, stock_qty: 4, low_stock_threshold: 3, is_active: true },
-    { id: 'prd-16', name: 'Yonex Power Cushion 65 Z3 (UK 8)', sku: 'YNX-PC65-08', category_id: 'cat-04', price: 9500, stock_qty: 1, low_stock_threshold: 3, is_active: true }, // LOW STOCK
-    { id: 'prd-17', name: 'Tourna Grip Original Dry XL (Pack of 3)', sku: 'TRN-GRP-3', category_id: 'cat-05', price: 590, stock_qty: 35, low_stock_threshold: 10, is_active: true },
-    { id: 'prd-18', name: 'Yonex Super Grap Overgrip (Pack of 3)', sku: 'YNX-GRAP-3', category_id: 'cat-05', price: 490, stock_qty: 40, low_stock_threshold: 12, is_active: true },
-    { id: 'prd-19', name: 'Nike Swoosh Wristbands (Pair)', sku: 'NKE-WRIST-BLK', category_id: 'cat-05', price: 695, stock_qty: 18, low_stock_threshold: 5, is_active: true },
-    { id: 'prd-20', name: 'Champions Club Insulated Water Bottle 1L', sku: 'CC-BTL-1L', category_id: 'cat-05', price: 890, stock_qty: 25, low_stock_threshold: 8, is_active: true },
+    { id: 'prd-01', name: 'Wilson Pro Staff 97 v14', sku: 'WIL-PS97-01', category_id: 'cat-01', price: 21990, stock_qty: 6, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1617083934555-563d762e8316?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-02', name: 'Babolat Pure Aero 2023', sku: 'BAB-PA23-01', category_id: 'cat-01', price: 19990, stock_qty: 3, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
+    { id: 'prd-03', name: 'Head Speed MP 2024', sku: 'HED-SMP24-01', category_id: 'cat-01', price: 18500, stock_qty: 8, low_stock_threshold: 4, image_url: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-04', name: 'Yonex Astrox 88D Pro', sku: 'YNX-AX88D-01', category_id: 'cat-01', price: 15490, stock_qty: 2, low_stock_threshold: 4, image_url: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
+    { id: 'prd-05', name: 'Bullpadel Hack 03 Padel Racket', sku: 'BUL-HACK3-01', category_id: 'cat-01', price: 24900, stock_qty: 5, low_stock_threshold: 3, image_url: 'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-06', name: 'Dunlop Fort All Court Balls (Can of 3)', sku: 'DUN-FORT-3', category_id: 'cat-02', price: 450, stock_qty: 48, low_stock_threshold: 15, image_url: 'https://images.unsplash.com/photo-1530915365347-e35b749a0381?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-07', name: 'Head Tour XT Balls (Can of 3)', sku: 'HED-TXT-3', category_id: 'cat-02', price: 420, stock_qty: 30, low_stock_threshold: 10, image_url: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-08', name: 'Yonex Aerosensa 30 Feather Shuttles', sku: 'YNX-AS30-TUBE', category_id: 'cat-02', price: 2100, stock_qty: 4, low_stock_threshold: 8, image_url: 'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
+    { id: 'prd-09', name: 'Head Padel Pro S (Can of 3)', sku: 'HED-PADEL-3', category_id: 'cat-02', price: 650, stock_qty: 24, low_stock_threshold: 8, image_url: 'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-10', name: 'SG Club Leather Cricket Ball', sku: 'SG-CLUB-BALL', category_id: 'cat-02', price: 550, stock_qty: 20, low_stock_threshold: 6, image_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-11', name: 'Nike Dri-FIT Court Tennis Polo (M)', sku: 'NKE-DF-POLO-M', category_id: 'cat-03', price: 2995, stock_qty: 12, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-12', name: 'Nike Dri-FIT Court Tennis Polo (L)', sku: 'NKE-DF-POLO-L', category_id: 'cat-03', price: 2995, stock_qty: 10, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-13', name: 'Adidas Club Tennis Shorts (M)', sku: 'ADI-SHRT-M', category_id: 'cat-03', price: 2199, stock_qty: 8, low_stock_threshold: 4, image_url: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-14', name: 'Yonex Team Badminton Tee (L)', sku: 'YNX-TEE-L', category_id: 'cat-03', price: 1290, stock_qty: 15, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-15', name: 'Asics Gel Resolution 9 Clay (UK 9)', sku: 'ASC-GELR9-09', category_id: 'cat-04', price: 11999, stock_qty: 4, low_stock_threshold: 3, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-16', name: 'Yonex Power Cushion 65 Z3 (UK 8)', sku: 'YNX-PC65-08', category_id: 'cat-04', price: 9500, stock_qty: 1, low_stock_threshold: 3, image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
+    { id: 'prd-17', name: 'Tourna Grip Original Dry XL (Pack of 3)', sku: 'TRN-GRP-3', category_id: 'cat-05', price: 590, stock_qty: 35, low_stock_threshold: 10, image_url: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-18', name: 'Yonex Super Grap Overgrip (Pack of 3)', sku: 'YNX-GRAP-3', category_id: 'cat-05', price: 490, stock_qty: 40, low_stock_threshold: 12, image_url: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-19', name: 'Nike Swoosh Wristbands (Pair)', sku: 'NKE-WRIST-BLK', category_id: 'cat-05', price: 695, stock_qty: 18, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-20', name: 'Champions Club Insulated Water Bottle 1L', sku: 'CC-BTL-1L', category_id: 'cat-05', price: 890, stock_qty: 25, low_stock_threshold: 8, image_url: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80', is_active: true },
   ]
   memoryStore.collections.products = products.map((p) => ({
     ...p,
@@ -48,21 +48,21 @@ export const seedCommerce = async () => {
 
   // 3. Bar Menu Items (~15 items)
   const menuItems = [
-    { id: 'mnu-01', name: 'Classic Margherita Pizza', category: 'food', price: 380, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-02', name: 'Grilled Chicken Panini', category: 'food', price: 320, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-03', name: 'Mediterranean Hummus Bowl', category: 'food', price: 290, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-04', name: 'Penne Arbiatta', category: 'food', price: 340, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-05', name: 'Champions Protein Shake', category: 'drink', price: 220, tax_rate_pct: 18, station: 'bar', is_available: true },
-    { id: 'mnu-06', name: 'Iced Americano', category: 'drink', price: 160, tax_rate_pct: 18, station: 'bar', is_available: true },
-    { id: 'mnu-07', name: 'Cold Brew Coffee', category: 'drink', price: 190, tax_rate_pct: 18, station: 'bar', is_available: true },
-    { id: 'mnu-08', name: 'Fresh Watermelon Juice', category: 'drink', price: 150, tax_rate_pct: 18, station: 'bar', is_available: true },
-    { id: 'mnu-09', name: 'Tender Coconut Water', category: 'drink', price: 120, tax_rate_pct: 18, station: 'bar', is_available: true },
-    { id: 'mnu-10', name: 'Masala French Fries', category: 'snack', price: 180, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-11', name: 'Crispy Veg Spring Rolls', category: 'snack', price: 220, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-12', name: 'Peri Peri Chicken Wings', category: 'snack', price: 280, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-13', name: 'Nachos with Cheese & Salsa', category: 'snack', price: 210, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-14', name: 'Warm Chocolate Walnut Brownie', category: 'dessert', price: 190, tax_rate_pct: 5, station: 'kitchen', is_available: true },
-    { id: 'mnu-15', name: 'Artisanal Gelato Scoop', category: 'dessert', price: 140, tax_rate_pct: 5, station: 'bar', is_available: true },
+    { id: 'mnu-01', name: 'Classic Margherita Pizza', category: 'food', price: 380, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-02', name: 'Grilled Chicken Panini', category: 'food', price: 320, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-03', name: 'Mediterranean Hummus Bowl', category: 'food', price: 290, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-04', name: 'Penne Arbiatta', category: 'food', price: 340, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-05', name: 'Champions Protein Shake', category: 'drink', price: 220, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-06', name: 'Iced Americano', category: 'drink', price: 160, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-07', name: 'Cold Brew Coffee', category: 'drink', price: 190, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-08', name: 'Fresh Watermelon Juice', category: 'drink', price: 150, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-09', name: 'Tender Coconut Water', category: 'drink', price: 120, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-10', name: 'Masala French Fries', category: 'snack', price: 180, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-11', name: 'Crispy Veg Spring Rolls', category: 'snack', price: 220, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-12', name: 'Peri Peri Chicken Wings', category: 'snack', price: 280, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-13', name: 'Nachos with Cheese & Salsa', category: 'snack', price: 210, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-14', name: 'Warm Chocolate Walnut Brownie', category: 'dessert', price: 190, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-15', name: 'Artisanal Gelato Scoop', category: 'dessert', price: 140, tax_rate_pct: 5, station: 'bar', image_url: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=600&q=80', is_available: true },
   ]
   memoryStore.collections.menu_items = menuItems.map((m) => ({
     ...m,

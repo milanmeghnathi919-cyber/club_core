@@ -5,6 +5,16 @@ import { nextTabNo } from '../utils/numbering.js'
 export const barRepository = {
   // Menu
   async listMenu({ isAvailable } = {}) {
+    try {
+      const sql = isAvailable !== undefined
+        ? 'select * from public.menu_items where is_available = $1 order by name asc'
+        : 'select * from public.menu_items order by name asc'
+      const rows = await query(sql, isAvailable !== undefined ? [isAvailable] : [])
+      if (rows && rows.length > 0) return rows
+    } catch (err) {
+      console.error('[barRepository.listMenu DB error]', err.message)
+    }
+
     let items = memoryStore.find('menu_items')
     if (isAvailable !== undefined) items = items.filter((m) => m.is_available === isAvailable)
     items.sort((a, b) => a.name.localeCompare(b.name))

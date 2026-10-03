@@ -15,6 +15,8 @@ const poolConfig = {
   // 30s is safe for Supabase direct connection
   connectionTimeoutMillis: 30_000,
   query_timeout: 30_000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10_000,
   ssl: config.db.ssl ? { rejectUnauthorized: false } : undefined,
 }
 

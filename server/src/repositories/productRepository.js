@@ -52,6 +52,44 @@ export const productRepository = {
   // Products
   async listProducts({ categoryId, isLowStock, search, isActive = true, page = 1, limit = 50 } = {}) {
     const offset = (page - 1) * limit
+
+    try {
+      const whereClauses = []
+      const params = []
+      let pIdx = 1
+
+      if (isActive !== undefined) {
+        whereClauses.push(`is_active = $${pIdx++}`)
+        params.push(isActive)
+      }
+      if (categoryId) {
+        whereClauses.push(`category_id = $${pIdx++}`)
+        params.push(categoryId)
+      }
+      if (isLowStock) {
+        whereClauses.push(`stock_qty <= low_stock_threshold`)
+      }
+      if (search) {
+        whereClauses.push(`(lower(name) like $${pIdx} or lower(sku) like $${pIdx})`)
+        params.push(`%${search.toLowerCase()}%`)
+        pIdx++
+      }
+
+      const whereSql = whereClauses.length > 0 ? `where ${whereClauses.join(' and ')}` : ''
+      const countRes = await query(`select count(*)::int as total from public.products ${whereSql}`, params)
+      const total = countRes[0]?.total || 0
+
+      const rows = await query(
+        `select * from public.products ${whereSql} order by name asc limit $${pIdx++} offset $${pIdx++}`,
+        [...params, limit, offset]
+      )
+      if (rows && rows.length > 0) {
+        return { items: rows, total }
+      }
+    } catch (err) {
+      console.error('[productRepository.listProducts DB error]', err.message)
+    }
+
     let items = memoryStore.find('products')
 
     if (isActive !== undefined) {
