@@ -1,11 +1,26 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Trophy, ShieldCheck, QrCode, Sparkles, CheckCircle2 } from 'lucide-react'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import authService from '@/service/authService'
+import { formatDate } from '@/utils/format'
 
 export const DigitalPass = () => {
   const user = useSelector((state) => state.auth.user)
+  const [memberData, setMemberData] = useState(null)
+  const [membershipData, setMembershipData] = useState(null)
+
+  useEffect(() => {
+    authService.me().then((res) => {
+      if (res?.member) setMemberData(res.member)
+      if (res?.membership) setMembershipData(res.membership)
+    }).catch(() => {})
+  }, [])
+
+  const memberCode = memberData?.member_code || 'CC-000225'
+  const planName = membershipData?.plan_name ? `${membershipData.plan_name.toUpperCase()} PASS` : 'GOLD PASS'
+  const validThru = membershipData?.end_date ? formatDate(membershipData.end_date) : 'Sep 2027'
 
   return (
     <div className="max-w-md mx-auto py-8 space-y-6 font-sans">
@@ -40,7 +55,7 @@ export const DigitalPass = () => {
             </div>
           </div>
           <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold uppercase tracking-wider">
-            GOLD PASS
+            {planName}
           </span>
         </div>
 
@@ -50,21 +65,21 @@ export const DigitalPass = () => {
             Member Name
           </p>
           <h2 className="text-2xl font-extrabold text-white tracking-wide">
-            {user?.name || 'Arun Kumar'}
+            {memberData?.full_name || user?.name || 'Member'}
           </h2>
           <div className="flex items-center gap-4 pt-2">
             <div>
               <p className="text-[9px] text-slate-400 uppercase font-semibold">Member Code</p>
-              <p className="text-xs font-mono font-bold text-amber-400">MEM-2026-000001</p>
+              <p className="text-xs font-mono font-bold text-amber-400">{memberCode}</p>
             </div>
             <div>
               <p className="text-[9px] text-slate-400 uppercase font-semibold">Valid Thru</p>
-              <p className="text-xs font-bold text-slate-200">Apr 2027</p>
+              <p className="text-xs font-bold text-slate-200">{validThru}</p>
             </div>
             <div>
               <p className="text-[9px] text-slate-400 uppercase font-semibold">Status</p>
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {membershipData?.status?.toUpperCase() || 'ACTIVE'}
               </span>
             </div>
           </div>

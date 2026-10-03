@@ -17,7 +17,6 @@ export const PublicLayout = () => {
 
   const navLinks = [
     { label: 'Club & Sports', path: '/' },
-    { label: 'The Café', path: '/#cafe' },
     { label: 'Court Availability', path: '/availability' },
     { label: 'Membership Plans', path: '/plans' },
     { label: 'Pro Shop', path: '/shop' },

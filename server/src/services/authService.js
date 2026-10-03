@@ -5,6 +5,8 @@ import ApiError from '../utils/ApiError.js'
 import userRepository from '../repositories/userRepository.js'
 import memberRepository from '../repositories/memberRepository.js'
 import membershipRepository from '../repositories/membershipRepository.js'
+import hrRepository from '../repositories/hrRepository.js'
+import { queryOne } from '../utils/db.js'
 import { toPublicUser } from '../models/User.js'
 import { ROLES } from '../config/roles.js'
 import { nextMemberCode } from '../utils/numbering.js'
@@ -101,17 +103,88 @@ export const authService = {
     const user = await userRepository.findById(userId)
     if (!user) throw new ApiError(404, 'User not found', null, 'NOT_FOUND')
 
-    const member = await memberRepository.findByUserId(userId)
+    let member = await memberRepository.findByUserId(userId)
+    if (!member && user.email) {
+      member = await memberRepository.findByEmail(user.email)
+    }
+
     let membership = null
+    let membershipHistory = []
     if (member) {
       membership = await membershipRepository.findActiveByMemberId(member.id)
+      membershipHistory = await membershipRepository.findByMemberId(member.id)
+      if (!membership && membershipHistory && membershipHistory.length > 0) {
+        membership = membershipHistory[0]
+      }
+    }
+
+    let employee = null
+    if (user.role !== 'member') {
+      employee = await hrRepository.findEmployeeByUserId(userId)
+      if (!employee && user.email) {
+        try {
+          employee = await queryOne('select * from public.employees where lower(email) = $1', [
+            user.email.toLowerCase(),
+          ])
+        } catch {}
+      }
     }
 
     return {
       user: toPublicUser(user),
       member: member || null,
       membership: membership || null,
+      membershipHistory: membershipHistory || [],
+      employee: employee || null,
     }
+  },
+
+  async updateProfile(userId, data) {
+    const user = await userRepository.findById(userId)
+    if (!user) throw new ApiError(404, 'User not found', null, 'NOT_FOUND')
+
+    const userUpdates = {}
+    if (data.name !== undefined) userUpdates.name = data.name
+    if (data.phone !== undefined) userUpdates.phone = data.phone
+    if (Object.keys(userUpdates).length > 0) {
+      await userRepository.update(userId, userUpdates)
+    }
+
+    let member = await memberRepository.findByUserId(userId)
+    if (!member && user.email) {
+      member = await memberRepository.findByEmail(user.email)
+    }
+
+    if (member) {
+      const memberUpdates = {}
+      if (data.name !== undefined) memberUpdates.full_name = data.name
+      if (data.phone !== undefined) memberUpdates.phone = data.phone
+      if (data.address !== undefined) memberUpdates.address = data.address
+      if (data.emergencyContact !== undefined || data.emergency_contact !== undefined) {
+        memberUpdates.emergency_contact = data.emergencyContact ?? data.emergency_contact
+      }
+      if (data.dob !== undefined) memberUpdates.dob = data.dob
+      if (data.photoUrl !== undefined || data.photo_url !== undefined) {
+        memberUpdates.photo_url = data.photoUrl ?? data.photo_url
+      }
+      if (Object.keys(memberUpdates).length > 0) {
+        await memberRepository.update(member.id, memberUpdates)
+      }
+    }
+
+    if (user.role !== 'member') {
+      const employee = await hrRepository.findEmployeeByUserId(userId)
+      if (employee) {
+        const empUpdates = {}
+        if (data.name !== undefined) empUpdates.full_name = data.name
+        if (data.phone !== undefined) empUpdates.phone = data.phone
+        if (Object.keys(empUpdates).length > 0) {
+          await hrRepository.updateEmployee(employee.id, empUpdates)
+        }
+      }
+    }
+
+    return this.me(userId)
   },
 
   async changePassword(userId, { currentPassword, newPassword }) {

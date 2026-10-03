@@ -7,7 +7,7 @@ export const membershipRepository = {
     const dStr = typeof date === 'string' ? date.slice(0, 10) : toClubDate(date)
     try {
       const row = await queryOne(
-        `select m.*, p.code as plan_code, p.name as plan_name, p.court_discount_pct, p.shop_discount_pct, p.bar_discount_pct, p.max_bookings_per_day
+        `select m.*, p.code as plan_code, p.name as plan_name, p.court_discount_pct, p.shop_discount_pct, p.bar_discount_pct, p.max_bookings_per_day, p.perks, p.description as plan_description
            from public.memberships m
            join public.plans p on p.id = m.plan_id
           where m.member_id = $1
@@ -38,6 +38,8 @@ export const membershipRepository = {
         shop_discount_pct: plan?.shop_discount_pct || 0,
         bar_discount_pct: plan?.bar_discount_pct || 0,
         max_bookings_per_day: plan?.max_bookings_per_day || 2,
+        perks: plan?.perks || [],
+        plan_description: plan?.description || '',
       }
     }
     return null
@@ -46,7 +48,7 @@ export const membershipRepository = {
   async findByMemberId(memberId) {
     try {
       const rows = await query(
-        `select m.*, p.code as plan_code, p.name as plan_name
+        `select m.*, p.code as plan_code, p.name as plan_name, p.court_discount_pct, p.shop_discount_pct, p.bar_discount_pct, p.perks, p.description as plan_description
            from public.memberships m
            join public.plans p on p.id = m.plan_id
           where m.member_id = $1

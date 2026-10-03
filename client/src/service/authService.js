@@ -35,6 +35,14 @@ export const authService = {
     return res.data
   },
 
+  async updateProfile(data) {
+    const res = await api.patch('/auth/profile', data)
+    if (res?.data?.user) {
+      localStorage.setItem('cc_user', JSON.stringify(res.data.user))
+    }
+    return res.data
+  },
+
   async changePassword(currentPassword, newPassword) {
     const res = await api.patch('/auth/password', { currentPassword, newPassword })
     return res.data

@@ -17,6 +17,7 @@ import {
   LogOut,
   ChevronRight,
   ShieldCheck,
+  User,
 } from 'lucide-react'
 
 export const MemberLayout = () => {
@@ -38,9 +39,9 @@ export const MemberLayout = () => {
     { label: 'Book Court', path: '/app/book', icon: Calendar },
     { label: 'My Bookings', path: '/app/bookings', icon: Clock },
     { label: 'Club Café', path: '/app/cafe', icon: Coffee },
-    { label: 'Friday Social', path: '/app/social', icon: Users },
     { label: 'Pro Shop', path: '/app/shop', icon: ShoppingBag },
     { label: 'Digital Pass', path: '/app/pass', icon: CreditCard },
+    { label: 'My Profile', path: '/app/profile', icon: User },
   ]
 
   return (
@@ -64,12 +65,19 @@ export const MemberLayout = () => {
             </Link>
 
             {/* Member Identity Badge */}
-            <div className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-slate-200">
+            <Link
+              to="/app/profile"
+              className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-slate-200 hover:opacity-80 transition-opacity"
+              title="View Profile & Membership Validity"
+            >
+              <div className="w-7 h-7 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] font-bold text-xs flex items-center justify-center border border-[#1B4D2E]/20">
+                {user?.name?.charAt(0)?.toUpperCase() || 'M'}
+              </div>
               <span className="text-xs font-bold text-slate-800">{user?.name || 'Member'}</span>
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-amber-600" /> Gold Member
+                <ShieldCheck className="w-3 h-3 text-amber-600" /> Member Profile
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Right Header CTAs */}
@@ -86,6 +94,14 @@ export const MemberLayout = () => {
                 </span>
               )}
             </button>
+
+            <Link
+              to="/app/profile"
+              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors"
+              title="My Profile & Membership Validity"
+            >
+              <User className="w-4 h-4" />
+            </Link>
 
             <button
               onClick={handleLogout}

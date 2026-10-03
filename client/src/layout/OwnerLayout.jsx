@@ -19,6 +19,7 @@ import {
   LogOut,
   ExternalLink,
   ShieldAlert,
+  UserCheck,
 } from 'lucide-react'
 
 export const OwnerLayout = () => {
@@ -44,6 +45,7 @@ export const OwnerLayout = () => {
     { label: 'Shift Roster', path: '/owner/shifts', icon: CalendarCheck },
     { label: 'Leave Requests', path: '/owner/leave', icon: ClipboardList },
     { label: 'Club Settings', path: '/owner/settings', icon: Sliders },
+    { label: 'Executive Profile', path: '/owner/profile', icon: UserCheck },
   ]
 
   return (
@@ -100,15 +102,19 @@ export const OwnerLayout = () => {
 
         {/* Owner Profile Footer */}
         <div className="p-3 border-t border-white/10 bg-black/40 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <Link
+            to="/owner/profile"
+            className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity"
+            title="View Executive Profile"
+          >
             <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center border border-amber-500/30 shrink-0">
-              RS
+              {user?.name?.slice(0, 2)?.toUpperCase() || 'RS'}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white truncate">Rajesh Sharma</p>
+              <p className="text-xs font-bold text-white truncate">{user?.name || 'Club Owner'}</p>
               <p className="text-[10px] text-amber-400 uppercase tracking-wider font-semibold">Club Owner</p>
             </div>
-          </div>
+          </Link>
           <button
             onClick={handleLogout}
             className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
@@ -131,6 +137,14 @@ export const OwnerLayout = () => {
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live Single Ledger
             </span>
+
+            <Link
+              to="/owner/profile"
+              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
+              title="Executive Profile"
+            >
+              <UserCheck className="w-4 h-4" />
+            </Link>
 
             <button
               onClick={handleLogout}

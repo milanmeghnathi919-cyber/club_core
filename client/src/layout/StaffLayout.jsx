@@ -20,6 +20,7 @@ import {
   LogOut,
   Sparkles,
   ClipboardList,
+  UserCheck,
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 
@@ -39,7 +40,6 @@ export const StaffLayout = () => {
     { label: 'Court Schedule', path: '/staff/bookings', icon: Calendar },
     { label: 'Members CRM', path: '/staff/members', icon: Users },
     { label: 'Counter POS', path: '/staff/pos', icon: ShoppingBag },
-    { label: 'Café POS & Orders', path: '/staff/bar', icon: Coffee },
     { label: 'Café Inventory', path: '/staff/cafe/inventory', icon: Utensils },
     { label: 'Shop Inventory', path: '/staff/products', icon: Package },
     { label: 'Shop Orders', path: '/staff/orders', icon: ListOrdered },
@@ -47,6 +47,7 @@ export const StaffLayout = () => {
     { label: 'Friday Social', path: '/staff/social', icon: Users },
     { label: 'Staff Shifts', path: '/staff/shifts', icon: Clock },
     { label: 'My Leave', path: '/staff/leave', icon: ClipboardList },
+    { label: 'Staff Profile', path: '/staff/profile', icon: UserCheck },
   ]
 
   return (
@@ -92,7 +93,11 @@ export const StaffLayout = () => {
 
         {/* Staff User Footer */}
         <div className="p-3 border-t border-slate-800/80 bg-slate-900/50 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <Link
+            to="/staff/profile"
+            className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity"
+            title="View Official Staff Profile"
+          >
             <div className="w-8 h-8 rounded-full bg-emerald-900 text-emerald-300 font-bold text-xs flex items-center justify-center shrink-0">
               {user?.name?.charAt(0) || 'S'}
             </div>
@@ -100,7 +105,7 @@ export const StaffLayout = () => {
               <p className="text-xs font-bold text-white truncate">{user?.name || 'Staff'}</p>
               <p className="text-[10px] text-emerald-400 capitalize">{user?.role?.replace('_', ' ')}</p>
             </div>
-          </div>
+          </Link>
           <button
             onClick={handleLogout}
             className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
@@ -126,6 +131,14 @@ export const StaffLayout = () => {
               <Button variant="lawn" size="sm" icon={UserPlus} className="text-xs">
                 New Member
               </Button>
+            </Link>
+
+            <Link
+              to="/staff/profile"
+              className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
+              title="Official Staff Profile"
+            >
+              <UserCheck className="w-4 h-4" />
             </Link>
 
             {/* Mobile / Tablet Logout */}

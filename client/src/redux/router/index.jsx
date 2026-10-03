@@ -52,7 +52,27 @@ import PayrollPage from '@/pages/owner/PayrollPage'
 import HrEmployees from '@/pages/owner/HrEmployees'
 import ClubSettingsPage from '@/pages/owner/ClubSettingsPage'
 
+// Common / Universal Pages
+import Profile from '@/pages/common/Profile'
+
+const UniversalProfileRedirect = () => {
+  let role = 'member'
+  try {
+    const raw = localStorage.getItem('cc_user')
+    if (raw) role = JSON.parse(raw)?.role || 'member'
+  } catch {}
+  if (role === 'owner') return <Navigate to="/owner/profile" replace />
+  if (role !== 'member') return <Navigate to="/staff/profile" replace />
+  return <Navigate to="/app/profile" replace />
+}
+
 export const router = createBrowserRouter([
+  // Universal Profile Shortcut
+  {
+    path: '/profile',
+    element: <UniversalProfileRedirect />,
+  },
+
   // Public Surfaces
   {
     path: '/',
@@ -81,6 +101,7 @@ export const router = createBrowserRouter([
       { path: 'shop', element: <Shop /> },
       { path: 'checkout', element: <Checkout /> },
       { path: 'pass', element: <DigitalPass /> },
+      { path: 'profile', element: <Profile /> },
     ],
   },
 
@@ -110,6 +131,7 @@ export const router = createBrowserRouter([
       { path: 'bar', element: <BarPos /> },
       { path: 'bar/kitchen', element: <KitchenDisplay /> },
       { path: 'bar/summary', element: <BarSummary /> },
+      { path: 'profile', element: <Profile /> },
     ],
   },
 
@@ -128,6 +150,7 @@ export const router = createBrowserRouter([
       { path: 'shifts', element: <StaffShifts /> },
       { path: 'leave', element: <StaffLeave /> },
       { path: 'settings', element: <ClubSettingsPage /> },
+      { path: 'profile', element: <Profile /> },
     ],
   },
 

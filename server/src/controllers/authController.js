@@ -41,6 +41,11 @@ export const me = asyncHandler(async (req, res) => {
   return ok(res, result)
 })
 
+export const updateProfile = asyncHandler(async (req, res) => {
+  const result = await authService.updateProfile(req.user.id || req.user.sub, req.body)
+  return ok(res, result)
+})
+
 export const changePassword = asyncHandler(async (req, res) => {
   await authService.changePassword(req.user.id || req.user.sub, req.body)
   return ok(res, {})
@@ -59,6 +64,7 @@ export default {
   login,
   logout,
   me,
+  updateProfile,
   changePassword,
   forgotPassword,
   resetPassword,
