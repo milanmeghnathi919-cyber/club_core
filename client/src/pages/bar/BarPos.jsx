@@ -204,21 +204,26 @@ export const BarPos = () => {
     <div className="space-y-6 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-            Food & Beverage
+          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E] flex items-center gap-1.5">
+            <Coffee className="w-3.5 h-3.5" /> Artisan Café & Dining
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-            Bar & Lounge Table POS
+            Club Café & Table POS
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Touch-friendly table map, live orders, kitchen routing, and tender settlement.
+            Touch-friendly café table map, live orders, barista and kitchen routing, and tender settlement.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to="/staff/cafe/inventory">
+            <Button variant="outline" size="sm" icon={Utensils} className="font-semibold">
+              Café Inventory
+            </Button>
+          </Link>
           <Link to="/staff/bar/kitchen">
-            <Button variant="lawn" size="sm" icon={Utensils} className="font-bold">
-              Live Kitchen Display (KDS)
+            <Button variant="lawn" size="sm" icon={Coffee} className="font-bold">
+              Kitchen & Barista KDS
             </Button>
           </Link>
           <Link to="/staff/bar/summary">

@@ -114,7 +114,7 @@ export const Plans = () => {
                           isGold ? 'text-amber-400' : 'text-[#1B4D2E]'
                         }`}
                       />
-                      <span>{p.bar_discount_pct}% Automatic Bar & Cafe Discount</span>
+                      <span>{p.bar_discount_pct}% Automatic Club Café & Lounge Discount</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check

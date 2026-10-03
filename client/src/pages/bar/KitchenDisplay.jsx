@@ -60,18 +60,18 @@ export const KitchenDisplay = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#C85A32]">
-              Kitchen & Bar Production
+            <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
+              Café Kitchen & Barista Production
             </span>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live 5s Polling
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-            Kitchen Display System (KDS)
+            Café Kitchen & Barista KDS
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Real-time ticket queue for chefs and bartenders. Oldest tickets prioritized first.
+            Real-time ticket queue for chefs and baristas. Oldest tickets prioritized first.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export const KitchenDisplay = () => {
               stationFilter === 'kitchen' ? 'bg-[#C85A32] text-white' : 'bg-white border text-slate-700'
             }`}
           >
-            Hot Kitchen
+            Hot Kitchen Line
           </button>
           <button
             onClick={() => setStationFilter('bar')}
@@ -99,7 +99,7 @@ export const KitchenDisplay = () => {
               stationFilter === 'bar' ? 'bg-[#1B4D2E] text-white' : 'bg-white border text-slate-700'
             }`}
           >
-            Club Bar
+            Barista Coffee Bar
           </button>
         </div>
       </div>

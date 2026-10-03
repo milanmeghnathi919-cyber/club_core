@@ -148,7 +148,7 @@ export const ClubSettingsPage = () => {
                   }
                 />
                 <Input
-                  label="F&B Food GST %"
+                  label="Café Food GST %"
                   type="number"
                   value={settings.taxRates?.barFood || 5}
                   onChange={(e) =>
@@ -159,7 +159,7 @@ export const ClubSettingsPage = () => {
                   }
                 />
                 <Input
-                  label="F&B Beverages GST %"
+                  label="Café Beverages GST %"
                   type="number"
                   value={settings.taxRates?.barDrink || 18}
                   onChange={(e) =>

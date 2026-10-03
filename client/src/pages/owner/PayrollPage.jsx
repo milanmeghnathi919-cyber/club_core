@@ -160,7 +160,7 @@ export const PayrollPage = () => {
                   Monthly Total: {formatCurrency(totalPayroll)}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  3 Full-time employees • Operations, Bar Lounge & Executive
+                  3 Full-time employees • Operations, Café & Executive
                 </p>
               </div>
 

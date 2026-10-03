@@ -4,25 +4,82 @@ import memoryStore from '../utils/memoryStore.js'
 export const hrRepository = {
   // Employees
   async listEmployees() {
+    try {
+      const rows = await query(`
+        SELECT e.*,
+               u.role as user_role,
+               u.is_active as user_active
+        FROM public.employees e
+        LEFT JOIN public.users u ON e.user_id = u.id
+        ORDER BY e.full_name ASC
+      `)
+      if (rows && rows.length > 0) return rows
+    } catch (err) {
+      console.error('[hrRepository.listEmployees DB error]', err.message)
+    }
+
     let items = memoryStore.find('employees')
-    items.sort((a, b) => a.full_name.localeCompare(b.full_name))
-    return items
+    const users = memoryStore.find('users') || []
+    const userMap = new Map(users.map((u) => [u.id, u]))
+    const enriched = items.map((e) => {
+      const u = userMap.get(e.user_id)
+      return {
+        ...e,
+        user_role: u?.role || null,
+        user_active: u?.is_active ?? true,
+      }
+    })
+    enriched.sort((a, b) => a.full_name.localeCompare(b.full_name))
+    return enriched
   },
 
   async findEmployeeById(id) {
+    try {
+      const row = await queryOne('select * from public.employees where id = $1', [id])
+      if (row) return row
+    } catch {}
     return memoryStore.findOne('employees', (e) => e.id === id)
   },
 
   async findEmployeeByUserId(userId) {
+    try {
+      const row = await queryOne('select * from public.employees where user_id = $1', [userId])
+      if (row) return row
+    } catch {}
     return memoryStore.findOne('employees', (e) => e.user_id === userId)
   },
 
   async createEmployee(data) {
+    try {
+      const row = await queryOne(
+        `INSERT INTO public.employees
+           (user_id, full_name, title, phone, email, base_salary, joined_on, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING *`,
+        [
+          data.userId || data.user_id || null,
+          data.fullName || data.full_name,
+          data.title || null,
+          data.phone || null,
+          data.email || null,
+          Number(data.baseSalary || data.base_salary || 0),
+          data.joinedOn || data.joined_on || new Date().toISOString().slice(0, 10),
+          data.status || 'active',
+        ]
+      )
+      if (row) {
+        memoryStore.insert('employees', row)
+        return row
+      }
+    } catch (err) {
+      console.error('[hrRepository.createEmployee DB error]', err.message)
+    }
+
     return memoryStore.insert('employees', {
       id: data.id || crypto.randomUUID(),
       user_id: data.userId || data.user_id || null,
       full_name: data.fullName || data.full_name,
-      title: data.title,
+      title: data.title || null,
       phone: data.phone || null,
       email: data.email || null,
       base_salary: Number(data.baseSalary || data.base_salary || 0),
@@ -33,6 +90,22 @@ export const hrRepository = {
   },
 
   async updateEmployee(id, updates) {
+    try {
+      const sets = []
+      const vals = []
+      let idx = 1
+      for (const [k, v] of Object.entries(updates)) {
+        const col = k.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase())
+        sets.push(`${col} = $${idx++}`)
+        vals.push(v)
+      }
+      vals.push(id)
+      const row = await queryOne(`update public.employees set ${sets.join(', ')} where id = $${idx} returning *`, vals)
+      if (row) {
+        memoryStore.update('employees', (e) => e.id === id, row)
+        return row
+      }
+    } catch {}
     return memoryStore.update('employees', (e) => e.id === id, updates)
   },
 

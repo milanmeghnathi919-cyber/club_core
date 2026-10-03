@@ -50,7 +50,7 @@ export const MemberDashboard = () => {
               Welcome back, {user?.name || 'Champion'}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100 max-w-xl">
-              Your membership entitles you to priority booking, complimentary court access on clay & hard courts, and 15% off at the Pro Shop & Bar.
+              Your membership entitles you to priority booking, complimentary court access on clay & hard courts, and 15% off at the Pro Shop & Café.
             </p>
           </div>
 

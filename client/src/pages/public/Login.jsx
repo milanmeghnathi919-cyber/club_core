@@ -248,10 +248,10 @@ export const Login = () => {
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('bar@championsclub.in', 'Staff@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-rose-400 text-left transition-colors cursor-pointer group"
+                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-400 text-left transition-colors cursor-pointer group"
                 >
-                  <p className="font-bold text-slate-800 group-hover:text-rose-800">Vikram Singh</p>
-                  <p className="text-[10px] text-rose-600 font-medium">Bar & Kitchen</p>
+                  <p className="font-bold text-slate-800 group-hover:text-amber-800">Vikram Singh</p>
+                  <p className="text-[10px] text-amber-600 font-medium">Café & Kitchen</p>
                 </button>
 
                 <button

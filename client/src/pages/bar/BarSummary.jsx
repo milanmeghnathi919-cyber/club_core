@@ -31,7 +31,7 @@ export const BarSummary = () => {
             End of Day Reconciliation
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-            Bar Daily Register Summary
+            Café & Dining Daily Register Summary
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Audit daily receipts, tender settlement breakdown, and F&B sales.

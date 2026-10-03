@@ -1,4 +1,6 @@
+import bcrypt from 'bcryptjs'
 import hrRepository from '../repositories/hrRepository.js'
+import userRepository from '../repositories/userRepository.js'
 import { expenseRepository } from '../repositories/financeRepository.js'
 import notificationService from './notificationService.js'
 import ApiError from '../utils/ApiError.js'
@@ -28,12 +30,50 @@ export const hrService = {
         baseSalary: Number(e.base_salary),
         joinedOn: e.joined_on,
         status: e.status,
+        role: e.user_role || (e.title?.toLowerCase().includes('bar') || e.title?.toLowerCase().includes('caf') ? 'bar_staff' : 'front_desk'),
       }
     })
   },
 
   async createEmployee(data) {
-    return hrRepository.createEmployee(data)
+    const cleanEmail = data.email ? String(data.email).toLowerCase().trim() : null
+    const cleanPhone = data.phone ? String(data.phone).trim() : null
+    let userId = data.userId || data.user_id || null
+    const password = data.password ? String(data.password).trim() : 'Staff@123'
+
+    if (cleanEmail && !userId) {
+      let existingUser = await userRepository.findByEmail(cleanEmail)
+      if (existingUser) {
+        userId = existingUser.id
+      } else {
+        const passwordHash = await bcrypt.hash(password, 10)
+        const role = data.role || (data.title?.toLowerCase().includes('bar') || data.department?.toLowerCase().includes('bar') || data.department?.toLowerCase().includes('caf') ? 'bar_staff' : 'front_desk')
+
+        const newUser = await userRepository.create({
+          email: cleanEmail,
+          passwordHash,
+          role,
+          name: data.fullName || data.full_name,
+          phone: cleanPhone,
+          isActive: true,
+        })
+        userId = newUser.id
+      }
+    }
+
+    const employee = await hrRepository.createEmployee({
+      ...data,
+      userId,
+      email: cleanEmail,
+      phone: cleanPhone,
+    })
+
+    return {
+      ...employee,
+      userId,
+      role: data.role || 'front_desk',
+      tempPassword: password,
+    }
   },
 
   async updateEmployee(id, data) {

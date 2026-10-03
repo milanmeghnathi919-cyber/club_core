@@ -36,7 +36,8 @@ import LeadsCrm from '@/pages/staff/LeadsCrm'
 import StaffShifts from '@/pages/staff/StaffShifts'
 import StaffLeave from '@/pages/staff/StaffLeave'
 
-// Bar POS Pages
+// Café POS & Inventory Pages
+import CafeInventory from '@/pages/staff/CafeInventory'
 import BarPos from '@/pages/bar/BarPos'
 import KitchenDisplay from '@/pages/bar/KitchenDisplay'
 import BarSummary from '@/pages/bar/BarSummary'
@@ -98,6 +99,12 @@ export const router = createBrowserRouter([
       { path: 'social', element: <MemberSocial /> },
       { path: 'shifts', element: <StaffShifts /> },
       { path: 'leave', element: <StaffLeave /> },
+      { path: 'cafe', element: <BarPos /> },
+      { path: 'cafe/pos', element: <BarPos /> },
+      { path: 'cafe/inventory', element: <CafeInventory /> },
+      { path: 'cafe-inventory', element: <CafeInventory /> },
+      { path: 'cafe/kitchen', element: <KitchenDisplay /> },
+      { path: 'cafe/summary', element: <BarSummary /> },
       { path: 'bar', element: <BarPos /> },
       { path: 'bar/kitchen', element: <KitchenDisplay /> },
       { path: 'bar/summary', element: <BarSummary /> },
@@ -115,6 +122,7 @@ export const router = createBrowserRouter([
       { path: 'tax', element: <TaxReportsPage /> },
       { path: 'payroll', element: <PayrollPage /> },
       { path: 'employees', element: <HrEmployees /> },
+      { path: 'cafe-inventory', element: <CafeInventory /> },
       { path: 'shifts', element: <StaffShifts /> },
       { path: 'leave', element: <StaffLeave /> },
       { path: 'settings', element: <ClubSettingsPage /> },

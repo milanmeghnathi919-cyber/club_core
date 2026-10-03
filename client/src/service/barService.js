@@ -6,8 +6,18 @@ export const barService = {
     return res.data || []
   },
 
+  async createMenuItem(data) {
+    const res = await api.post('/bar/menu', data)
+    return res.data
+  },
+
   async updateMenuItem(id, data) {
     const res = await api.patch(`/bar/menu/${id}`, data)
+    return res.data
+  },
+
+  async deleteMenuItem(id) {
+    const res = await api.delete(`/bar/menu/${id}`)
     return res.data
   },
 

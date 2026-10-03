@@ -26,13 +26,37 @@ export const barRepository = {
   },
 
   async createMenuItem(data) {
+    try {
+      const row = await queryOne(
+        `insert into public.menu_items
+           (name, category, price, tax_rate_pct, station, is_available, image_url)
+         values ($1, $2, $3, $4, $5, $6, $7)
+         returning *`,
+        [
+          data.name,
+          data.category || 'Coffee & Brews',
+          Number(data.price),
+          Number(data.taxRatePct ?? data.tax_rate_pct ?? (data.category?.toLowerCase().includes('food') ? 5 : 18)),
+          data.station || (data.category?.toLowerCase().includes('food') ? 'kitchen' : 'bar'),
+          data.isAvailable ?? data.is_available ?? true,
+          data.imageUrl || data.image_url || null,
+        ]
+      )
+      if (row) {
+        memoryStore.insert('menu_items', row)
+        return row
+      }
+    } catch (err) {
+      console.error('[barRepository.createMenuItem DB error]', err.message)
+    }
+
     return memoryStore.insert('menu_items', {
       id: data.id || crypto.randomUUID(),
       name: data.name,
-      category: data.category || 'drink',
+      category: data.category || 'Coffee & Brews',
       price: Number(data.price),
-      tax_rate_pct: Number(data.taxRatePct ?? data.tax_rate_pct ?? (data.category === 'food' ? 5 : 18)),
-      station: data.station || (data.category === 'drink' ? 'bar' : 'kitchen'),
+      tax_rate_pct: Number(data.taxRatePct ?? data.tax_rate_pct ?? 5),
+      station: data.station || 'bar',
       is_available: data.isAvailable ?? data.is_available ?? true,
       image_url: data.imageUrl || data.image_url || null,
       created_at: new Date().toISOString(),
@@ -40,7 +64,35 @@ export const barRepository = {
   },
 
   async updateMenuItem(id, updates) {
+    try {
+      const sets = []
+      const vals = []
+      let idx = 1
+      for (const [k, v] of Object.entries(updates)) {
+        const col = k.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase())
+        sets.push(`${col} = $${idx++}`)
+        vals.push(v)
+      }
+      vals.push(id)
+      const row = await queryOne(
+        `update public.menu_items set ${sets.join(', ')} where id = $${idx} returning *`,
+        vals
+      )
+      if (row) {
+        memoryStore.update('menu_items', (m) => m.id === id, row)
+        return row
+      }
+    } catch (err) {
+      console.error('[barRepository.updateMenuItem DB error]', err.message)
+    }
     return memoryStore.update('menu_items', (m) => m.id === id, updates)
+  },
+
+  async deleteMenuItem(id) {
+    try {
+      await query('delete from public.menu_items where id = $1', [id])
+    } catch {}
+    return memoryStore.delete('menu_items', (m) => m.id === id)
   },
 
   // Tables

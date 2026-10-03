@@ -8,8 +8,9 @@ const router = Router()
 
 // Menu
 router.get('/menu', authenticate, authorize('staff'), barController.listMenu)
-router.post('/menu', authenticate, authorize('owner'), barController.createMenuItem)
+router.post('/menu', authenticate, authorize('staff'), barController.createMenuItem)
 router.patch('/menu/:id', authenticate, authorize('staff'), barController.updateMenuItem)
+router.delete('/menu/:id', authenticate, authorize('staff'), barController.deleteMenuItem)
 
 // Tables
 router.get('/tables', authenticate, authorize('staff'), barController.listTables)

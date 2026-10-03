@@ -22,6 +22,10 @@ export const barService = {
     return barRepository.updateMenuItem(id, updates)
   },
 
+  async deleteMenuItem(id) {
+    return barRepository.deleteMenuItem(id)
+  },
+
   // Tables
   async listTables() {
     return barRepository.listTables()

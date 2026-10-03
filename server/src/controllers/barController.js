@@ -18,6 +18,11 @@ export const updateMenuItem = asyncHandler(async (req, res) => {
   return ok(res, item)
 })
 
+export const deleteMenuItem = asyncHandler(async (req, res) => {
+  await barService.deleteMenuItem(req.params.id)
+  return ok(res, { deleted: true })
+})
+
 // Tables
 export const listTables = asyncHandler(async (req, res) => {
   const tables = await barService.listTables()

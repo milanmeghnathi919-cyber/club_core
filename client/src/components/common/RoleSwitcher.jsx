@@ -38,9 +38,9 @@ const ROLES = [
     label: 'Vikram Singh',
     email: 'bar@championsclub.in',
     password: 'Staff@123',
-    path: '/bar/pos',
-    badge: 'Bar & KDS',
-    color: 'bg-rose-700',
+    path: '/staff/bar',
+    badge: 'Café Staff',
+    color: 'bg-amber-700',
   },
   {
     role: 'owner',

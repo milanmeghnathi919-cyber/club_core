@@ -229,7 +229,7 @@ export const MemberDetail = () => {
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-emerald-900 mt-2">
                         <li>• 100% Free Court Access (Complimentary)</li>
                         <li>• 15% Off All Pro Shop Merchandise</li>
-                        <li>• 15% Off All F&B Bar & Lounge Orders</li>
+                        <li>• 15% Off All F&B Café & Dining Orders</li>
                         <li>• 14-Day Advance Priority Court Booking</li>
                       </ul>
                     </div>
