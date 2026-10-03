@@ -53,7 +53,7 @@ async function main() {
     // --- the row really is in Postgres ------------------------------------
     const row = await queryOne('select id, email, role from public.users where email = $1', [email])
     check(Boolean(row), 'row exists in postgres', row ? `id=${row.id}` : 'not found')
-    check(row?.role === 'user', 'default role applied', row?.role)
+    check(row?.role === 'member', 'default role applied', row?.role)
 
     // --- login round trip --------------------------------------------------
     const loginRes = await fetch(`${base}/api/auth/login`, {

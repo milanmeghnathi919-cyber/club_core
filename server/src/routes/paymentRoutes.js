@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as paymentController from '../controllers/paymentController.js'
-import { authenticate, authorize } from '../middlewares/auth.js'
+import { authenticate, staffOnly, adminOnly, managerOnly } from '../middlewares/auth.js'
 import { verifyWebhookSignature } from '../utils/razorpay.js'
 
 const router = Router()
@@ -16,10 +16,10 @@ router.post('/webhook', (req, res) => {
 
 router.use(authenticate)
 
-router.post('/order', authorize('admin', 'manager'), paymentController.createOrder)
+router.post('/order', managerOnly, paymentController.createOrder)
 router.post('/verify', paymentController.verifyPayment)
-router.post('/', authorize('admin', 'manager', 'staff'), paymentController.recordCashPayment)
-router.get('/', authorize('admin', 'manager'), paymentController.listPayments)
-router.get('/revenue', authorize('admin', 'owner'), paymentController.revenueSummary)
+router.post('/', staffOnly, paymentController.recordCashPayment)
+router.get('/', managerOnly, paymentController.listPayments)
+router.get('/revenue', adminOnly, paymentController.revenueSummary)
 
 export default router

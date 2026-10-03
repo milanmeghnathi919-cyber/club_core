@@ -24,6 +24,9 @@ const validate = (schema) => (req, res, next) => {
     if (value && rule.enum && !rule.enum.includes(value)) {
       errors.push(`${field} must be one of: ${rule.enum.join(', ')}`)
     }
+    if (value && rule.pattern && !rule.pattern.test(String(value))) {
+      errors.push(rule.patternError ?? `${field} is not in the expected format`)
+    }
   }
 
   if (errors.length) return next(ApiError.badRequest('Validation failed', errors))
@@ -44,6 +47,10 @@ export const loginRules = {
 export const changePasswordRules = {
   currentPassword: { required: true },
   newPassword: { required: true, minLength: 8 },
+}
+
+export const verifyCodeRules = {
+  code: { required: true, pattern: /^\d{6}$/, patternError: 'code must be exactly 6 digits' },
 }
 
 export default validate

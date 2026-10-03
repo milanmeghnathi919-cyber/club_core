@@ -38,7 +38,7 @@ Copy `client/.env.example` to `client/.env` to override `VITE_API_BASE_URL`. Dev
 ```bash
 cd server
 npm install
-cp .env.example .env   # set DB_* , CLOUDINARY_* and JWT_SECRET
+cp .env.example .env   # set DB_* , CLOUDINARY_* , EMAIL_* and JWT_SECRET
 npm run db:test        # verify the database connection
 npm run db:migrate     # create the 31 tables
 npm run dev            # http://localhost:5000
@@ -65,8 +65,16 @@ Remote Postgres requires TLS, so leave `DB_SSL=true` and set it to `false` only 
 | `npm run db:test` | Opens a real connection, authenticates, reports tables and doc-number functions |
 | `npm run db:migrate` | Applies pending SQL files, one transaction per file |
 | `npm run db:migrate -- --status` | Lists applied vs pending without changing anything |
-| `npm run db:check` | Checks Postgres, Cloudinary, SMTP and Razorpay together |
+| `npm run db:check` | Checks Postgres, Cloudinary, email and Razorpay together |
+| `npm run mail:test` | Authenticate against Google SMTP without sending anything |
 | `npm run db:smoke` | End-to-end test: registers over HTTP, verifies the Postgres row, cleans up |
+| `npm run db:smoke:verify` | Tests email verification and role enforcement |
+
+### Email
+
+Email uses Google SMTP with an App Password. Set `EMAIL_USER` (the Gmail address) and `EMAIL_PASS` (the 16-character app password from <https://myaccount.google.com/apppasswords>) — **not** your Google account password. 2-Step Verification has to be on before app passwords can be generated.
+
+Mail config is validated lazily rather than at boot, so a missing or wrong app password never blocks migrations or health checks — it only fails when an email is actually due.
 
 Migrations live in `server/src/db/migrations/`. Each file is idempotent and applied inside a transaction, so a failure rolls the whole file back; `schema_migrations` records what has run, making `db:migrate` safe to repeat.
 

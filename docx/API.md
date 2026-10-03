@@ -142,9 +142,46 @@ All 31 tables, and where each is read or written. Every table is reachable throu
 
 ### Auth
 
-JWT in an **httpOnly cookie `cc_token`**, 7 days, `SameSite=Lax`. `Authorization: Bearer <jwt>` also accepted for Postman and mobile. `GET /auth/me` returns the role, and the client hides what the role cannot reach — but **every route re-checks the role server-side**, because client-side hiding is not security.
+JWT in an **httpOnly cookie `cc_token`**, 7 days, `SameSite=Lax`. `Authorization: Bearer <jwt>` also accepted for Postman and mobile.
 
-> The live `users.role` enum and the contract's role list disagree — see §9.1. Unresolved.
+The **role is read from the database on every authenticated request**, not trusted from the token. A token that claims `admin` while the row says `member` gets `member`. That costs one indexed lookup per request and buys immediate revocation: demoting or disabling a person takes effect at once rather than whenever their token happens to expire.
+
+> Enforced in `server/src/middlewares/auth.js`. Covered by the “a token claiming admin is ignored” test.
+
+### Roles
+
+Five operational roles, mirroring how the club actually divides work.
+
+| Role | Areas | Notes |
+|---|---|---|
+| `admin` | everything | manages staff accounts and settings; the only role that touches finance and HR |
+| `cafe_manager` | bar, kitchen, tables | cannot open a shift or view payroll |
+| `court_manager` | courts, availability, bookings, social sessions | |
+| `shop_manager` | products, stock, shop orders | |
+| `member` | own bookings, orders, tabs, membership | |
+
+Single source of truth: `server/src/config/roles.js`, mirrored by the `users_role_check` constraint in `004_auth_roles.sql`.
+
+Reusable guards: `staffOnly` (any of the four staff roles), `managerOnly` (the three managers + admin), `adminOnly`.
+
+### Email verification
+
+Members confirm their address with a 6-digit code before member-only actions work.
+
+| Rule | Detail |
+|---|---|
+| Code | 6 digits, random, `crypto.randomInt` (not `Math.random`) |
+| Storage | SHA-256 hash only — a leaked table snapshot cannot be replayed |
+| Comparison | `timingSafeEqual`, so a wrong code cannot be found by timing |
+| Lifetime | 10 min (`EMAIL_CODE_TTL_MINUTES`) |
+| Single-use | consumed on success; a partial unique index keeps at most one live code per user |
+| Resend throttle | one code per 60s per user → `429` with the wait time in the message |
+| Attempt limit | 5 wrong guesses, then the code is burned and a new one is needed |
+| Staff exemption | managers and admins are created by the club and skip verification |
+
+Requesting a code supersedes any earlier one, so “click send twice” never leaves two valid codes.
+
+> A failed send never fails the request: `POST /auth/email/send-code` returns `200 { sent: false, reason }` and the user can retry. A broken mail server must not look like a broken signup.
 
 ### Money
 
@@ -196,15 +233,30 @@ Auth shorthand: **public** = no login · **member** = the member's own rows only
 
 | Method | Path | Auth | Request | Response `data` | Errors |
 |---|---|---|---|---|---|
-| POST | `/auth/register` | public | B: `name, email, phone, password(≥8), dob?` | `{ user, member }` + sets cookie | 409 `EMAIL_EXISTS`, 422 |
-| POST | `/auth/login` | public | B: `email, password` | `{ user, member? }` + cookie | 401 `INVALID_CREDENTIALS`, 429 |
+| POST | `/auth/register` | public | B: `name, email, phone, password(≥8), dob?` | `{ user, token, emailCodeSent }` + sets cookie. Fires the first verification code | 409 `EMAIL_EXISTS`, 422 |
+| POST | `/auth/login` | public | B: `email, password` | `{ user, token, needsEmailVerification }` + cookie | 401 `INVALID_CREDENTIALS`, 429 |
 | POST | `/auth/logout` | any | – | `{}`, clears cookie | – |
-| GET | `/auth/me` | any | – | `{ user, member?, membership? }` | 401 |
+| GET | `/auth/me` | any | – | `{ user, member?, membership? }` | 401, 403 if deactivated |
 | PATCH | `/auth/password` | any | B: `currentPassword, newPassword` | `{}` | 401, 422 |
 | POST | `/auth/forgot-password` | public | B: `email` | `{}` always (never leaks whether the email exists) | – |
 | POST | `/auth/reset-password` | public | B: `token, newPassword` | `{}` | 422 |
 
 Registration creates a `users` row **and** a `members` row in one transaction — a login always has a member profile, so no orphan accounts exist.
+
+#### Email verification
+
+All four require a signed-in user. Base path `/auth/email`.
+
+| Method | Path | Request | Response `data` | Errors |
+|---|---|---|---|---|
+| POST | `/send-code` | – | `{ sent, expiresInMinutes }` — `reason` instead of `sent` if mail failed | 400 already verified, 429 `CODE_ALREADY_SENT` |
+| POST | `/resend` | – | same as `send-code`; a clearer name for the client | 400, 429 |
+| POST | `/verify` | B: `code` (exactly 6 digits) | `{ verified: true }` or `{ alreadyVerified: true }` | 400 `INVALID_CODE` (wrong, expired, or none active) |
+| GET | `/status` | – | `{ isEmailVerified, verifiedAt, lastSentAt, hasActiveCode, resendAvailableInSeconds }` | 401 |
+
+`resendAvailableInSeconds` lets the UI start a countdown instead of the user discovering the limit by hitting it.
+
+Member-only endpoints additionally pass through `requireVerifiedEmail`, which returns `403` with a `details` entry pointing at verification. Staff roles skip the gate — they were created by the club, not self-signed-up.
 
 ### 5.2 Public — no login
 
@@ -564,14 +616,13 @@ All jobs must be **idempotent** and safe to run twice.
 
 > These need a decision from the team **before** the matching code is written. Per `PROJECT_CONTEXT.md` §0, unknowns get marked rather than invented.
 
-### 9.1 Roles do not match — blocking
+### 9.1 Roles — RESOLVED
 
-| Source | Roles |
-|---|---|
-| `users.role` in the live DB | `owner`, `admin`, `manager`, `staff`, `user` |
-| `API_CONTRACT.md` §0 | `owner`, `front_desk`, `bar_staff`, `member` |
+The live DB previously carried `owner, admin, manager, staff, user`, which matched neither the contract nor how the club works. Migration `004_auth_roles.sql` replaced it with the five operational roles in §4 (`admin`, `cafe_manager`, `court_manager`, `shop_manager`, `member`).
 
-Five different vocabularies. The contract's model is better for this product — "who is allowed to settle a bar tab" is not the same question as "is this person an admin". **Recommended:** change the DB enum to the contract's four roles, which is a one-line `alter type` since the database is empty apart from a test row.
+Consequences already handled: `userRepository.create` defaults to `member` rather than `user`, every route guard uses the new names, and `authenticate` reads the role from the row on each request so a demotion is immediate.
+
+> **Note for `API_CONTRACT.md` §0:** that file still lists `owner/front_desk/bar_staff/member`. It needs updating to match, and a line added to the contract change log in `PROJECT_CONTEXT.md` §8.
 
 ### 9.2 Enum values drift from the contract
 
@@ -584,6 +635,7 @@ Five different vocabularies. The contract's model is better for this product —
 | `payments.method` | `razorpay`, `bank_transfer`, `wallet` | `online` | Method filtering |
 | `payments.status` | `pending`, `success`, `failed`, `refunded` | `paid`, `refund_pending`, `refunded` | Revenue queries |
 | `plans.code` | free text | `gold`, `silver`, `junior` | Plan filtering |
+| `users.role` | **RESOLVED** — now `admin, cafe_manager, court_manager, shop_manager, member` | was `owner, front_desk, bar_staff, member` | see §4 |
 
 Each is a `drop constraint` + `add constraint` while the database holds no production data — cheap now, expensive later.
 
@@ -612,6 +664,15 @@ All are data, not code. Once the owner fills them in, no code changes.
 - **Member self-cancellation cutoff** — assumed 2 hours; not stated.
 - **Guest bookings** — the DB allows a booking with neither `member_id` nor `guest_name`, but §5.8 requires one. Add the constraint.
 - **Member login** — a member gets a `users` row at conversion; do they get a password immediately or a temp one?
+
+### 9.6 Email delivery — operational note
+
+Delivery depends on a Google account with an App Password in `EMAIL_USER` / `EMAIL_PASS`. Constraints worth knowing before a demo:
+
+- **Gmail caps sending at ~500 messages/day.** Fine for a club, not for a bulk run. A large member-import would need a transactional provider.
+- **Free Gmail accounts are limited to ~100 concurrent SMTP connections.** The mailer pools 3, which is comfortable.
+- Codes expire after 10 minutes. A member who waits longer must request another — there is a 60-second resend throttle, so the UI needs a countdown, not just a button.
+- Staff accounts skip verification. Only self-registered `member` accounts must confirm a code.
 
 ---
 

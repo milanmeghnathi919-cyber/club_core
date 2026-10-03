@@ -78,21 +78,16 @@ export const queryOne = async (text, params = []) => {
  *     await tx.query('insert ...')
  *     await tx.query('update ...')
  *   })
+ *
+ * `tx` is the raw pg client, so `tx.query` is a normal call and rows come
+ * back as `{ rows }`.
  */
 export const transaction = async (work) => {
   const client = await pool.connect()
 
   try {
     await client.query('begin')
-    const result = await work({
-      query: async (text, params = []) => {
-        try {
-          return await client.query(text, params)
-        } catch (err) {
-          throw toApiError(err)
-        }
-      },
-    })
+    const result = await work(client)
     await client.query('commit')
     return result
   } catch (err) {

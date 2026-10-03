@@ -56,14 +56,18 @@ const config = {
       'image/jpeg,image/png,image/webp,image/avif').split(','),
   },
 
-  // Mail (nodemailer)
-  smtp: {
-    host: process.env.SMTP_HOST,
-    port: optionalNumber(process.env.SMTP_PORT, 587),
-    secure: process.env.SMTP_SECURE === 'true',
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-    from: process.env.MAIL_FROM ?? 'no-reply@example.com',
+  // Mail (nodemailer over Google SMTP)
+  // EMAIL_USER is the Google account, EMAIL_PASS is a 16-char App Password
+  // (not the account password). Generate at myaccount.google.com > Security > App passwords.
+  mail: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    host: process.env.MAIL_HOST ?? 'smtp.gmail.com',
+    port: optionalNumber(process.env.MAIL_PORT, 587),
+    secure: process.env.MAIL_SECURE === 'true',
+    from: process.env.MAIL_FROM ?? process.env.EMAIL_USER,
+    codeTtlMinutes: optionalNumber(process.env.EMAIL_CODE_TTL_MINUTES, 10),
+    maxPerHour: optionalNumber(process.env.EMAIL_MAX_PER_HOUR, 5),
   },
 
   // Razorpay
@@ -80,6 +84,18 @@ export function assertConfig() {
   const missing = required.filter((key) => !process.env[key])
   if (missing.length) {
     throw new Error(`Missing required env vars: ${missing.join(', ')}\nCopy .env.example to .env and fill them in.`)
+  }
+}
+
+/**
+ * Mail is checked separately and lazily, so a missing EMAIL_USER/EMAIL_PASS
+ * never blocks migrations or health checks — it only fails when an email is
+ * actually due to go out.
+ */
+export function assertMailConfig() {
+  const missing = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key])
+  if (missing.length) {
+    throw new Error(`Mail is not configured: ${missing.join(', ')} missing`)
   }
 }
 

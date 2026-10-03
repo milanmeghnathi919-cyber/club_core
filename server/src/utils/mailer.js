@@ -1,42 +1,92 @@
 import nodemailer from 'nodemailer'
 import config from '../config/index.js'
 import logger from './logger.js'
+import ApiError from './ApiError.js'
 
 let transporter = null
 
-function isConfigured() {
-  return Boolean(config.smtp.host && config.smtp.user && config.smtp.pass)
+/**
+ * Google SMTP over app password.
+ *
+ * GOOGLE_APP_PASSWORD is used, not the account password — Google rejects
+ * password auth for SMTP. The app password is 16 chars with spaces stripped.
+ */
+export function isMailConfigured() {
+  return Boolean(config.mail.user && config.mail.pass)
 }
 
 function getTransporter() {
-  if (!isConfigured()) return null
+  if (!isMailConfigured()) return null
 
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      host: config.smtp.host,
-      port: config.smtp.port,
-      secure: config.smtp.secure,
-      auth: { user: config.smtp.user, pass: config.smtp.pass },
+      host: config.mail.host,
+      port: config.mail.port,
+      secure: config.mail.secure,
+      auth: {
+        user: config.mail.user,
+        // app passwords are shown in 4-char groups; the space is cosmetic
+        pass: config.mail.pass.replace(/\s+/g, ''),
+      },
+      pool: true,
+      maxConnections: 3,
+      connectionTimeout: 20_000,
     })
   }
 
   return transporter
 }
 
-export const sendMail = async ({ to, subject, text, html }) => {
+/** Verify credentials without sending. Used by `npm run db:check`. */
+export async function verifyMail() {
+  const tx = getTransporter()
+  if (!tx) throw new ApiError(503, 'EMAIL_USER / EMAIL_PASS not configured')
+  return tx.verify()
+}
+
+export async function sendMail({ to, subject, text, html, replyTo }) {
   const tx = getTransporter()
 
   if (!tx) {
-    logger.warn('SMTP not configured, skipping email to', to)
+    logger.warn('EMAIL_USER/EMAIL_PASS not set, skipping email to', to)
     return { skipped: true }
   }
 
-  const info = await tx.sendMail({ from: config.smtp.from, to, subject, text, html })
-  logger.info(`Email sent: ${subject} -> ${to} (${info.messageId})`)
-  return info
+  try {
+    const info = await tx.sendMail({
+      from: config.mail.from,
+      to,
+      subject,
+      text,
+      html,
+      ...(replyTo && { replyTo }),
+    })
+    logger.info(`Email sent: ${subject} -> ${to} (${info.messageId})`)
+    return info
+  } catch (err) {
+    // A failed send must not take down the request that triggered it.
+    logger.error(`Email failed: ${subject} -> ${to}: ${err.message}`)
+    throw err
+  }
 }
 
 export const templates = {
+  emailVerificationCode: ({ name, code, expiresInMinutes }) => ({
+    subject: `${code} is your Champions Club verification code`,
+    text: `Hi ${name},\n\nYour verification code is ${code}. It expires in ${expiresInMinutes} minutes.\n\nIf you did not request this, ignore this email.`,
+    html: `
+      <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto">
+        <h2 style="margin:0 0 16px">Verify your email</h2>
+        <p>Hi ${name},</p>
+        <p>Enter this code to finish setting up your Champions Club account:</p>
+        <p style="font-size:32px;font-weight:700;letter-spacing:8px;margin:24px 0">
+          ${code}
+        </p>
+        <p style="color:#666;font-size:14px">Expires in ${expiresInMinutes} minutes.</p>
+        <p style="color:#666;font-size:14px">If you did not request this, you can ignore this email.</p>
+      </div>`,
+  }),
+
   membershipReminder: ({ memberName, planName, endDate, daysLeft }) => ({
     subject: `Your ${planName} membership expires in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
     text: `Hi ${memberName},\n\nYour ${planName} membership ends on ${endDate}. Renew to keep your member rates.\n\nSee you on the court.`,
@@ -56,6 +106,7 @@ export const templates = {
   }),
 }
 
-export const sendTemplatedMail = async (template, context, to) => sendMail({ to, ...template(context) })
+export const sendTemplatedMail = async (template, context, to) =>
+  sendMail({ to, ...template(context) })
 
 export default sendMail

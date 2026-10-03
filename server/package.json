@@ -14,7 +14,9 @@
     "db:check": "node --env-file-if-exists=.env src/scripts/checkConnections.js",
     "lint": "eslint .",
     "db:test": "node --env-file-if-exists=.env src/scripts/testConnection.js",
-    "db:smoke": "node --env-file-if-exists=.env src/scripts/smokeTest.js"
+    "db:smoke": "node --env-file-if-exists=.env src/scripts/smokeTest.js",
+    "mail:test": "node --env-file-if-exists=.env src/scripts/testMail.js",
+    "db:smoke:verify": "node --env-file-if-exists=.env src/scripts/verificationTest.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

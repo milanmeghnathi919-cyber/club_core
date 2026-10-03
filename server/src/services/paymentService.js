@@ -50,7 +50,7 @@ export const paymentService = {
       throw ApiError.badRequest(`Unsupported source table: ${sourceTable}`)
     }
 
-    return transaction(async ({ query: tx }) => {
+    return transaction(async (tx) => {
       const insert = await tx.query(
         `insert into public.${TABLE}
            (payment_no, source_type, source_id, member_id, amount, method,

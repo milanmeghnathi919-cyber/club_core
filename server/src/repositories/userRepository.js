@@ -1,5 +1,6 @@
 import { query, queryOne } from '../utils/db.js'
 import { USER_COLUMNS } from '../models/User.js'
+import { ROLES } from '../config/roles.js'
 
 const TABLE = 'users'
 const PUBLIC_COLS = USER_COLUMNS.join(', ')
@@ -39,16 +40,18 @@ export const userRepository = {
 
   async create(data) {
     return queryOne(
-      `insert into public.${TABLE} (email, password_hash, role, name, phone, is_active)
-       values ($1, $2, $3, $4, $5, $6)
+      `insert into public.${TABLE}
+         (email, password_hash, role, name, phone, is_active, is_email_verified)
+       values ($1, $2, $3, $4, $5, $6, $7)
        returning ${PUBLIC_COLS}`,
       [
         String(data.email).toLowerCase(),
         data.passwordHash,
-        data.role ?? 'user',
+        data.role ?? ROLES.MEMBER,
         data.name,
         data.phone ?? null,
         data.isActive ?? true,
+        data.isEmailVerified ?? false,
       ],
     )
   },
