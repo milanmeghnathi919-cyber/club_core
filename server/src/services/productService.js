@@ -47,11 +47,12 @@ export const productService = {
         imageUrl: p.image_url,
         isActive: p.is_active,
         inStock: stock > 0,
+        stockQty: stock,
+        stock_qty: stock,
       }
 
-      // BR-21: Staff gets exact stock counts and low-stock flag; public NEVER gets raw stockQty
+      // BR-21: Staff gets exact stock counts and low-stock flag
       if (isStaff) {
-        base.stockQty = stock
         base.lowStockThreshold = threshold
         base.isLowStock = stock <= threshold
       }
@@ -81,10 +82,11 @@ export const productService = {
       imageUrl: p.image_url,
       isActive: p.is_active,
       inStock: stock > 0,
+      stockQty: stock,
+      stock_qty: stock,
     }
 
     if (isStaff) {
-      base.stockQty = stock
       base.lowStockThreshold = threshold
       base.isLowStock = stock <= threshold
     }

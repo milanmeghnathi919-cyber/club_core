@@ -39,11 +39,12 @@ export const Shop = () => {
   })
 
   const handleAdd = (product) => {
-    const stock = Number(product.stock_qty ?? product.stockQty ?? product.stock ?? 0)
+    const rawStock = product.stock_qty ?? product.stockQty ?? product.stock
+    const stock = rawStock !== undefined && rawStock !== null ? Number(rawStock) : (product.inStock === false ? 0 : 99)
     const existing = cartItems.find((i) => i.productId === product.id)
     const currentQty = existing?.qty || 0
 
-    if (stock <= 0) {
+    if (product.inStock === false || stock <= 0) {
       toast.error(`${product.name} is currently out of stock`)
       return
     }
@@ -127,10 +128,11 @@ export const Shop = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((p) => {
-            const stock = Number(p.stock_qty ?? p.stockQty ?? p.stock ?? 0)
+            const rawStock = p.stock_qty ?? p.stockQty ?? p.stock
+            const stock = rawStock !== undefined && rawStock !== null ? Number(rawStock) : (p.inStock === false ? 0 : 99)
             const cartItem = cartItems.find((i) => i.productId === p.id)
             const cartQty = cartItem?.qty || 0
-            const isOutOfStock = stock <= 0
+            const isOutOfStock = p.inStock === false || stock <= 0
             const isMaxInBag = !isOutOfStock && cartQty >= stock
 
             return (
