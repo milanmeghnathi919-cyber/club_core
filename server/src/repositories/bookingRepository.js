@@ -289,7 +289,7 @@ export const bookingRepository = {
     return bookings.length
   },
 
-  async list({ date, courtId, memberId, status, page = 1, limit = 50 } = {}) {
+  async list({ date, courtId, memberId, userId, userEmail, status, upcoming, page = 1, limit = 50 } = {}) {
     const offset = (page - 1) * limit
     try {
       let conditions = ['1=1']
@@ -308,9 +308,33 @@ export const bookingRepository = {
         conditions.push(`b.member_id = $${idx++}`)
         params.push(memberId)
       }
+      if (userId) {
+        if (userEmail) {
+          conditions.push(`(
+            b.created_by = $${idx}
+            OR b.member_id IN (
+              SELECT id FROM public.members WHERE user_id = $${idx} OR lower(email) = lower($${idx + 1})
+            )
+          )`)
+          params.push(userId, userEmail)
+          idx += 2
+        } else {
+          conditions.push(`(
+            b.created_by = $${idx}
+            OR b.member_id IN (
+              SELECT id FROM public.members WHERE user_id = $${idx}
+            )
+          )`)
+          params.push(userId)
+          idx += 1
+        }
+      }
       if (status) {
         conditions.push(`b.status = $${idx++}`)
         params.push(status)
+      }
+      if (upcoming) {
+        conditions.push(`b.start_at >= now()`)
       }
 
       const whereClause = conditions.join(' AND ')
@@ -318,6 +342,7 @@ export const bookingRepository = {
       const totalRow = await queryOne(countSql, params)
       const total = totalRow ? Number(totalRow.total) : 0
 
+      const orderDir = upcoming ? 'ASC' : 'DESC'
       const dataSql = `
         SELECT b.*,
                c.name AS court_name,
@@ -336,7 +361,7 @@ export const bookingRepository = {
         LEFT JOIN public.memberships ms ON m.id = ms.member_id AND ms.status = 'active'
         LEFT JOIN public.plans p ON ms.plan_id = p.id
         WHERE ${whereClause}
-        ORDER BY b.start_at DESC
+        ORDER BY b.start_at ${orderDir}
         LIMIT $${idx++} OFFSET $${idx++}
       `
       const rows = await query(dataSql, [...params, limit, offset])
@@ -361,11 +386,26 @@ export const bookingRepository = {
     if (memberId) {
       items = items.filter((b) => (b.member_id || b.memberId) === memberId)
     }
+    if (userId) {
+      items = items.filter((b) => {
+        if (b.created_by === userId || b.createdBy === userId) return true
+        const mem = memoryStore.findOne('members', (m) => m.id === (b.member_id || b.memberId))
+        if (mem && (mem.user_id === userId || mem.userId === userId || (userEmail && String(mem.email).toLowerCase() === String(userEmail).toLowerCase()))) return true
+        return false
+      })
+    }
     if (status) {
       items = items.filter((b) => b.status === status)
     }
+    if (upcoming) {
+      const nowIso = new Date().toISOString()
+      items = items.filter((b) => (b.start_at || b.startAt) >= nowIso)
+    }
 
-    items.sort((a, b) => new Date(b.start_at || b.startAt) - new Date(a.start_at || a.startAt))
+    items.sort((a, b) => {
+      const diff = new Date(a.start_at || a.startAt) - new Date(b.start_at || b.startAt)
+      return upcoming ? diff : -diff
+    })
 
     const courts = memoryStore.find('courts') || []
     const courtMap = new Map(courts.map((c) => [c.id, c]))

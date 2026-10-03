@@ -21,7 +21,8 @@ export const MyBookings = () => {
     setLoading(true)
     try {
       const data = await courtService.getMyBookings()
-      setBookings(data || [])
+      const list = Array.isArray(data) ? data : data?.items || data?.data || []
+      setBookings(list)
     } catch (err) {
       toast.error('Failed to load your bookings')
     } finally {

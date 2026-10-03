@@ -27,7 +27,10 @@ export const MemberDashboard = () => {
   useEffect(() => {
     courtService
       .getMyBookings(true)
-      .then((data) => setUpcoming(data || []))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.items || data?.data || []
+        setUpcoming(list)
+      })
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [])

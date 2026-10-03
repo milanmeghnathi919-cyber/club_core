@@ -10,15 +10,39 @@ export const create = asyncHandler(async (req, res) => {
   let memberId = req.body.memberId || null
   let source = isStaff ? 'staff_counter' : 'member_web'
 
-  if (req.user.role === 'member') {
-    const member = await memberRepository.findByUserId(req.user.id)
-    if (!member) throw ApiError.notFound('Member profile not found', 'NOT_FOUND')
-    memberId = member.id
+  let guestName = req.body.guestName || req.body.guest?.name || null
+  let guestPhone = req.body.guestPhone || req.body.guest?.phone || null
+
+  // If memberId is not explicitly provided and this is not a guest booking:
+  if (!memberId && !guestName) {
+    let member = await memberRepository.findByUserId(req.user.id)
+    if (!member && req.user.email) {
+      member = await memberRepository.findByEmail(req.user.email)
+    }
+    if (member) {
+      memberId = member.id
+    } else {
+      // Auto-create member profile for the authenticated user if missing
+      try {
+        const { nextMemberCode } = await import('../utils/numbering.js')
+        const code = await nextMemberCode()
+        member = await memberRepository.create({
+          memberCode: code,
+          userId: req.user.id,
+          fullName: req.user.name || 'Club Member',
+          phone: req.user.phone || 'Not Provided',
+          email: req.user.email,
+        })
+        if (member) memberId = member.id
+      } catch {}
+    }
   }
 
   const booking = await bookingService.create({
     ...req.body,
     memberId,
+    guestName,
+    guestPhone,
     source,
     actorId: req.user.id,
   })
@@ -33,7 +57,7 @@ export const list = asyncHandler(async (req, res) => {
     if (!member) throw ApiError.notFound('Member profile not found', 'NOT_FOUND')
     memberId = member.id
   }
-  const { page = 1, limit = 20, date, courtId, status } = req.query
+  const { page = 1, limit = 50, date, courtId, status } = req.query
   const { items, total } = await bookingService.list({
     page: Number(page),
     limit: Number(limit),
@@ -52,17 +76,16 @@ export const list = asyncHandler(async (req, res) => {
 })
 
 export const mine = asyncHandler(async (req, res) => {
-  const member = await memberRepository.findByUserId(req.user.id)
-  if (!member) {
-    return paginated(res, [], { page: 1, limit: 20, total: 0, totalPages: 1 })
-  }
+  const { page = 1, limit = 50, status, upcoming } = req.query
+  const isUpcoming = upcoming === 'true' || upcoming === true
 
-  const { page = 1, limit = 20, status } = req.query
   const { items, total } = await bookingService.list({
     page: Number(page),
     limit: Number(limit),
-    memberId: member.id,
+    userId: req.user.id,
+    userEmail: req.user.email,
     status,
+    upcoming: isUpcoming,
   })
 
   return paginated(res, items, {

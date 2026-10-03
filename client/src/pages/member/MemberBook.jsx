@@ -27,6 +27,7 @@ export const MemberBook = () => {
   const [selectedSlotInfo, setSelectedSlotInfo] = useState(null)
   const [loading, setLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const handleSelectSlot = ({ court, slot }) => {
     setSelectedSlotInfo({ court, slot })
@@ -49,6 +50,7 @@ export const MemberBook = () => {
       setBookingSuccess(res.booking || res)
       toast.success('Court reserved successfully! Enjoy your match.')
       setSelectedSlotInfo(null)
+      setRefreshKey((k) => k + 1)
     } catch (err) {
       if (err.code === 'DAILY_LIMIT_REACHED') {
         toast.error('Daily booking limit reached for today (max active bookings reached).')
@@ -136,6 +138,7 @@ export const MemberBook = () => {
 
       {/* Slot Grid Matrix */}
       <SlotGrid
+        key={refreshKey}
         selectedDate={selectedDate}
         sport={sport}
         mode="member"

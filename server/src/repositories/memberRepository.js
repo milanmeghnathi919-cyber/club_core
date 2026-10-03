@@ -24,6 +24,16 @@ export const memberRepository = {
     return memoryStore.findOne('members', (m) => m.user_id === userId)
   },
 
+  async findByEmail(email) {
+    if (!email) return null
+    const clean = String(email).trim().toLowerCase()
+    try {
+      const row = await queryOne(`select ${COLS} from public.${TABLE} where lower(email) = $1`, [clean])
+      if (row) return row
+    } catch {}
+    return memoryStore.findOne('members', (m) => m.email?.toLowerCase() === clean)
+  },
+
   async findByPhone(phone) {
     const clean = String(phone).trim()
     try {

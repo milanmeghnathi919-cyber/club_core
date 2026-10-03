@@ -79,6 +79,13 @@ export const bookingCreateSchema = z.object({
   memberId: z.string().min(1).optional().nullable(),
   guestName: z.string().trim().max(120).optional().nullable(),
   guestPhone: z.string().trim().regex(phoneRegex).optional().nullable(),
+  guest: z
+    .object({
+      name: z.string().trim().max(120).optional().nullable(),
+      phone: z.string().trim().regex(phoneRegex).optional().nullable(),
+    })
+    .optional()
+    .nullable(),
   paymentMethod: z.enum(['cash', 'card', 'upi', 'online', 'pay_at_club']).default('pay_at_club'),
   notes: z.string().max(1000).optional().nullable(),
 })

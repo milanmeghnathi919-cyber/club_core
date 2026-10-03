@@ -18,7 +18,10 @@ export const courtService = {
 
   async getMyBookings(upcoming = false) {
     const res = await api.get('/bookings/mine', { params: { upcoming } })
-    return res.data
+    if (Array.isArray(res)) return res
+    if (Array.isArray(res?.data)) return res.data
+    if (Array.isArray(res?.items)) return res.items
+    return []
   },
 
   async getAllBookings(params = {}) {
