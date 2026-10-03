@@ -11,7 +11,12 @@ import config from './config/index.js'
 const app = express()
 
 app.set('trust proxy', 1)
-app.use(helmet())
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: false,
+  }),
+)
 app.use(corsMiddleware)
 app.use(compression())
 app.use(

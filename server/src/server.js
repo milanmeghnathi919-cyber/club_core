@@ -16,8 +16,8 @@ async function start() {
       initJobs()
     }
 
-    const server = app.listen(config.port, () => {
-      logger.info(`API listening on http://localhost:${config.port} (${config.env})`)
+    const server = app.listen(config.port, '0.0.0.0', () => {
+      logger.info(`API listening on http://0.0.0.0:${config.port} (${config.env})`)
       logger.info(`Razorpay ${isRazorpayEnabled() ? 'enabled' : 'disabled'}`)
     })
 

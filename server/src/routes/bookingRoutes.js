@@ -7,7 +7,7 @@ import { bookingCreateSchema } from '../validators/schemas.js'
 const router = Router()
 
 // STATIC ROUTES FIRST (before /:id)
-router.get('/mine', authenticate, authorize('member'), bookingController.mine)
+router.get('/mine', authenticate, bookingController.mine)
 
 router.get('/', authenticate, bookingController.list)
 router.post('/', authenticate, validateBody(bookingCreateSchema), bookingController.create)

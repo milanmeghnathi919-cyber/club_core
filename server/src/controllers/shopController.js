@@ -61,7 +61,9 @@ export const list = asyncHandler(async (req, res) => {
 
 export const mine = asyncHandler(async (req, res) => {
   const member = await memberRepository.findByUserId(req.user.id)
-  if (!member) throw ApiError.notFound('Member profile not found', 'NOT_FOUND')
+  if (!member) {
+    return paginated(res, [], { page: 1, limit: 20, total: 0, totalPages: 1 })
+  }
 
   const { page = 1, limit = 20, status } = req.query
   const { items, total } = await shopService.list({

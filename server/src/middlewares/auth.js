@@ -57,6 +57,47 @@ export const authenticate = asyncHandler(async (req, res, next) => {
 
 export const requireAuth = authenticate
 
+export const optionalAuth = asyncHandler(async (req, res, next) => {
+  const header = req.headers.authorization ?? ''
+  const bearer = header.startsWith('Bearer ') ? header.slice(7) : null
+  const token = bearer ?? req.cookies?.[COOKIE_NAME]
+
+  if (!token) return next()
+
+  let payload
+  try {
+    payload = jwt.verify(token, config.jwtSecret || 'dev-secret-key-12345')
+  } catch {
+    return next()
+  }
+
+  const userId = payload.sub ?? payload.id
+  let row = await userRepository.findById(userId)
+
+  if (!row) {
+    try {
+      row = await queryOne(
+        'select id, role, is_active, name, email, phone from public.users where id = $1',
+        [userId],
+      )
+    } catch {}
+  }
+
+  if (row && row.is_active !== false) {
+    req.user = {
+      ...payload,
+      id: row.id,
+      sub: row.id,
+      role: row.role,
+      name: row.name,
+      email: row.email,
+      phone: row.phone,
+    }
+  }
+
+  next()
+})
+
 /**
  * Expand roles and shorthands:
  *   'staff' -> owner, front_desk, bar_staff
@@ -100,6 +141,7 @@ export const managerOnly = fdPlusOnly
 export default {
   authenticate,
   requireAuth,
+  optionalAuth,
   authorize,
   requireRole,
   staffOnly,

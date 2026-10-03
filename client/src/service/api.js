@@ -25,17 +25,23 @@ api.interceptors.response.use(
   },
   (error) => {
     const errorData = error.response?.data?.error || {}
-    const message = errorData.message || error.message || 'Something went wrong'
+    let message = errorData.message || error.response?.data?.message || error.message || 'Something went wrong'
     const code = errorData.code || 'UNKNOWN_ERROR'
     const details = errorData.details || []
 
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      message = 'Unable to connect to backend server. Please ensure the API is running on port 5000.'
+    }
+
     if (error.response?.status === 401) {
-      localStorage.removeItem('cc_token')
-      localStorage.removeItem('cc_user')
-      // Don't auto-redirect if we're on public paths
-      const currentPath = window.location.pathname
-      if (currentPath.startsWith('/app') || currentPath.startsWith('/staff') || currentPath.startsWith('/owner')) {
-        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : ''
+      // Don't auto-redirect if user is deliberately trying to sign in or register
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        localStorage.removeItem('cc_token')
+        localStorage.removeItem('cc_user')
+        if (currentPath.startsWith('/app') || currentPath.startsWith('/staff') || currentPath.startsWith('/owner')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
+        }
       }
     }
 
