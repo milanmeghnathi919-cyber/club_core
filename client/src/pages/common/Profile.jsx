@@ -4,6 +4,11 @@ import { Link } from 'react-router-dom'
 import { setCredentials } from '@/feature/auth/slices/authSlice'
 import authService from '@/service/authService'
 import { formatDate, formatCurrency } from '@/utils/format'
+import {
+  getStaffDepartment,
+  getDepartmentHome,
+  getDepartmentTitle,
+} from '@/utils/staffRoles'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
@@ -188,6 +193,7 @@ export const Profile = () => {
   const isOwner = user.role === 'owner'
   const isStaff = !isOwner && user.role && user.role !== 'member'
   const isMember = !isOwner && !isStaff
+  const staffDept = getStaffDepartment(user)
 
   // Calculate validity days (only relevant for Member)
   let validityDaysRemaining = null
@@ -488,86 +494,170 @@ export const Profile = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10 relative z-10">
               <div className="space-y-1">
                 <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-emerald-400">
-                  <Briefcase className="w-4 h-4 text-emerald-400" /> Official Staff Operations Hub
+                  <Briefcase className="w-4 h-4 text-emerald-400" /> {getDepartmentTitle(staffDept)}
                 </span>
-                <h2 className="text-2xl font-black text-white">Staff Operations Dashboard</h2>
+                <h2 className="text-2xl font-black text-white">
+                  {staffDept === 'shop'
+                    ? 'Pro Shop Operations Hub'
+                    : staffDept === 'cafe'
+                    ? 'Club Café & Bar Operations Hub'
+                    : 'Court Operations Dashboard'}
+                </h2>
                 <p className="text-xs text-slate-300 max-w-xl">
-                  You are logged in as a verified staff member ({employee?.title || user.role}). Manage daily court reservations, member check-ins, pro-shop sales, and café counter orders.
+                  {staffDept === 'shop'
+                    ? 'Authorized Pro Shop staff console. Manage shop inventory, catalog items, customer orders, and counter POS sales.'
+                    : staffDept === 'cafe'
+                    ? 'Authorized Club Café staff console. Manage café inventory, ingredient stock levels, POS order tabs, and kitchen queue.'
+                    : 'Authorized Court staff console. Manage court schedules, reservations, member check-ins, and leads pipeline.'}
                 </p>
               </div>
 
-              <Link to="/staff" className="shrink-0">
+              <Link to={getDepartmentHome(staffDept)} className="shrink-0">
                 <Button
                   variant="lawn"
                   size="md"
                   icon={LayoutDashboard}
                   className="font-black text-xs px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
                 >
-                  Access Staff Dashboard &rarr;
+                  {staffDept === 'shop'
+                    ? 'Access Shop Inventory →'
+                    : staffDept === 'cafe'
+                    ? 'Access Café Inventory →'
+                    : 'Access Court Schedule →'}
                 </Button>
               </Link>
             </div>
 
-            {/* Staff Operations Shortcuts Grid */}
+            {/* Staff Operations Shortcuts Grid - Tailored to Department */}
             <div className="relative z-10 space-y-3">
               <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                Staff Operations Shortcuts
+                Authorized Department Shortcuts
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                <Link
-                  to="/staff/bookings"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <Calendar className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">Court Schedule</p>
-                  <p className="text-[10px] text-slate-400">Daily slot allocations</p>
-                </Link>
+                {/* 1. COURT STAFF SHORTCUTS */}
+                {staffDept === 'court' && (
+                  <>
+                    <Link
+                      to="/staff/bookings"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Calendar className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Court Schedule</p>
+                      <p className="text-[10px] text-slate-400">Daily slot allocations</p>
+                    </Link>
 
-                <Link
-                  to="/staff/members"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <Users className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">Members CRM</p>
-                  <p className="text-[10px] text-slate-400">Search & member profiles</p>
-                </Link>
+                    <Link
+                      to="/staff/members"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Users className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Members CRM</p>
+                      <p className="text-[10px] text-slate-400">Search & member profiles</p>
+                    </Link>
 
-                <Link
-                  to="/staff/members/new"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">New Member</p>
-                  <p className="text-[10px] text-slate-400">Onboard walk-in member</p>
-                </Link>
+                    <Link
+                      to="/staff/members/new"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">New Member</p>
+                      <p className="text-[10px] text-slate-400">Onboard walk-in member</p>
+                    </Link>
 
-                <Link
-                  to="/staff/pos"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <ShoppingBag className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">Counter POS</p>
-                  <p className="text-[10px] text-slate-400">Quick shop & equipment sale</p>
-                </Link>
+                    <Link
+                      to="/staff/leads"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Sparkles className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Leads Pipeline</p>
+                      <p className="text-[10px] text-slate-400">Inbound trial leads</p>
+                    </Link>
 
-                <Link
-                  to="/staff/cafe/inventory"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <Coffee className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">Café Inventory</p>
-                  <p className="text-[10px] text-slate-400">Stock counts & recipes</p>
-                </Link>
+                    <Link
+                      to="/staff/social"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Users className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Friday Social</p>
+                      <p className="text-[10px] text-slate-400">Mixer & tournament list</p>
+                    </Link>
+                  </>
+                )}
 
-                <Link
-                  to="/staff/products"
-                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
-                >
-                  <Package className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <p className="text-xs font-bold text-white">Shop Inventory</p>
-                  <p className="text-[10px] text-slate-400">Catalog & stock levels</p>
-                </Link>
+                {/* 2. SHOP STAFF SHORTCUTS */}
+                {staffDept === 'shop' && (
+                  <>
+                    <Link
+                      to="/staff/products"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Package className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Shop Inventory</p>
+                      <p className="text-[10px] text-slate-400">Catalog & stock levels</p>
+                    </Link>
 
+                    <Link
+                      to="/staff/orders"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <ListOrdered className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Shop Orders</p>
+                      <p className="text-[10px] text-slate-400">Member order fulfillment</p>
+                    </Link>
+
+                    <Link
+                      to="/staff/pos"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <ShoppingBag className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Counter POS</p>
+                      <p className="text-[10px] text-slate-400">Quick shop checkout</p>
+                    </Link>
+                  </>
+                )}
+
+                {/* 3. CAFÉ STAFF SHORTCUTS */}
+                {staffDept === 'cafe' && (
+                  <>
+                    <Link
+                      to="/staff/cafe/inventory"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Utensils className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Café Inventory</p>
+                      <p className="text-[10px] text-slate-400">Stock & replenishment</p>
+                    </Link>
+
+                    <Link
+                      to="/staff/cafe/pos"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Coffee className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Café POS & Tabs</p>
+                      <p className="text-[10px] text-slate-400">Order taking & bills</p>
+                    </Link>
+
+                    <Link
+                      to="/staff/cafe/kitchen"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Coffee className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Kitchen Display</p>
+                      <p className="text-[10px] text-slate-400">Live order tickets</p>
+                    </Link>
+
+                    <Link
+                      to="/staff/cafe/summary"
+                      className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                    >
+                      <Utensils className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-white">Daily Summary</p>
+                      <p className="text-[10px] text-slate-400">End-of-day report</p>
+                    </Link>
+                  </>
+                )}
+
+                {/* UNIVERSAL STAFF SHORTCUTS */}
                 <Link
                   to="/staff/shifts"
                   className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"

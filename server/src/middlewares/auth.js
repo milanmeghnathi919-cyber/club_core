@@ -3,7 +3,7 @@ import config from '../config/index.js'
 import ApiError from '../utils/ApiError.js'
 import asyncHandler from '../utils/asyncHandler.js'
 import { queryOne } from '../utils/db.js'
-import { ROLES, STAFF, FD_PLUS, OWNER_ONLY, ANY_AUTH } from '../config/roles.js'
+import { ROLES, STAFF, FD_PLUS, OWNER_ONLY, ANY_AUTH, COURT_STAFF, SHOP_STAFF, CAFE_STAFF } from '../config/roles.js'
 import userRepository from '../repositories/userRepository.js'
 
 export const COOKIE_NAME = 'cc_token'
@@ -111,8 +111,12 @@ export const authorize = (...roles) => {
   for (const r of roles.flat()) {
     if (r === 'staff') {
       STAFF.forEach((item) => expanded.add(item))
-    } else if (r === 'FD+' || r === 'fd+' || r === 'FD_PLUS') {
-      FD_PLUS.forEach((item) => expanded.add(item))
+    } else if (r === 'court' || r === 'court_staff' || r === 'FD+' || r === 'fd+' || r === 'FD_PLUS') {
+      COURT_STAFF.forEach((item) => expanded.add(item))
+    } else if (r === 'shop' || r === 'shop_staff') {
+      SHOP_STAFF.forEach((item) => expanded.add(item))
+    } else if (r === 'cafe' || r === 'cafe_staff' || r === 'bar' || r === 'bar_staff') {
+      CAFE_STAFF.forEach((item) => expanded.add(item))
     } else if (r === 'owner') {
       OWNER_ONLY.forEach((item) => expanded.add(item))
     } else if (r === 'any' || r === '*') {

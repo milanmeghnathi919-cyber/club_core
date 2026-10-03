@@ -78,8 +78,15 @@ export const Login = () => {
         navigate('/owner')
       } else if (data.user.role === 'member') {
         navigate('/app')
-      } else if (data.user.role === 'bar_staff') {
-        navigate('/bar/pos')
+      } else if (data.user.role === 'shop_staff' || data.user.email?.toLowerCase().includes('shop')) {
+        navigate('/staff/products')
+      } else if (
+        data.user.role === 'cafe_staff' ||
+        data.user.role === 'bar_staff' ||
+        data.user.email?.toLowerCase().includes('cafe') ||
+        data.user.email?.toLowerCase().includes('bar')
+      ) {
+        navigate('/staff/cafe/inventory')
       } else {
         navigate('/staff/bookings')
       }
@@ -226,7 +233,7 @@ export const Login = () => {
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Instant Demo Accounts (Click to Fill)</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('member@championsclub.in', 'Member@123')}
@@ -238,29 +245,38 @@ export const Login = () => {
 
                 <button
                   type="button"
-                  onClick={() => fillQuickDemo('frontdesk@championsclub.in', 'Staff@123')}
+                  onClick={() => fillQuickDemo('courts@championsclub.in', 'Staff@123')}
                   className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-400 text-left transition-colors cursor-pointer group"
                 >
                   <p className="font-bold text-slate-800 group-hover:text-emerald-800">Priya Patel</p>
-                  <p className="text-[10px] text-emerald-600 font-medium">Front Desk</p>
+                  <p className="text-[10px] text-emerald-600 font-medium">Court Staff</p>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => fillQuickDemo('bar@championsclub.in', 'Staff@123')}
+                  onClick={() => fillQuickDemo('shop@championsclub.in', 'Staff@123')}
+                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-400 text-left transition-colors cursor-pointer group"
+                >
+                  <p className="font-bold text-slate-800 group-hover:text-blue-800">Vikram Singh</p>
+                  <p className="text-[10px] text-blue-600 font-medium">Shop Staff</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fillQuickDemo('cafe@championsclub.in', 'Staff@123')}
                   className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-400 text-left transition-colors cursor-pointer group"
                 >
-                  <p className="font-bold text-slate-800 group-hover:text-amber-800">Vikram Singh</p>
-                  <p className="text-[10px] text-amber-600 font-medium">Café & Kitchen</p>
+                  <p className="font-bold text-slate-800 group-hover:text-amber-800">Ananya Rao</p>
+                  <p className="text-[10px] text-amber-600 font-medium">Café Staff</p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('owner@championsclub.in', 'Admin@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-400 text-left transition-colors cursor-pointer group"
+                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-400 text-left transition-colors cursor-pointer group sm:col-span-2"
                 >
                   <p className="font-bold text-slate-800 group-hover:text-indigo-800">Rajesh Sharma</p>
-                  <p className="text-[10px] text-indigo-600 font-medium">Club Owner</p>
+                  <p className="text-[10px] text-indigo-600 font-medium">Club Owner / Executive</p>
                 </button>
               </div>
             </div>

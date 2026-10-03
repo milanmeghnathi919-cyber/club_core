@@ -10,13 +10,13 @@ const router = Router()
 router.get('/low-stock', authenticate, authorize('staff'), productController.listLowStock)
 
 router.get('/', authenticate, authorize('staff'), productController.listProducts)
-router.post('/', authenticate, authorize('FD+'), validateBody(productCreateSchema), productController.createProduct)
+router.post('/', authenticate, authorize('shop', 'FD+'), validateBody(productCreateSchema), productController.createProduct)
 
 router.get('/:id', authenticate, authorize('staff'), productController.getProduct)
-router.patch('/:id', authenticate, authorize('FD+'), validateBody(productPatchSchema), productController.updateProduct)
+router.patch('/:id', authenticate, authorize('shop', 'FD+'), validateBody(productPatchSchema), productController.updateProduct)
 router.delete('/:id', authenticate, authorize('owner'), productController.deleteProduct)
 
-router.post('/:id/stock', authenticate, authorize('FD+'), validateBody(stockAdjustSchema), productController.adjustStock)
+router.post('/:id/stock', authenticate, authorize('shop', 'FD+'), validateBody(stockAdjustSchema), productController.adjustStock)
 router.get('/:id/movements', authenticate, authorize('staff'), productController.getMovements)
 
 export default router

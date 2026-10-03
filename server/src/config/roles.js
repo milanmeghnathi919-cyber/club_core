@@ -17,7 +17,10 @@
 export const ROLES = Object.freeze({
   OWNER: 'owner',
   FRONT_DESK: 'front_desk',
+  COURT_STAFF: 'court_staff',
+  SHOP_STAFF: 'shop_staff',
   BAR_STAFF: 'bar_staff',
+  CAFE_STAFF: 'cafe_staff',
   MEMBER: 'member',
 })
 
@@ -28,16 +31,32 @@ export const isValidRole = (role) => ROLE_VALUES.includes(role)
 export const STAFF = Object.freeze([
   ROLES.OWNER,
   ROLES.FRONT_DESK,
+  ROLES.COURT_STAFF,
+  ROLES.SHOP_STAFF,
   ROLES.BAR_STAFF,
+  ROLES.CAFE_STAFF,
 ])
 
 export const ANY_STAFF = STAFF
 
-export const FD_PLUS = Object.freeze([
+export const COURT_STAFF = Object.freeze([
   ROLES.OWNER,
   ROLES.FRONT_DESK,
+  ROLES.COURT_STAFF,
 ])
 
+export const SHOP_STAFF = Object.freeze([
+  ROLES.OWNER,
+  ROLES.SHOP_STAFF,
+])
+
+export const CAFE_STAFF = Object.freeze([
+  ROLES.OWNER,
+  ROLES.BAR_STAFF,
+  ROLES.CAFE_STAFF,
+])
+
+export const FD_PLUS = COURT_STAFF
 export const FRONT_DESK_PLUS = FD_PLUS
 
 export const OWNER_ONLY = Object.freeze([
@@ -47,7 +66,10 @@ export const OWNER_ONLY = Object.freeze([
 export const ANY_AUTH = Object.freeze([
   ROLES.OWNER,
   ROLES.FRONT_DESK,
+  ROLES.COURT_STAFF,
+  ROLES.SHOP_STAFF,
   ROLES.BAR_STAFF,
+  ROLES.CAFE_STAFF,
   ROLES.MEMBER,
 ])
 
@@ -56,6 +78,9 @@ export default {
   ROLE_VALUES,
   isValidRole,
   STAFF,
+  COURT_STAFF,
+  SHOP_STAFF,
+  CAFE_STAFF,
   FD_PLUS,
   OWNER_ONLY,
   ANY_AUTH,
