@@ -35,7 +35,11 @@ export const nextMemberCodeSync = () => {
 
 export const nextBookingNo = () => nextNo('BK', 6)
 export const nextPaymentNo = () => nextNo('PAY', 6)
-export const nextOrderNo = () => nextNo('ORD', 6)
+export const nextOrderNo = () => {
+  const year = new Date().getFullYear()
+  const rand = Math.floor(100000 + Math.random() * 900000)
+  return `ORD-${year}-${rand}`
+}
 export const nextInvoiceNo = () => nextNo('INV', 4)
 
 export const nextTabNo = () => {

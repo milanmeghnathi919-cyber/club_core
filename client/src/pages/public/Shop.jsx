@@ -164,39 +164,48 @@ export const Shop = () => {
           </p>
         </div>
 
-        {/* View Switcher: Catalog vs My Past Orders */}
-        <div className="flex items-center gap-3">
-          <div className="inline-flex p-1 bg-slate-100 rounded-2xl border border-slate-200/90 shadow-2xs">
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeTab === 'catalog'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-[#1B4D2E]" />
-              <span>Catalog</span>
-            </button>
+        {/* View Switcher: Catalog vs My Past Orders (Shown when user is logged in) */}
+        {user ? (
+          <div className="flex items-center gap-3">
+            <div className="inline-flex p-1 bg-slate-100 rounded-2xl border border-slate-200/90 shadow-2xs">
+              <button
+                onClick={() => setActiveTab('catalog')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                  activeTab === 'catalog'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <ShoppingBag className="w-4 h-4 text-[#1B4D2E]" />
+                <span>Catalog</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeTab === 'orders'
-                  ? 'bg-white text-slate-900 shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Package className="w-4 h-4 text-[#C85A32]" />
-              <span>My Past Orders</span>
-              {user && myOrders.length > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#1B4D2E] text-white">
-                  {myOrders.length}
-                </span>
-              )}
-            </button>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                  activeTab === 'orders'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Package className="w-4 h-4 text-[#C85A32]" />
+                <span>My Past Orders</span>
+                {myOrders.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#1B4D2E] text-white">
+                    {myOrders.length}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <Link to="/login?redirect=/shop?tab=orders">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+              <Package className="w-3.5 h-3.5 text-slate-500" />
+              <span>Sign in to view past orders</span>
+            </button>
+          </Link>
+        )}
       </div>
 
       {/* ========================================================================= */}
