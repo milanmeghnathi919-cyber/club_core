@@ -2,11 +2,37 @@ import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 import { nextBookingNo } from '../utils/numbering.js'
 
-export const enrichBookingRow = (b, court = null) => {
+export const enrichBookingRow = (b, court = null, member = null) => {
   if (!b) return null
   const courtName = court?.name || b.court_name || 'Championship Court'
   const courtSport = court?.sport || b.court_sport || 'Tennis'
   const courtRate = Number(court?.rate_per_hour || court?.ratePerHour || b.court_rate_per_hour || 0)
+
+  let memObj = member
+  let planObj = null
+  const memberIdVal = b.member_id || b.memberId
+
+  if (!memObj && memberIdVal) {
+    memObj = memoryStore.findOne('members', (m) => m.id === memberIdVal)
+    if (memObj) {
+      const activeMembership = memoryStore.findOne('memberships', (ms) => ms.member_id === memberIdVal && ms.status === 'active')
+      if (activeMembership) {
+        planObj = memoryStore.findOne('plans', (p) => p.id === activeMembership.plan_id)
+      }
+    }
+  }
+
+  const memberName = b.member_name || memObj?.full_name || memObj?.fullName || null
+  const memberPhone = b.member_phone || memObj?.phone || null
+  const memberEmail = b.member_email || b.user_email || memObj?.email || null
+  const memberCode = b.member_code || memObj?.member_code || memObj?.memberCode || null
+  const planName = b.plan_name || planObj?.name || null
+  const planCode = b.plan_code || planObj?.code || null
+
+  const guestName = b.guest_name || b.guestName || null
+  const guestPhone = b.guest_phone || b.guestPhone || null
+
+  const resolvedMemberName = memberName || guestName || (memberIdVal ? 'Club Member' : 'Guest')
 
   return {
     ...b,
@@ -17,12 +43,12 @@ export const enrichBookingRow = (b, court = null) => {
     court_id: b.court_id || b.courtId,
     bookingType: b.booking_type || b.bookingType || 'regular',
     booking_type: b.booking_type || b.bookingType || 'regular',
-    memberId: b.member_id || b.memberId || null,
-    member_id: b.member_id || b.memberId || null,
-    guestName: b.guest_name || b.guestName || null,
-    guest_name: b.guest_name || b.guestName || null,
-    guestPhone: b.guest_phone || b.guestPhone || null,
-    guest_phone: b.guest_phone || b.guestPhone || null,
+    memberId: memberIdVal || null,
+    member_id: memberIdVal || null,
+    guestName,
+    guest_name: guestName,
+    guestPhone,
+    guest_phone: guestPhone,
     startAt: b.start_at || b.startAt,
     start_at: b.start_at || b.startAt,
     endAt: b.end_at || b.endAt,
@@ -56,6 +82,30 @@ export const enrichBookingRow = (b, court = null) => {
     },
     court_name: courtName,
     court_sport: courtSport,
+    member: memberIdVal
+      ? {
+          id: memberIdVal,
+          fullName: memberName || 'Club Member',
+          name: memberName || 'Club Member',
+          phone: memberPhone,
+          email: memberEmail,
+          memberCode,
+          planName,
+          planCode,
+        }
+      : null,
+    guest: guestName
+      ? {
+          name: guestName,
+          phone: guestPhone,
+        }
+      : null,
+    memberName: resolvedMemberName,
+    memberPhone: memberPhone || guestPhone || null,
+    memberEmail: memberEmail || null,
+    memberCode: memberCode || null,
+    planName: planName || null,
+    planCode: planCode || null,
   }
 }
 
@@ -139,9 +189,19 @@ export const bookingRepository = {
         `SELECT b.*,
                 c.name AS court_name,
                 c.sport AS court_sport,
-                c.rate_per_hour AS court_rate_per_hour
+                c.rate_per_hour AS court_rate_per_hour,
+                m.full_name AS member_name,
+                m.phone AS member_phone,
+                COALESCE(m.email, u.email) AS member_email,
+                m.member_code AS member_code,
+                p.name AS plan_name,
+                p.code AS plan_code
          FROM public.bookings b
          LEFT JOIN public.courts c ON b.court_id = c.id
+         LEFT JOIN public.members m ON b.member_id = m.id
+         LEFT JOIN public.users u ON m.user_id = u.id
+         LEFT JOIN public.memberships ms ON m.id = ms.member_id AND ms.status = 'active'
+         LEFT JOIN public.plans p ON ms.plan_id = p.id
          WHERE b.id = $1`,
         [id]
       )
@@ -262,9 +322,19 @@ export const bookingRepository = {
         SELECT b.*,
                c.name AS court_name,
                c.sport AS court_sport,
-               c.rate_per_hour AS court_rate_per_hour
+               c.rate_per_hour AS court_rate_per_hour,
+               m.full_name AS member_name,
+               m.phone AS member_phone,
+               COALESCE(m.email, u.email) AS member_email,
+               m.member_code AS member_code,
+               p.name AS plan_name,
+               p.code AS plan_code
         FROM public.bookings b
         LEFT JOIN public.courts c ON b.court_id = c.id
+        LEFT JOIN public.members m ON b.member_id = m.id
+        LEFT JOIN public.users u ON m.user_id = u.id
+        LEFT JOIN public.memberships ms ON m.id = ms.member_id AND ms.status = 'active'
+        LEFT JOIN public.plans p ON ms.plan_id = p.id
         WHERE ${whereClause}
         ORDER BY b.start_at DESC
         LIMIT $${idx++} OFFSET $${idx++}
@@ -324,11 +394,12 @@ export const bookingRepository = {
       const row = await queryOne(`update public.bookings set ${sets.join(', ')} where id = $${idx} returning *`, vals)
       if (row) {
         memoryStore.update('bookings', (b) => b.id === id, row)
-        return row
+        return this.findById(id)
       }
     } catch {}
 
-    return memoryStore.update('bookings', (b) => b.id === id, updates)
+    memoryStore.update('bookings', (b) => b.id === id, updates)
+    return this.findById(id)
   },
 }
 

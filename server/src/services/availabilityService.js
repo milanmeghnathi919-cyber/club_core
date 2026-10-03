@@ -50,10 +50,21 @@ export const availabilityService = {
     let dbBookings = []
     try {
       dbBookings = await query(
-        `SELECT * FROM public.bookings
-         WHERE status <> 'cancelled'
-           AND start_at < $2
-           AND end_at > $1`,
+        `SELECT b.*,
+                m.full_name AS member_name,
+                m.phone AS member_phone,
+                COALESCE(m.email, u.email) AS member_email,
+                m.member_code AS member_code,
+                p.name AS plan_name,
+                p.code AS plan_code
+         FROM public.bookings b
+         LEFT JOIN public.members m ON b.member_id = m.id
+         LEFT JOIN public.users u ON m.user_id = u.id
+         LEFT JOIN public.memberships ms ON m.id = ms.member_id AND ms.status = 'active'
+         LEFT JOIN public.plans p ON ms.plan_id = p.id
+         WHERE b.status <> 'cancelled'
+           AND b.start_at < $2
+           AND b.end_at > $1`,
         [startIso, endIso]
       )
     } catch (err) {
@@ -65,24 +76,46 @@ export const availabilityService = {
       (b) => b.status !== 'cancelled' && (b.start_at || b.startAt) < endIso && (b.end_at || b.endAt) > startIso
     )
 
+    const toIso = (val) => {
+      if (!val) return null
+      if (val instanceof Date) return val.toISOString()
+      return new Date(val).toISOString()
+    }
+
     const bookingMap = new Map()
     for (const b of (dbBookings || [])) {
       bookingMap.set(b.id, {
         ...b,
         court_id: b.court_id || b.courtId,
-        start_at: b.start_at || b.startAt,
-        end_at: b.end_at || b.endAt,
+        start_at: toIso(b.start_at || b.startAt),
+        end_at: toIso(b.end_at || b.endAt),
         booking_type: b.booking_type || b.bookingType || 'regular',
       })
     }
     for (const b of (memBookings || [])) {
       if (!bookingMap.has(b.id)) {
+        let memObj = null
+        let planObj = null
+        const memberIdVal = b.member_id || b.memberId
+        if (memberIdVal) {
+          memObj = memoryStore.findOne('members', (m) => m.id === memberIdVal)
+          if (memObj) {
+            const ms = memoryStore.findOne('memberships', (m) => m.member_id === memberIdVal && m.status === 'active')
+            if (ms) planObj = memoryStore.findOne('plans', (p) => p.id === ms.plan_id)
+          }
+        }
         bookingMap.set(b.id, {
           ...b,
           court_id: b.court_id || b.courtId,
-          start_at: b.start_at || b.startAt,
-          end_at: b.end_at || b.endAt,
+          start_at: toIso(b.start_at || b.startAt),
+          end_at: toIso(b.end_at || b.endAt),
           booking_type: b.booking_type || b.bookingType || 'regular',
+          member_name: b.member_name || memObj?.full_name || null,
+          member_phone: b.member_phone || memObj?.phone || null,
+          member_email: b.member_email || memObj?.email || null,
+          member_code: b.member_code || memObj?.member_code || null,
+          plan_name: b.plan_name || planObj?.name || null,
+          plan_code: b.plan_code || planObj?.code || null,
         })
       }
     }
@@ -141,7 +174,34 @@ export const availabilityService = {
           }
 
           if (isStaff && activeBooking) {
+            const memberIdVal = activeBooking.member_id || activeBooking.memberId
+            const guestName = activeBooking.guest_name || activeBooking.guestName
+            const guestPhone = activeBooking.guest_phone || activeBooking.guestPhone
+            const memberName = activeBooking.member_name || activeBooking.memberName
+            const resolvedName = memberName || guestName || (memberIdVal ? 'Club Member' : 'Guest')
+
             slotData.bookingId = activeBooking.id
+            slotData.booking = {
+              id: activeBooking.id,
+              bookingNo: activeBooking.booking_no || activeBooking.bookingNo,
+              courtId: activeBooking.court_id || activeBooking.courtId,
+              bookingType: activeBooking.booking_type || activeBooking.bookingType,
+              memberId: memberIdVal || null,
+              memberName: resolvedName,
+              memberPhone: activeBooking.member_phone || activeBooking.memberPhone || guestPhone || null,
+              memberEmail: activeBooking.member_email || activeBooking.memberEmail || null,
+              memberCode: activeBooking.member_code || activeBooking.memberCode || null,
+              planName: activeBooking.plan_name || activeBooking.planName || null,
+              planCode: activeBooking.plan_code || activeBooking.planCode || null,
+              guestName: guestName || null,
+              guestPhone: guestPhone || null,
+              status: activeBooking.status || 'confirmed',
+              paymentStatus: activeBooking.payment_status || activeBooking.paymentStatus || 'unpaid',
+              price: Number(activeBooking.price ?? 0),
+              title: activeBooking.title || null,
+              startAt: activeBooking.start_at || activeBooking.startAt,
+              endAt: activeBooking.end_at || activeBooking.endAt,
+            }
           }
 
           if (state === 'social' && activeSocial) {

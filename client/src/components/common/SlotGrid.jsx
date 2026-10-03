@@ -188,12 +188,31 @@ export const SlotGrid = ({
                               </span>
                             </button>
                           ) : isBooked ? (
-                            <div className="w-full py-2 px-2.5 rounded-lg bg-rose-50/90 text-rose-700 border border-rose-200/90 flex flex-col items-center justify-center gap-0.5 select-none cursor-not-allowed shadow-2xs">
-                              <span className="text-xs font-bold tabular-nums text-rose-800">{timeLabel}</span>
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
-                                Booked
-                              </span>
-                            </div>
+                            mode === 'staff' ? (
+                              <button
+                                type="button"
+                                onClick={() => onSelectSlot && onSelectSlot({ court, slot, isBooked: true, booking: slot.booking })}
+                                className="w-full py-2 px-2 rounded-lg bg-rose-50/95 hover:bg-rose-100 text-rose-900 border border-rose-300 hover:border-rose-400 flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-2xs group text-left"
+                                title={`Booked by: ${slot.booking?.memberName || 'Member'}\nStatus: ${slot.booking?.status || 'Confirmed'}\nClick to view full reservation & member details`}
+                              >
+                                <div className="flex items-center justify-between w-full px-0.5">
+                                  <span className="text-xs font-bold tabular-nums text-rose-900">{timeLabel}</span>
+                                  <span className="text-[9px] font-bold uppercase tracking-wider px-1 py-0.5 rounded bg-rose-200/90 text-rose-800">
+                                    Booked
+                                  </span>
+                                </div>
+                                <span className="text-[11px] font-semibold text-rose-950 truncate max-w-full px-0.5 w-full text-center group-hover:underline">
+                                  {slot.booking?.memberName || 'Member Booking'}
+                                </span>
+                              </button>
+                            ) : (
+                              <div className="w-full py-2 px-2.5 rounded-lg bg-rose-50/90 text-rose-700 border border-rose-200/90 flex flex-col items-center justify-center gap-0.5 select-none cursor-not-allowed shadow-2xs">
+                                <span className="text-xs font-bold tabular-nums text-rose-800">{timeLabel}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                                  Booked
+                                </span>
+                              </div>
+                            )
                           ) : isSocial ? (
                             <button
                               onClick={() => onSelectSlot && onSelectSlot({ court, slot })}
