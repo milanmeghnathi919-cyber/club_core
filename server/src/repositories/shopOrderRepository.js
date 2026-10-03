@@ -128,16 +128,91 @@ export const shopOrderRepository = {
     return { ...order, items }
   },
 
-  async list({ memberId, status, page = 1, limit = 50 } = {}) {
+  async list({ memberId, createdBy, status, page = 1, limit = 50 } = {}) {
     const offset = (page - 1) * limit
-    let items = memoryStore.find('shop_orders')
+    try {
+      const whereClauses = []
+      const params = []
+      let pIdx = 1
 
-    if (memberId) items = items.filter((o) => o.member_id === memberId)
+      if (memberId && createdBy) {
+        whereClauses.push(`(member_id = $${pIdx} or created_by = $${pIdx + 1})`)
+        params.push(memberId, createdBy)
+        pIdx += 2
+      } else if (memberId) {
+        whereClauses.push(`member_id = $${pIdx++}`)
+        params.push(memberId)
+      } else if (createdBy) {
+        whereClauses.push(`created_by = $${pIdx++}`)
+        params.push(createdBy)
+      }
+
+      if (status) {
+        whereClauses.push(`status = $${pIdx++}`)
+        params.push(status)
+      }
+
+      const whereSql = whereClauses.length > 0 ? `where ${whereClauses.join(' and ')}` : ''
+      const countRes = await query(`select count(*)::int as total from public.shop_orders ${whereSql}`, params)
+      const total = countRes[0]?.total || 0
+
+      const rows = await query(
+        `select * from public.shop_orders ${whereSql} order by created_at desc limit $${pIdx++} offset $${pIdx++}`,
+        [...params, limit, offset]
+      )
+
+      if (rows) {
+        const orderIds = rows.map((r) => r.id)
+        let itemsMap = {}
+        if (orderIds.length > 0) {
+          try {
+            const itemsRows = await query(
+              `select oi.*, p.image_url, p.sku 
+               from public.shop_order_items oi 
+               left join public.products p on p.id = oi.product_id 
+               where oi.order_id = any($1)`,
+              [orderIds]
+            )
+            if (itemsRows) {
+              itemsRows.forEach((item) => {
+                if (!itemsMap[item.order_id]) itemsMap[item.order_id] = []
+                itemsMap[item.order_id].push(item)
+              })
+            }
+          } catch {}
+        }
+
+        const itemsWithDetails = rows.map((r) => ({
+          ...r,
+          items: itemsMap[r.id] || [],
+        }))
+
+        return {
+          items: itemsWithDetails,
+          total,
+        }
+      }
+    } catch (err) {
+      console.error('[shopOrderRepository.list DB error]', err.message)
+    }
+
+    let items = memoryStore.find('shop_orders')
+    if (memberId && createdBy) {
+      items = items.filter((o) => o.member_id === memberId || o.created_by === createdBy)
+    } else if (memberId) {
+      items = items.filter((o) => o.member_id === memberId)
+    } else if (createdBy) {
+      items = items.filter((o) => o.created_by === createdBy)
+    }
     if (status) items = items.filter((o) => o.status === status)
 
     items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    const paged = items.slice(offset, offset + limit).map((o) => {
+      const orderItems = memoryStore.find('shop_order_items', (i) => i.order_id === o.id)
+      return { ...o, items: orderItems }
+    })
     return {
-      items: items.slice(offset, offset + limit),
+      items: paged,
       total: items.length,
     }
   },

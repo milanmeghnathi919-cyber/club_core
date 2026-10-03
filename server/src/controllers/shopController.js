@@ -60,16 +60,17 @@ export const list = asyncHandler(async (req, res) => {
 })
 
 export const mine = asyncHandler(async (req, res) => {
-  const member = await memberRepository.findByUserId(req.user.id)
-  if (!member) {
-    return paginated(res, [], { page: 1, limit: 20, total: 0, totalPages: 1 })
+  let member = await memberRepository.findByUserId(req.user.id)
+  if (!member && req.user.email) {
+    member = await memberRepository.findByEmail(req.user.email)
   }
 
-  const { page = 1, limit = 20, status } = req.query
+  const { page = 1, limit = 50, status } = req.query
   const { items, total } = await shopService.list({
     page: Number(page),
     limit: Number(limit),
-    memberId: member.id,
+    memberId: member?.id || null,
+    createdBy: req.user.id,
     status,
   })
 

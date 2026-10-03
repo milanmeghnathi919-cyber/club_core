@@ -64,7 +64,10 @@ export const shopService = {
 
   async getMyOrders(params = {}) {
     const res = await api.get('/shop/orders/mine', { params })
-    return res.data || []
+    if (Array.isArray(res?.data)) return res.data
+    if (Array.isArray(res?.items)) return res.items
+    if (Array.isArray(res)) return res
+    return []
   },
 
   async getOrderById(id) {
