@@ -26,6 +26,7 @@ import {
   Sparkles,
   ShoppingBag,
   Coffee,
+  Utensils,
   CheckCircle2,
   AlertCircle,
   Edit3,
