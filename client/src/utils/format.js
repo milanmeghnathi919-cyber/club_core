@@ -82,6 +82,7 @@ export const getStatusBadgeColor = (status) => {
       return 'bg-blue-100 text-blue-800 border-blue-200'
     case 'new':
       return 'bg-indigo-100 text-indigo-800 border-indigo-200'
+    case 'booked':
     case 'cancelled':
     case 'void':
     case 'lost':

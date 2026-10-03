@@ -9,12 +9,12 @@ import config from './index.js'
  * off because Supabase's cert for *.supabase.co is not in Node's default trust store.
  */
 const poolConfig = {
-  max: config.db.poolMax,
-  idleTimeoutMillis: 30_000,
+  max: Math.min(Number(config.db.poolMax) || 5, 5),
+  idleTimeoutMillis: 10_000,
   // remote Postgres over the open internet is occasionally slow to handshake;
-  // 30s is safe for Supabase direct connection
-  connectionTimeoutMillis: 30_000,
-  query_timeout: 30_000,
+  // 15s is safe for Supabase direct connection
+  connectionTimeoutMillis: 15_000,
+  query_timeout: 15_000,
   keepAlive: true,
   keepAliveInitialDelayMillis: 10_000,
   ssl: config.db.ssl ? { rejectUnauthorized: false } : undefined,

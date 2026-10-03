@@ -60,6 +60,14 @@ export const query = async (text, params = []) => {
     const result = await pool.query(text, params)
     return result.rows
   } catch (err) {
+    if (['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', '57P01'].includes(err.code)) {
+      try {
+        const retry = await pool.query(text, params)
+        return retry.rows
+      } catch (retryErr) {
+        throw toApiError(retryErr)
+      }
+    }
     throw toApiError(err)
   }
 }

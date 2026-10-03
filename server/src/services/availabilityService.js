@@ -2,6 +2,7 @@ import courtRepository from '../repositories/courtRepository.js'
 import settingsService from './settingsService.js'
 import membershipService from './membershipService.js'
 import memoryStore from '../utils/memoryStore.js'
+import { query } from '../utils/db.js'
 import { toClubDate, parseClubDateTime, generateTimeSlots, localDayRange } from '../utils/clubTime.js'
 import { round2, calcInclusiveTax } from '../utils/money.js'
 
@@ -45,16 +46,49 @@ export const availabilityService = {
     const { startIso, endIso } = localDayRange(date)
     const nowIso = new Date().toISOString()
 
-    // Fetch bookings & social sessions for this day
-    const allBookings = memoryStore.find(
+    // Fetch bookings & social sessions for this day from PostgreSQL with memoryStore fallback
+    let dbBookings = []
+    try {
+      dbBookings = await query(
+        `SELECT * FROM public.bookings
+         WHERE status <> 'cancelled'
+           AND start_at < $2
+           AND end_at > $1`,
+        [startIso, endIso]
+      )
+    } catch (err) {
+      // fallback
+    }
+
+    const memBookings = memoryStore.find(
       'bookings',
-      (b) => b.status !== 'cancelled' && b.start_at >= startIso && b.start_at <= endIso
+      (b) => b.status !== 'cancelled' && (b.start_at || b.startAt) < endIso && (b.end_at || b.endAt) > startIso
     )
 
-    const socialSessions = memoryStore.find(
-      'bookings',
-      (b) => b.booking_type === 'social_session' && b.status !== 'cancelled' && b.start_at >= startIso && b.start_at <= endIso
-    )
+    const bookingMap = new Map()
+    for (const b of (dbBookings || [])) {
+      bookingMap.set(b.id, {
+        ...b,
+        court_id: b.court_id || b.courtId,
+        start_at: b.start_at || b.startAt,
+        end_at: b.end_at || b.endAt,
+        booking_type: b.booking_type || b.bookingType || 'regular',
+      })
+    }
+    for (const b of (memBookings || [])) {
+      if (!bookingMap.has(b.id)) {
+        bookingMap.set(b.id, {
+          ...b,
+          court_id: b.court_id || b.courtId,
+          start_at: b.start_at || b.startAt,
+          end_at: b.end_at || b.endAt,
+          booking_type: b.booking_type || b.bookingType || 'regular',
+        })
+      }
+    }
+
+    const allBookings = Array.from(bookingMap.values())
+    const socialSessions = allBookings.filter((b) => b.booking_type === 'social_session')
 
     const timeSlots = generateTimeSlots(openTime, closeTime, 60, 30)
 

@@ -2,6 +2,63 @@ import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 import { nextBookingNo } from '../utils/numbering.js'
 
+export const enrichBookingRow = (b, court = null) => {
+  if (!b) return null
+  const courtName = court?.name || b.court_name || 'Championship Court'
+  const courtSport = court?.sport || b.court_sport || 'Tennis'
+  const courtRate = Number(court?.rate_per_hour || court?.ratePerHour || b.court_rate_per_hour || 0)
+
+  return {
+    ...b,
+    id: b.id,
+    bookingNo: b.booking_no || b.bookingNo,
+    booking_no: b.booking_no || b.bookingNo,
+    courtId: b.court_id || b.courtId,
+    court_id: b.court_id || b.courtId,
+    bookingType: b.booking_type || b.bookingType || 'regular',
+    booking_type: b.booking_type || b.bookingType || 'regular',
+    memberId: b.member_id || b.memberId || null,
+    member_id: b.member_id || b.memberId || null,
+    guestName: b.guest_name || b.guestName || null,
+    guest_name: b.guest_name || b.guestName || null,
+    guestPhone: b.guest_phone || b.guestPhone || null,
+    guest_phone: b.guest_phone || b.guestPhone || null,
+    startAt: b.start_at || b.startAt,
+    start_at: b.start_at || b.startAt,
+    endAt: b.end_at || b.endAt,
+    end_at: b.end_at || b.endAt,
+    status: b.status || 'confirmed',
+    basePrice: Number(b.base_price ?? b.basePrice ?? 0),
+    base_price: Number(b.base_price ?? b.basePrice ?? 0),
+    discountPct: Number(b.discount_pct ?? b.discountPct ?? 0),
+    discount_pct: Number(b.discount_pct ?? b.discountPct ?? 0),
+    price: Number(b.price ?? 0),
+    taxAmount: Number(b.tax_amount ?? b.taxAmount ?? 0),
+    tax_amount: Number(b.tax_amount ?? b.taxAmount ?? 0),
+    paymentStatus: b.payment_status || b.paymentStatus || 'unpaid',
+    payment_status: b.payment_status || b.paymentStatus || 'unpaid',
+    source: b.source || 'staff_counter',
+    capacity: b.capacity || null,
+    pricePerHead: b.price_per_head ?? b.pricePerHead ?? null,
+    price_per_head: b.price_per_head ?? b.pricePerHead ?? null,
+    title: b.title || null,
+    notes: b.notes || null,
+    createdBy: b.created_by || b.createdBy || null,
+    created_by: b.created_by || b.createdBy || null,
+    createdAt: b.created_at || b.createdAt,
+    created_at: b.created_at || b.createdAt,
+    court: {
+      id: b.court_id || b.courtId,
+      name: courtName,
+      sport: courtSport,
+      ratePerHour: courtRate,
+      rate_per_hour: courtRate,
+    },
+    court_name: courtName,
+    court_sport: courtSport,
+  }
+}
+
 export const bookingRepository = {
   async insert(data) {
     const bookingNo = data.bookingNo || data.booking_no || nextBookingNo()
@@ -38,13 +95,18 @@ export const bookingRepository = {
       )
       if (row) {
         memoryStore.insert('bookings', row)
-        return row
+        let court = null
+        try {
+          court = await queryOne('select * from public.courts where id = $1', [row.court_id])
+        } catch {}
+        return enrichBookingRow(row, court)
       }
     } catch (err) {
       if (err.code === '23P01') throw err
     }
 
-    return memoryStore.insert('bookings', {
+    const court = memoryStore.findOne('courts', (c) => c.id === (data.courtId || data.court_id))
+    const inserted = memoryStore.insert('bookings', {
       id: data.id || crypto.randomUUID(),
       booking_no: bookingNo,
       court_id: data.courtId || data.court_id,
@@ -68,14 +130,27 @@ export const bookingRepository = {
       created_by: data.createdBy || data.created_by || null,
       created_at: new Date().toISOString(),
     })
+    return enrichBookingRow(inserted, court)
   },
 
   async findById(id) {
     try {
-      const row = await queryOne('select * from public.bookings where id = $1', [id])
-      if (row) return row
+      const row = await queryOne(
+        `SELECT b.*,
+                c.name AS court_name,
+                c.sport AS court_sport,
+                c.rate_per_hour AS court_rate_per_hour
+         FROM public.bookings b
+         LEFT JOIN public.courts c ON b.court_id = c.id
+         WHERE b.id = $1`,
+        [id]
+      )
+      if (row) return enrichBookingRow(row)
     } catch {}
-    return memoryStore.findOne('bookings', (b) => b.id === id)
+    const memRow = memoryStore.findOne('bookings', (b) => b.id === id)
+    if (!memRow) return null
+    const court = memoryStore.findOne('courts', (c) => c.id === (memRow.court_id || memRow.courtId))
+    return enrichBookingRow(memRow, court)
   },
 
   async findOverlapping(courtId, startAt, endAt, excludeId = null) {
@@ -156,25 +231,82 @@ export const bookingRepository = {
 
   async list({ date, courtId, memberId, status, page = 1, limit = 50 } = {}) {
     const offset = (page - 1) * limit
+    try {
+      let conditions = ['1=1']
+      const params = []
+      let idx = 1
+
+      if (date) {
+        conditions.push(`b.start_at::text LIKE $${idx++} || '%'`)
+        params.push(date)
+      }
+      if (courtId) {
+        conditions.push(`b.court_id = $${idx++}`)
+        params.push(courtId)
+      }
+      if (memberId) {
+        conditions.push(`b.member_id = $${idx++}`)
+        params.push(memberId)
+      }
+      if (status) {
+        conditions.push(`b.status = $${idx++}`)
+        params.push(status)
+      }
+
+      const whereClause = conditions.join(' AND ')
+      const countSql = `SELECT count(*)::int as total FROM public.bookings b WHERE ${whereClause}`
+      const totalRow = await queryOne(countSql, params)
+      const total = totalRow ? Number(totalRow.total) : 0
+
+      const dataSql = `
+        SELECT b.*,
+               c.name AS court_name,
+               c.sport AS court_sport,
+               c.rate_per_hour AS court_rate_per_hour
+        FROM public.bookings b
+        LEFT JOIN public.courts c ON b.court_id = c.id
+        WHERE ${whereClause}
+        ORDER BY b.start_at DESC
+        LIMIT $${idx++} OFFSET $${idx++}
+      `
+      const rows = await query(dataSql, [...params, limit, offset])
+      if (rows) {
+        return {
+          items: rows.map((r) => enrichBookingRow(r)),
+          total,
+        }
+      }
+    } catch (err) {
+      // In case of any DB error or disconnect, fall back to memoryStore
+    }
+
     let items = memoryStore.find('bookings')
 
     if (date) {
-      items = items.filter((b) => b.start_at && b.start_at.startsWith(date))
+      items = items.filter((b) => (b.start_at || b.startAt) && (b.start_at || b.startAt).startsWith(date))
     }
     if (courtId) {
-      items = items.filter((b) => b.court_id === courtId)
+      items = items.filter((b) => (b.court_id || b.courtId) === courtId)
     }
     if (memberId) {
-      items = items.filter((b) => b.member_id === memberId)
+      items = items.filter((b) => (b.member_id || b.memberId) === memberId)
     }
     if (status) {
       items = items.filter((b) => b.status === status)
     }
 
-    items.sort((a, b) => new Date(b.start_at) - new Date(a.start_at))
+    items.sort((a, b) => new Date(b.start_at || b.startAt) - new Date(a.start_at || a.startAt))
+
+    const courts = memoryStore.find('courts') || []
+    const courtMap = new Map(courts.map((c) => [c.id, c]))
+
+    const sliced = items.slice(offset, offset + limit).map((b) => {
+      const c = courtMap.get(b.court_id || b.courtId)
+      return enrichBookingRow(b, c)
+    })
 
     return {
-      items: items.slice(offset, offset + limit),
+      items: sliced,
       total: items.length,
     }
   },

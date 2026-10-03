@@ -95,7 +95,12 @@ export const MyBookings = () => {
         <div className="space-y-3">
           {bookings.map((b) => {
             const isConfirmed = b.status === 'confirmed'
-            const isPast = new Date(b.startAt) < new Date()
+            const start = b.startAt || b.start_at
+            const end = b.endAt || b.end_at
+            const isPast = start ? new Date(start) < new Date() : false
+            const courtName = b.court?.name || b.court_name || 'Championship Court'
+            const courtSport = b.court?.sport || b.court_sport || ''
+            const bookingRef = b.bookingNo || b.booking_no || (b.id ? b.id.slice(0, 8) : 'CONFIRMED')
 
             return (
               <Card key={b.id} className="border-slate-200 hover:border-slate-300 transition-colors">
@@ -107,20 +112,22 @@ export const MyBookings = () => {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-base text-slate-900">
-                          {b.court?.name || 'Championship Court'}
+                          {courtName}
                         </h4>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                          {b.court?.sport}
-                        </span>
+                        {courtSport && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                            {courtSport}
+                          </span>
+                        )}
                         <Badge status={b.status}>{b.status}</Badge>
                       </div>
 
-                      <p className="text-xs text-slate-600">
-                        {formatDate(b.startAt)} • {formatTime(b.startAt)} – {formatTime(b.endAt)}
+                      <p className="text-xs font-semibold text-slate-700">
+                        {formatDate(start)} • {formatTime(start)} – {formatTime(end)}
                       </p>
 
-                      <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono">
-                        <span>Ref: {b.bookingNo || b.id.slice(0, 8)}</span>
+                      <div className="flex items-center gap-3 text-[11px] text-slate-500 font-mono">
+                        <span>Ref: {bookingRef}</span>
                         <span>•</span>
                         <span>Amount: {formatCurrency(b.price || 0)}</span>
                       </div>
@@ -151,7 +158,7 @@ export const MyBookings = () => {
         isOpen={!!cancelModalBooking}
         onClose={() => setCancelModalBooking(null)}
         title="Cancel Court Reservation?"
-        subtitle={`Court: ${cancelModalBooking?.court?.name} on ${formatDate(cancelModalBooking?.startAt)}`}
+        subtitle={`Court: ${cancelModalBooking?.court?.name || cancelModalBooking?.court_name || 'Court'} on ${formatDate(cancelModalBooking?.startAt || cancelModalBooking?.start_at)}`}
         footer={
           <div className="flex items-center justify-end gap-2.5 w-full">
             <Button

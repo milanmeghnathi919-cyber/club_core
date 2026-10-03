@@ -98,14 +98,14 @@ export const SlotGrid = ({
       {/* Indicator bar */}
       <div className="flex items-center justify-between text-xs text-slate-500 px-1">
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Available
+          <span className="flex items-center gap-1.5 font-medium">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs" /> Available
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> Booked
+          <span className="flex items-center gap-1.5 font-medium">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs" /> Booked
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" /> Social Play
+          <span className="flex items-center gap-1.5 font-medium">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-xs" /> Social Play
           </span>
         </div>
         <button
@@ -188,9 +188,9 @@ export const SlotGrid = ({
                               </span>
                             </button>
                           ) : isBooked ? (
-                            <div className="w-full py-2 px-2.5 rounded-lg bg-slate-100/90 text-slate-400 border border-slate-200/60 flex flex-col items-center justify-center gap-0.5 select-none cursor-not-allowed">
-                              <span className="text-xs font-medium tabular-nums">{timeLabel}</span>
-                              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                            <div className="w-full py-2 px-2.5 rounded-lg bg-rose-50/90 text-rose-700 border border-rose-200/90 flex flex-col items-center justify-center gap-0.5 select-none cursor-not-allowed shadow-2xs">
+                              <span className="text-xs font-bold tabular-nums text-rose-800">{timeLabel}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
                                 Booked
                               </span>
                             </div>

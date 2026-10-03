@@ -83,7 +83,7 @@ export const StaffBookings = () => {
 
       const res = await courtService.createBooking(payload)
       toast.success(
-        `Court booked! Ref: ${res.booking?.bookingNo || 'CONFIRMED'} (${paymentMethod.toUpperCase()})`,
+        `Court booked! Ref: ${res.booking?.bookingNo || res.booking?.booking_no || 'CONFIRMED'} (${paymentMethod.toUpperCase()})`,
       )
       setIsWalkInModalOpen(false)
       setSelectedSlotInfo(null)

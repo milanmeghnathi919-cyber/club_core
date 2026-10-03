@@ -94,13 +94,13 @@ export const MemberDashboard = () => {
                     </div>
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                        {nextBooking.court?.sport || 'Court'}
+                        {nextBooking.court?.sport || nextBooking.court_sport || 'Court'}
                       </span>
                       <h4 className="font-bold text-base text-slate-900 mt-0.5">
-                        {nextBooking.court?.name || 'Championship Court'}
+                        {nextBooking.court?.name || nextBooking.court_name || 'Championship Court'}
                       </h4>
                       <p className="text-xs text-slate-600 mt-0.5">
-                        {formatDate(nextBooking.startAt)} • {formatTime(nextBooking.startAt)} – {formatTime(nextBooking.endAt)}
+                        {formatDate(nextBooking.startAt || nextBooking.start_at)} • {formatTime(nextBooking.startAt || nextBooking.start_at)} – {formatTime(nextBooking.endAt || nextBooking.end_at)}
                       </p>
                     </div>
                   </div>

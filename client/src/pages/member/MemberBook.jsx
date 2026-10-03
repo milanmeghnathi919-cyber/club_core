@@ -118,8 +118,8 @@ export const MemberBook = () => {
               <h4 className="font-bold text-base">Booking Confirmed!</h4>
               <p className="text-xs text-emerald-800 mt-0.5">
                 Booking Reference:{' '}
-                <strong className="font-mono">{bookingSuccess.bookingNo || 'CONFIRMED'}</strong> •{' '}
-                {bookingSuccess.court?.name || 'Court'} at {formatTime(bookingSuccess.startAt)}
+                <strong className="font-mono">{bookingSuccess.bookingNo || bookingSuccess.booking_no || 'CONFIRMED'}</strong> •{' '}
+                {bookingSuccess.court?.name || bookingSuccess.court_name || 'Court'} at {formatTime(bookingSuccess.startAt || bookingSuccess.start_at)}
               </p>
             </div>
           </div>
