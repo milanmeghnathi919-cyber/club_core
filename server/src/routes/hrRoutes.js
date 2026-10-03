@@ -10,6 +10,7 @@ router.use(authenticate)
 router.get('/employees', authorize('FD+'), hrController.listEmployees)
 router.post('/employees', authorize('owner'), hrController.createEmployee)
 router.patch('/employees/:id', authorize('owner'), hrController.updateEmployee)
+router.delete('/employees/:id', authorize('owner'), hrController.deleteEmployee)
 
 // Shifts
 router.get('/shifts', hrController.listShifts)

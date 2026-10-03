@@ -142,6 +142,15 @@ export const userRepository = {
       return memoryStore.update('users', (u) => u.id === id, updates)
     }
   },
+
+  async delete(id) {
+    try {
+      await queryOne(`delete from public.${TABLE} where id = $1 returning id`, [id])
+    } catch {
+      // fallback
+    }
+    return memoryStore.delete('users', (u) => u.id === id)
+  },
 }
 
 export default userRepository

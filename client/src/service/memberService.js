@@ -30,6 +30,11 @@ export const memberService = {
     return res.data
   },
 
+  async deleteMember(id) {
+    const res = await api.delete(`/members/${id}`)
+    return res.data
+  },
+
   async getMemberHistory(id, params = {}) {
     const res = await api.get(`/members/${id}/history`, { params })
     return {

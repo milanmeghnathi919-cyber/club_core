@@ -82,6 +82,33 @@ export const hrService = {
     return hrRepository.updateEmployee(id, data)
   },
 
+  async deleteEmployee(id, requestingUserId) {
+    const emp = await hrRepository.findEmployeeById(id)
+    if (!emp) throw new ApiError(404, 'Employee not found', null, 'NOT_FOUND')
+
+    if (emp.user_id) {
+      if (emp.user_id === requestingUserId) {
+        throw new ApiError(400, 'Cannot delete your own account', null, 'CANNOT_DELETE_SELF')
+      }
+      const user = await userRepository.findById(emp.user_id)
+      if (user && user.role === 'owner') {
+        throw new ApiError(400, 'Cannot delete an owner account', null, 'CANNOT_DELETE_OWNER')
+      }
+    }
+
+    await hrRepository.deleteEmployee(id)
+
+    if (emp.user_id) {
+      try {
+        await userRepository.delete(emp.user_id)
+      } catch (err) {
+        await userRepository.update(emp.user_id, { is_active: false })
+      }
+    }
+
+    return { message: 'Employee deleted successfully', id }
+  },
+
   // Shifts
   async listShifts({ isOwnerOrFD = false, userId = null, date = null, from = null, to = null } = {}) {
     let employeeId = null

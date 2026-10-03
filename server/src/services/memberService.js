@@ -277,6 +277,30 @@ export const memberService = {
       total: events.length,
     }
   },
+
+  async delete(id) {
+    const member = await memberRepository.findById(id)
+    if (!member) throw new ApiError(404, 'Member not found', null, 'NOT_FOUND')
+
+    if (member.user_id) {
+      const user = await userRepository.findById(member.user_id)
+      if (user && user.role === 'owner') {
+        throw new ApiError(400, 'Cannot delete an owner account', null, 'CANNOT_DELETE_OWNER')
+      }
+    }
+
+    await memberRepository.delete(id)
+
+    if (member.user_id) {
+      try {
+        await userRepository.delete(member.user_id)
+      } catch (err) {
+        await userRepository.update(member.user_id, { is_active: false })
+      }
+    }
+
+    return { message: 'Member deleted successfully', id }
+  },
 }
 
 export default memberService

@@ -193,6 +193,21 @@ export const memberRepository = {
 
     return memoryStore.update('members', (m) => m.id === id, updates)
   },
+
+  async delete(id) {
+    let deleted = null
+    try {
+      const row = await queryOne(`delete from public.${TABLE} where id = $1 returning ${COLS}`, [id])
+      if (row) deleted = row
+    } catch (err) {
+      console.error('[memberRepository.delete DB error]', err.message)
+    }
+
+    const memItem = memoryStore.findOne('members', (m) => m.id === id)
+    memoryStore.delete('memberships', (m) => m.member_id === id)
+    memoryStore.delete('members', (m) => m.id === id)
+    return deleted || memItem
+  },
 }
 
 export default memberRepository

@@ -14,6 +14,7 @@ router.post('/', authenticate, authorize('FD+'), validateBody(memberCreateSchema
 
 router.get('/:id', authenticate, authorize('staff', 'member'), memberController.get)
 router.patch('/:id', authenticate, authorize('FD+'), validateBody(memberPatchSchema), memberController.update)
+router.delete('/:id', authenticate, authorize('owner'), memberController.deleteMember)
 router.get('/:id/history', authenticate, authorize('staff', 'member'), memberController.history)
 router.post('/:id/memberships', authenticate, authorize('FD+'), memberController.assignMembership)
 

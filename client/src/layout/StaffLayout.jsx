@@ -79,9 +79,6 @@ export const StaffLayout = () => {
   // 3. CAFÉ STAFF NAV
   const cafeNav = [
     { label: 'Café Inventory', path: '/staff/cafe/inventory', icon: Utensils },
-    { label: 'Kitchen Display', path: '/staff/cafe/kitchen', icon: Coffee },
-    { label: 'Daily Summary', path: '/staff/cafe/summary', icon: Utensils },
-    { label: 'Staff Shifts', path: '/staff/shifts', icon: Clock },
     { label: 'My Leave', path: '/staff/leave', icon: ClipboardList },
     { label: 'Staff Profile', path: '/staff/profile', icon: UserCheck },
   ]

@@ -125,6 +125,11 @@ export const purchaseMembership = asyncHandler(async (req, res) => {
   })
 })
 
+export const deleteMember = asyncHandler(async (req, res) => {
+  const result = await memberService.delete(req.params.id)
+  return ok(res, result)
+})
+
 export default {
   list,
   lookup,
@@ -135,4 +140,5 @@ export default {
   assignMembership,
   cancelMembership,
   purchaseMembership,
+  deleteMember,
 }

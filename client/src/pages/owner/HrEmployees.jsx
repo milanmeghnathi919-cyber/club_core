@@ -24,6 +24,8 @@ import {
   Coffee,
   Briefcase,
   Calendar,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react'
 
 export const HrEmployees = () => {
@@ -48,6 +50,25 @@ export const HrEmployees = () => {
   // Newly Created Credentials Modal State
   const [createdCredentials, setCreatedCredentials] = useState(null)
   const [copied, setCopied] = useState(false)
+
+  // Delete Staff Modal State
+  const [employeeToDelete, setEmployeeToDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDeleteEmployee = async () => {
+    if (!employeeToDelete) return
+    setDeleting(true)
+    try {
+      await hrService.deleteEmployee(employeeToDelete.id)
+      toast.success(`Staff member "${employeeToDelete.fullName}" removed successfully`)
+      setEmployees((prev) => prev.filter((e) => e.id !== employeeToDelete.id))
+      setEmployeeToDelete(null)
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete staff member')
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const fetchEmployees = async () => {
     setLoading(true)
@@ -186,6 +207,7 @@ export const HrEmployees = () => {
                   <th className="py-3.5 px-4">Department</th>
                   <th className="py-3.5 px-4">Monthly Salary</th>
                   <th className="py-3.5 px-4">Account Status</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -234,6 +256,24 @@ export const HrEmployees = () => {
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                         <ShieldCheck className="w-3 h-3" /> User Active
                       </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-right">
+                      {emp.role === 'owner' ? (
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider px-2 py-1 bg-slate-100 rounded-md">
+                          Protected
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setEmployeeToDelete(emp)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/60 hover:border-rose-300 transition-colors text-xs font-semibold cursor-pointer shadow-2xs"
+                          title={`Delete ${emp.fullName}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -425,6 +465,67 @@ export const HrEmployees = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Delete Staff Member Confirmation Modal */}
+      <Modal
+        isOpen={!!employeeToDelete}
+        onClose={() => !deleting && setEmployeeToDelete(null)}
+        title="Remove Staff Member"
+        subtitle="Permanent removal of employee record and staff access"
+      >
+        {employeeToDelete && (
+          <div className="space-y-4 py-2">
+            <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs leading-relaxed">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block text-rose-900 mb-0.5">Permanent Deletion Warning</span>
+                Are you sure you want to remove <strong className="font-semibold text-rose-950">{employeeToDelete.fullName}</strong>?
+                This will revoke their portal login access, delete their employee profile, and clear associated shifts and schedules.
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs space-y-2">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Staff Member:</span>
+                <span className="font-bold text-slate-800">{employeeToDelete.fullName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Role / Designation:</span>
+                <span className="font-semibold text-slate-700">{employeeToDelete.title || employeeToDelete.role}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Email:</span>
+                <span className="font-mono text-slate-700">{employeeToDelete.email || 'None'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Department:</span>
+                <span className="text-slate-700 font-medium">{employeeToDelete.department || 'Operations'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEmployeeToDelete(null)}
+                disabled={deleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                icon={Trash2}
+                loading={deleting}
+                onClick={handleDeleteEmployee}
+                className="font-bold"
+              >
+                Confirm Deletion
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

@@ -16,6 +16,11 @@ export const hrService = {
     return res.data
   },
 
+  async deleteEmployee(id) {
+    const res = await api.delete(`/employees/${id}`)
+    return res.data
+  },
+
   async getShifts(params = {}) {
     const res = await api.get('/shifts', { params })
     return res.data || []

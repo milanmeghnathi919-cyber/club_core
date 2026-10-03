@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import memberService from '@/service/memberService'
 import { formatCurrency, formatDate, formatDateTime } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
@@ -21,12 +22,16 @@ import {
   Mail,
   History,
   CreditCard,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react'
 
 export const MemberDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
+  const currentUser = useSelector((state) => state.auth.user)
+  const isOwner = currentUser?.role === 'owner'
 
   const [memberData, setMemberData] = useState(null)
   const [history, setHistory] = useState([])
@@ -39,6 +44,22 @@ export const MemberDetail = () => {
   const [selectedPlanId, setSelectedPlanId] = useState('')
   const [renewMethod, setRenewMethod] = useState('cash')
   const [renewing, setRenewing] = useState(false)
+
+  // Member Deletion Modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDeleteMember = async () => {
+    setDeleting(true)
+    try {
+      await memberService.deleteMember(id)
+      toast.success(`Member "${member?.fullName || 'record'}" deleted successfully`)
+      navigate('/staff/members')
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete member')
+      setDeleting(false)
+    }
+  }
 
   const fetchProfile = async () => {
     setLoading(true)
@@ -149,6 +170,16 @@ export const MemberDetail = () => {
           >
             Renew Plan
           </Button>
+          {isOwner && (
+            <Button
+              variant="danger"
+              size="sm"
+              icon={Trash2}
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              Delete Member
+            </Button>
+          )}
         </div>
       </div>
 
@@ -354,6 +385,65 @@ export const MemberDetail = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Member Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => !deleting && setIsDeleteModalOpen(false)}
+        title="Delete Member"
+        subtitle="Permanent removal of member record"
+      >
+        <div className="space-y-4 py-2">
+          <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs leading-relaxed">
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block text-rose-900 mb-0.5">Permanent Deletion Warning</span>
+              Are you sure you want to delete member <strong className="font-semibold text-rose-950">{member?.fullName}</strong> ({member?.memberCode})?
+              This will permanently remove their member profile, linked account, and cancel all active membership privileges.
+            </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-500">Member:</span>
+              <span className="font-bold text-slate-800">{member?.fullName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Member Code:</span>
+              <span className="font-mono font-bold text-slate-700">{member?.memberCode}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Phone:</span>
+              <span className="text-slate-700">{member?.phone || 'None'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-500">Email:</span>
+              <span className="font-mono text-slate-700">{member?.email || 'None'}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              icon={Trash2}
+              loading={deleting}
+              onClick={handleDeleteMember}
+              className="font-bold"
+            >
+              Confirm & Delete Member
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

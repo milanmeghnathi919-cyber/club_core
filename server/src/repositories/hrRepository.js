@@ -109,6 +109,31 @@ export const hrRepository = {
     return memoryStore.update('employees', (e) => e.id === id, updates)
   },
 
+  async deleteEmployee(id) {
+    try {
+      await query('DELETE FROM public.leave_requests WHERE employee_id = $1', [id])
+      await query('DELETE FROM public.shifts WHERE employee_id = $1', [id])
+      await query('DELETE FROM public.payslips WHERE employee_id = $1', [id])
+      const row = await queryOne('DELETE FROM public.employees WHERE id = $1 RETURNING *', [id])
+      if (row) {
+        memoryStore.delete('leave_requests', (l) => l.employee_id === id)
+        memoryStore.delete('shifts', (s) => s.employee_id === id)
+        memoryStore.delete('payslips', (p) => p.employee_id === id)
+        memoryStore.delete('employees', (e) => e.id === id)
+        return row
+      }
+    } catch (err) {
+      console.error('[hrRepository.deleteEmployee DB error]', err.message)
+    }
+
+    const item = memoryStore.findOne('employees', (e) => e.id === id)
+    memoryStore.delete('leave_requests', (l) => l.employee_id === id)
+    memoryStore.delete('shifts', (s) => s.employee_id === id)
+    memoryStore.delete('payslips', (p) => p.employee_id === id)
+    memoryStore.delete('employees', (e) => e.id === id)
+    return item
+  },
+
   // Shifts
   async listShifts({ employeeId, date, from, to } = {}) {
     let items = memoryStore.find('shifts')

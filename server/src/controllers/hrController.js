@@ -20,6 +20,11 @@ export const updateEmployee = asyncHandler(async (req, res) => {
   return ok(res, employee)
 })
 
+export const deleteEmployee = asyncHandler(async (req, res) => {
+  const result = await hrService.deleteEmployee(req.params.id, req.user.id)
+  return ok(res, result)
+})
+
 // Shifts
 export const listShifts = asyncHandler(async (req, res) => {
   const isOwnerOrFD = FD_PLUS.includes(req.user.role)
@@ -122,6 +127,7 @@ export default {
   listEmployees,
   createEmployee,
   updateEmployee,
+  deleteEmployee,
   listShifts,
   createShift,
   updateShift,
