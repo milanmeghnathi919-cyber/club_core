@@ -5,6 +5,14 @@ import { nextOrderNo } from '../utils/numbering.js'
 export const shopOrderRepository = {
   async insert(data) {
     const orderNo = data.orderNo || data.order_no || nextOrderNo()
+    const rawFulfilment = data.fulfilment || data.fulfilment_type || 'pickup'
+    const fulfilment = rawFulfilment === 'delivery' ? 'delivery' : 'pickup'
+
+    const rawPref = data.paymentPref || data.payment_pref
+    const paymentPref = ['prepaid', 'on_delivery'].includes(rawPref)
+      ? rawPref
+      : (data.paymentStatus === 'paid' ? 'prepaid' : 'on_delivery')
+
     try {
       const row = await queryOne(
         `insert into public.shop_orders
@@ -19,12 +27,12 @@ export const shopOrderRepository = {
           data.customerName || data.customer_name,
           data.customerPhone || data.customer_phone || null,
           data.channel || 'counter',
-          data.fulfilment || 'in_store',
+          fulfilment,
           data.deliveryAddress || data.delivery_address || null,
           data.deliveryFee ?? data.delivery_fee ?? 0,
           data.status || 'pending',
           data.paymentStatus || data.payment_status || 'unpaid',
-          data.paymentPref || data.payment_pref || null,
+          paymentPref,
           data.subtotal || 0,
           data.discountPct ?? data.discount_pct ?? 0,
           data.discount || 0,
@@ -39,7 +47,9 @@ export const shopOrderRepository = {
         memoryStore.insert('shop_orders', row)
         return row
       }
-    } catch {}
+    } catch (err) {
+      console.error('[shopOrderRepository.insert error]', err.message)
+    }
 
     return memoryStore.insert('shop_orders', {
       id: data.id || crypto.randomUUID(),
