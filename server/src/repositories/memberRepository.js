@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 import { MEMBER_COLUMNS } from '../models/Member.js'

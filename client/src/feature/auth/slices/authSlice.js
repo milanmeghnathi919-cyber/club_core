@@ -1,9 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+let savedUser = null
+try {
+  const raw = localStorage.getItem('cc_user')
+  if (raw) savedUser = JSON.parse(raw)
+} catch {
+  savedUser = null
+}
+
 const initialState = {
-  user: null,
-  token: null,
-  status: 'idle', // idle | loading | succeeded | failed
+  user: savedUser,
+  token: typeof window !== 'undefined' ? localStorage.getItem('cc_token') || null : null,
+  status: savedUser ? 'succeeded' : 'idle',
   error: null,
 }
 

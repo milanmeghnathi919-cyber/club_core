@@ -4,9 +4,13 @@ import logger from './utils/logger.js'
 import { isRazorpayEnabled } from './utils/razorpay.js'
 import { initJobs } from './jobs/index.js'
 
-function start() {
+import runSeeds from './db/seeds/seed.js'
+
+async function start() {
   try {
     assertConfig()
+
+    await runSeeds()
 
     if (config.env !== 'test') {
       initJobs()

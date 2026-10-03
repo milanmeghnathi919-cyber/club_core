@@ -19,7 +19,7 @@ const signToken = (user) =>
   )
 
 export const authService = {
-  async register({ name, email, password, phone }) {
+  async register({ name, email, password, phone, dob }) {
     const cleanEmail = String(email).toLowerCase().trim()
     const cleanPhone = phone ? String(phone).trim() : null
 
@@ -51,8 +51,9 @@ export const authService = {
       memberCode,
       userId: user.id,
       fullName: name.trim(),
-      phone: cleanPhone,
+      phone: cleanPhone || 'Not Provided',
       email: cleanEmail,
+      dob: dob || null,
     })
 
     const token = signToken(user)

@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { query, queryOne } from '../utils/db.js'
 import { USER_COLUMNS } from '../models/User.js'
 import { ROLES } from '../config/roles.js'
