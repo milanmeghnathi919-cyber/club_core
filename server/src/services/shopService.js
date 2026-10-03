@@ -24,6 +24,9 @@ export const shopService = {
 
       const unitPrice = Number(product.price)
       const qty = Number(item.qty)
+      const currentStock = Number(product.stock_qty || 0)
+      const isOutOfStock = currentStock <= 0
+      const exceedsStock = qty > currentStock
       const lineTotal = round2(unitPrice * qty)
       const taxRate = Number(product.tax_rate_pct || 18)
       const lineTax = calcInclusiveTax(lineTotal, taxRate)
@@ -37,6 +40,9 @@ export const shopService = {
         sku: product.sku,
         unitPrice,
         qty,
+        stockQty: currentStock,
+        isOutOfStock,
+        exceedsStock,
         taxRatePct: taxRate,
         taxAmount: lineTax,
         lineTotal,
@@ -55,6 +61,7 @@ export const shopService = {
 
     // BR-16: Tax calculation on discounted items
     const taxAmount = round2(calcInclusiveTax(net, 18))
+    const hasOutOfStock = lines.some((l) => l.isOutOfStock || l.exceedsStock)
 
     return {
       lines,
@@ -64,6 +71,7 @@ export const shopService = {
       taxAmount,
       deliveryFee,
       total,
+      hasOutOfStock,
     }
   },
 

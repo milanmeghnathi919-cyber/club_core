@@ -37,17 +37,33 @@ const cartSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const { product, qty = 1 } = action.payload
+      const stock = product.stock_qty !== undefined
+        ? Number(product.stock_qty)
+        : product.stockQty !== undefined
+        ? Number(product.stockQty)
+        : product.stock !== undefined
+        ? Number(product.stock)
+        : 999
+
       const existing = state.items.find((i) => i.productId === product.id)
       if (existing) {
-        existing.qty += qty
+        existing.stockQty = stock
+        if (stock <= 0) {
+          // Out of stock
+          existing.qty = 0
+        } else {
+          existing.qty = Math.min(existing.qty + qty, stock)
+        }
       } else {
+        const initialQty = stock <= 0 ? 0 : Math.min(qty, stock)
         state.items.push({
           productId: product.id,
           name: product.name,
           sku: product.sku,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          qty,
+          price: Number(product.price),
+          imageUrl: product.imageUrl || product.image_url,
+          stockQty: stock,
+          qty: initialQty,
         })
       }
       state.isDrawerOpen = true
@@ -67,7 +83,37 @@ const cartSlice = createSlice({
         if (qty <= 0) {
           state.items = state.items.filter((i) => i.productId !== productId)
         } else {
-          item.qty = qty
+          const maxStock = item.stockQty !== undefined && item.stockQty !== null ? Number(item.stockQty) : null
+          if (maxStock !== null && maxStock >= 0 && qty > maxStock) {
+            item.qty = maxStock
+          } else {
+            item.qty = qty
+          }
+        }
+      }
+      saveCartToStorage(state)
+    },
+
+    syncItemStock(state, action) {
+      const lines = action.payload || []
+      lines.forEach((l) => {
+        const item = state.items.find((i) => i.productId === (l.productId || l.id))
+        const incomingStock = l.stockQty !== undefined ? l.stockQty : (l.stock_qty !== undefined ? l.stock_qty : l.stock)
+        if (item && incomingStock !== undefined && incomingStock !== null) {
+          item.stockQty = Number(incomingStock)
+        }
+      })
+      saveCartToStorage(state)
+    },
+
+    capItemToStock(state, action) {
+      const productId = action.payload
+      const item = state.items.find((i) => i.productId === productId)
+      if (item && item.stockQty !== undefined) {
+        if (item.stockQty <= 0) {
+          state.items = state.items.filter((i) => i.productId !== productId)
+        } else {
+          item.qty = item.stockQty
         }
       }
       saveCartToStorage(state)
@@ -103,6 +149,8 @@ export const {
   addToCart,
   removeFromCart,
   updateQuantity,
+  syncItemStock,
+  capItemToStock,
   setFulfilment,
   setDeliveryAddress,
   setQuote,

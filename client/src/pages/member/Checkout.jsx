@@ -8,7 +8,7 @@ import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card, { CardContent, CardHeader } from '@/components/ui/Card'
-import { ShoppingBag, Store, Truck, CheckCircle2, ArrowRight, ShieldCheck, CreditCard } from 'lucide-react'
+import { ShoppingBag, Store, Truck, CheckCircle2, ArrowRight, ShieldCheck, CreditCard, AlertCircle } from 'lucide-react'
 
 export const Checkout = () => {
   const dispatch = useDispatch()
@@ -23,6 +23,8 @@ export const Checkout = () => {
   const [submitting, setSubmitting] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('pay_at_club')
   const [orderSuccess, setOrderSuccess] = useState(null)
+
+  const hasOutOfStock = quote?.hasOutOfStock || quote?.lines?.some((l) => l.isOutOfStock || l.exceedsStock)
 
   useEffect(() => {
     if (items.length === 0 && !orderSuccess) {
@@ -52,6 +54,10 @@ export const Checkout = () => {
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault()
+    if (hasOutOfStock) {
+      toast.error('One or more items in your cart are out of stock. Please adjust quantities.')
+      return
+    }
     if (fulfilment === 'delivery' && !deliveryAddress.trim()) {
       toast.error('Please enter your delivery address')
       return
@@ -243,18 +249,44 @@ export const Checkout = () => {
             <CardHeader title="Order Summary" subtitle={`${items.length} unique items in bag`} />
             <CardContent className="space-y-4">
               <div className="divide-y divide-slate-100 max-h-56 overflow-y-auto pr-1">
-                {items.map((i) => (
-                  <div key={i.productId} className="py-2.5 flex items-center justify-between text-xs">
-                    <div className="min-w-0 pr-2">
-                      <p className="font-bold text-slate-800 truncate">{i.name}</p>
-                      <span className="text-slate-400">Qty: {i.qty}</span>
+                {items.map((i) => {
+                  const line = quote?.lines?.find((l) => l.productId === i.productId)
+                  const isOut = line?.isOutOfStock || line?.exceedsStock
+                  return (
+                    <div key={i.productId} className="py-2.5 flex items-center justify-between text-xs">
+                      <div className="min-w-0 pr-2">
+                        <p className="font-bold text-slate-800 truncate">{i.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-slate-400">Qty: {i.qty}</span>
+                          {isOut && (
+                            <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-1.5 py-0.2 rounded border border-rose-300">
+                              Out of stock (Max: {line?.stockQty ?? 0})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="font-bold text-slate-900 tabular-nums">
+                        {formatCurrency(i.price * i.qty)}
+                      </span>
                     </div>
-                    <span className="font-bold text-slate-900 tabular-nums">
-                      {formatCurrency(i.price * i.qty)}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
+
+              {hasOutOfStock && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold">Items exceed available inventory</p>
+                    <p className="text-[11px] text-rose-700 mt-0.5">
+                      Please adjust your cart before placing this order.
+                    </p>
+                    <Link to="/shop" className="text-[11px] font-bold text-rose-900 underline mt-1 block">
+                      ← Return to Pro Shop
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-1.5 text-xs pt-3 border-t border-slate-200">
                 <div className="flex justify-between text-slate-500">
@@ -287,11 +319,13 @@ export const Checkout = () => {
                 variant="lawn"
                 size="lg"
                 loading={submitting}
-                disabled={loadingQuote}
+                disabled={loadingQuote || hasOutOfStock}
                 onClick={handlePlaceOrder}
-                className="w-full font-bold shadow-md"
+                className={`w-full font-bold shadow-md ${
+                  hasOutOfStock ? 'opacity-60 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : ''
+                }`}
               >
-                Confirm & Place Order
+                {hasOutOfStock ? 'Out of Stock — Adjust Items' : 'Confirm & Place Order'}
               </Button>
             </CardContent>
           </Card>
