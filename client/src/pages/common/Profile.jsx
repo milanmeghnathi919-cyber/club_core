@@ -34,6 +34,20 @@ import {
   QrCode,
   Check,
   Lock,
+  BarChart3,
+  Receipt,
+  CreditCard,
+  FileSpreadsheet,
+  Users2,
+  Users,
+  Package,
+  ListOrdered,
+  CalendarCheck,
+  ClipboardList,
+  Sliders,
+  ArrowRight,
+  LayoutDashboard,
+  Trophy,
 } from 'lucide-react'
 
 export const Profile = () => {
@@ -169,16 +183,19 @@ export const Profile = () => {
   const membership = profileData?.membership
   const membershipHistory = profileData?.membershipHistory || []
   const employee = profileData?.employee
-  const isMemberRole = user.role === 'member' || !!member
-  const isStaffOrOwner = !isMemberRole || !!employee
 
-  // Calculate validity days
+  // Role Checks: strictly differentiate Owner vs Staff vs Member
+  const isOwner = user.role === 'owner'
+  const isStaff = !isOwner && user.role && user.role !== 'member'
+  const isMember = !isOwner && !isStaff
+
+  // Calculate validity days (only relevant for Member)
   let validityDaysRemaining = null
   let validityPercent = 100
   let isExpired = false
   let isExpiringSoon = false
 
-  if (membership?.end_date) {
+  if (isMember && membership?.end_date) {
     const end = new Date(membership.end_date)
     const now = new Date()
     const diffTime = end.getTime() - now.getTime()
@@ -227,21 +244,57 @@ export const Profile = () => {
         </div>
       )}
 
-      {/* Hero Profile Header */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-[#1B4D2E] via-[#143B23] to-[#0A1F13] text-white p-6 sm:p-8 shadow-xl overflow-hidden border border-emerald-900/40">
+      {/* =========================================================================
+          HERO PROFILE HEADER
+          ========================================================================= */}
+      <div
+        className={`relative rounded-3xl text-white p-6 sm:p-8 shadow-xl overflow-hidden border ${
+          isOwner
+            ? 'bg-gradient-to-br from-[#090D16] via-[#141A29] to-[#05070B] border-amber-500/30'
+            : isStaff
+            ? 'bg-gradient-to-br from-[#0f281e] via-[#173a27] to-[#0b1b13] border-emerald-800/40'
+            : 'bg-gradient-to-br from-[#1B4D2E] via-[#143B23] to-[#0A1F13] border-emerald-900/40'
+        }`}
+      >
         {/* Decorative backdrop shapes */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div
+          className={`absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl pointer-events-none ${
+            isOwner ? 'bg-amber-400/15' : 'bg-emerald-400/10'
+          }`}
+        />
         <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-200 text-[#1B4D2E] font-black text-3xl sm:text-4xl flex items-center justify-center shadow-lg border-2 border-white/20">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              <div
+                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl font-black text-3xl sm:text-4xl flex items-center justify-center shadow-lg border-2 ${
+                  isOwner
+                    ? 'bg-gradient-to-tr from-amber-400 to-amber-200 text-slate-950 border-amber-400/40'
+                    : isStaff
+                    ? 'bg-gradient-to-tr from-emerald-400 to-teal-200 text-slate-950 border-emerald-400/40'
+                    : 'bg-gradient-to-tr from-amber-400 to-amber-200 text-[#1B4D2E] border-white/20'
+                }`}
+              >
+                {user?.name ? user.name.slice(0, 2).toUpperCase() : 'CC'}
               </div>
-              <div className="absolute -bottom-2 -right-2 p-1.5 rounded-lg bg-emerald-800 border border-emerald-600 text-white shadow-xs">
-                {isMemberRole ? <Award className="w-4 h-4 text-amber-300" /> : <Briefcase className="w-4 h-4 text-emerald-300" />}
+              <div
+                className={`absolute -bottom-2 -right-2 p-1.5 rounded-lg border text-white shadow-xs ${
+                  isOwner
+                    ? 'bg-amber-500 border-amber-300 text-slate-950'
+                    : isStaff
+                    ? 'bg-emerald-700 border-emerald-500 text-white'
+                    : 'bg-emerald-800 border-emerald-600 text-white'
+                }`}
+              >
+                {isOwner ? (
+                  <Trophy className="w-4 h-4 text-slate-950" />
+                ) : isStaff ? (
+                  <Briefcase className="w-4 h-4 text-emerald-200" />
+                ) : (
+                  <Award className="w-4 h-4 text-amber-300" />
+                )}
               </div>
             </div>
 
@@ -249,9 +302,9 @@ export const Profile = () => {
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                  {user?.name || 'Club Member'}
+                  {user?.name || (isOwner ? 'Rajesh Sharma' : 'Staff Member')}
                 </h1>
-                {member?.member_code && (
+                {isMember && member?.member_code && (
                   <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-200 border border-white/20 text-xs font-mono font-bold">
                     {member.member_code}
                   </span>
@@ -263,33 +316,71 @@ export const Profile = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  {isMemberRole
-                    ? (membership?.plan_name || 'Active Member')
-                    : (employee?.title || user.role?.replace('_', ' ').toUpperCase() || 'Staff Member')}
-                </span>
+                {isOwner ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-400/25 text-amber-300 border border-amber-400/40">
+                    <ShieldCheck className="w-3.5 h-3.5" /> Club Owner & Executive
+                  </span>
+                ) : isStaff ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                    <Briefcase className="w-3.5 h-3.5" />
+                    {employee?.title || user.role?.replace('_', ' ').toUpperCase() || 'Staff Operations'}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {membership?.plan_name || 'Active Member'}
+                  </span>
+                )}
 
                 <span className="text-xs text-white/70">
-                  Member since {formatDate(member?.created_at || user?.created_at)}
+                  {isOwner || isStaff ? 'Onboarded on' : 'Member since'}{' '}
+                  {formatDate(employee?.joined_on || member?.created_at || user?.created_at)}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+          {/* Action CTAs in Header */}
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+            {/* Quick Link to Dashboard depending on role */}
+            {isOwner && (
+              <Link
+                to="/owner"
+                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:brightness-105"
+              >
+                <BarChart3 className="w-4 h-4" /> Go to Owner Dashboard &rarr;
+              </Link>
+            )}
+
+            {isStaff && (
+              <Link
+                to="/staff"
+                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 hover:brightness-105"
+              >
+                <Calendar className="w-4 h-4" /> Go to Staff Dashboard &rarr;
+              </Link>
+            )}
+
+            {isMember && (
+              <Link
+                to="/app"
+                className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs bg-white text-[#1B4D2E] hover:bg-emerald-50"
+              >
+                <LayoutDashboard className="w-4 h-4" /> Member Home &rarr;
+              </Link>
+            )}
+
             <button
               onClick={() => setEditMode(!editMode)}
-              className="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs bg-white text-[#1B4D2E] hover:bg-emerald-50"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs bg-white/15 text-white hover:bg-white/25 border border-white/20"
             >
               {editMode ? (
                 <>
-                  <X className="w-4 h-4" /> Cancel Edit
+                  <X className="w-4 h-4" /> Cancel
                 </>
               ) : (
                 <>
-                  <Edit3 className="w-4 h-4" /> Edit Profile
+                  <Edit3 className="w-4 h-4" /> Edit
                 </>
               )}
             </button>
@@ -306,9 +397,321 @@ export const Profile = () => {
       </div>
 
       {/* =========================================================================
-          SECTION 1: MEMBERSHIP DETAILS & VALIDITY (FOR MEMBERS)
+          SECTION: OWNER EXECUTIVE DASHBOARD ACCESS & PORTAL (ONLY FOR OWNER)
           ========================================================================= */}
-      {isMemberRole && (
+      {isOwner && (
+        <div className="space-y-6">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-[#0A101C] text-white border-2 border-amber-500/40 p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-6">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10 relative z-10">
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-amber-400">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" /> Club Owner Executive Hub
+                </span>
+                <h2 className="text-2xl font-black text-white">Owner Executive Dashboard</h2>
+                <p className="text-xs text-slate-300 max-w-xl">
+                  You are logged in with Owner executive rights. Access real-time revenue analytics, invoices, single ledger reconciliation, staff payroll, and club administration.
+                </p>
+              </div>
+
+              <Link to="/owner" className="shrink-0">
+                <Button
+                  variant="clay"
+                  size="md"
+                  icon={BarChart3}
+                  className="font-black text-xs px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 border-0 shadow-lg"
+                >
+                  Access Owner Dashboard &rarr;
+                </Button>
+              </Link>
+            </div>
+
+            {/* Executive Tools Shortcuts Grid */}
+            <div className="relative z-10 space-y-3">
+              <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                Direct Executive Console Tools
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <Link
+                  to="/owner"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <BarChart3 className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Executive Analytics</p>
+                  <p className="text-[10px] text-slate-400">Revenue & KPI Trends</p>
+                </Link>
+
+                <Link
+                  to="/owner/invoices"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Receipt className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Invoices & Billing</p>
+                  <p className="text-[10px] text-slate-400">Single ledger billing</p>
+                </Link>
+
+                <Link
+                  to="/owner/expenses"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <CreditCard className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Expenses & Payables</p>
+                  <p className="text-[10px] text-slate-400">Vendor disbursements</p>
+                </Link>
+
+                <Link
+                  to="/owner/tax"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <FileSpreadsheet className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Tax & GST Reports</p>
+                  <p className="text-[10px] text-slate-400">Statutory tax summaries</p>
+                </Link>
+
+                <Link
+                  to="/owner/payroll"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Users2 className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Payroll Runs</p>
+                  <p className="text-[10px] text-slate-400">Staff salary disbursements</p>
+                </Link>
+
+                <Link
+                  to="/owner/employees"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Users className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Employee Staff</p>
+                  <p className="text-[10px] text-slate-400">Roster & staff directory</p>
+                </Link>
+
+                <Link
+                  to="/owner/cafe-inventory"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Coffee className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Café Inventory</p>
+                  <p className="text-[10px] text-slate-400">Stock & replenishment</p>
+                </Link>
+
+                <Link
+                  to="/owner/settings"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Sliders className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Club Settings</p>
+                  <p className="text-[10px] text-slate-400">Pricing & configuration</p>
+                </Link>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-white/10">
+              <span>Looking for front-line operations?</span>
+              <Link
+                to="/staff"
+                className="text-amber-400 hover:text-amber-300 font-bold inline-flex items-center gap-1"
+              >
+                Switch to Staff Operations Console &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: STAFF OPERATIONS DASHBOARD ACCESS & PORTAL (ONLY FOR STAFF)
+          ========================================================================= */}
+      {isStaff && (
+        <div className="space-y-6">
+          <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-[#10241B] to-slate-950 text-white border-2 border-emerald-500/40 p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-6">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10 relative z-10">
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-widest text-emerald-400">
+                  <Briefcase className="w-4 h-4 text-emerald-400" /> Official Staff Operations Hub
+                </span>
+                <h2 className="text-2xl font-black text-white">Staff Operations Dashboard</h2>
+                <p className="text-xs text-slate-300 max-w-xl">
+                  You are logged in as a verified staff member ({employee?.title || user.role}). Manage daily court reservations, member check-ins, pro-shop sales, and café counter orders.
+                </p>
+              </div>
+
+              <Link to="/staff" className="shrink-0">
+                <Button
+                  variant="lawn"
+                  size="md"
+                  icon={LayoutDashboard}
+                  className="font-black text-xs px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
+                >
+                  Access Staff Dashboard &rarr;
+                </Button>
+              </Link>
+            </div>
+
+            {/* Staff Operations Shortcuts Grid */}
+            <div className="relative z-10 space-y-3">
+              <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                Staff Operations Shortcuts
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <Link
+                  to="/staff/bookings"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Calendar className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Court Schedule</p>
+                  <p className="text-[10px] text-slate-400">Daily slot allocations</p>
+                </Link>
+
+                <Link
+                  to="/staff/members"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Users className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Members CRM</p>
+                  <p className="text-[10px] text-slate-400">Search & member profiles</p>
+                </Link>
+
+                <Link
+                  to="/staff/members/new"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">New Member</p>
+                  <p className="text-[10px] text-slate-400">Onboard walk-in member</p>
+                </Link>
+
+                <Link
+                  to="/staff/pos"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <ShoppingBag className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Counter POS</p>
+                  <p className="text-[10px] text-slate-400">Quick shop & equipment sale</p>
+                </Link>
+
+                <Link
+                  to="/staff/cafe/inventory"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Coffee className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Café Inventory</p>
+                  <p className="text-[10px] text-slate-400">Stock counts & recipes</p>
+                </Link>
+
+                <Link
+                  to="/staff/products"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Package className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Shop Inventory</p>
+                  <p className="text-[10px] text-slate-400">Catalog & stock levels</p>
+                </Link>
+
+                <Link
+                  to="/staff/shifts"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <Clock className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">Staff Shifts</p>
+                  <p className="text-[10px] text-slate-400">Assigned shift roster</p>
+                </Link>
+
+                <Link
+                  to="/staff/leave"
+                  className="p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors group block space-y-1"
+                >
+                  <ClipboardList className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs font-bold text-white">My Leave</p>
+                  <p className="text-[10px] text-slate-400">Apply for time off</p>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: STAFF / EMPLOYEE OFFICIAL RECORD (FOR OWNER & STAFF ONLY)
+          ========================================================================= */}
+      {(isOwner || isStaff) && (
+        <div className="space-y-6">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#1B4D2E]">
+              Employment Record
+            </span>
+            <h2 className="text-xl font-bold text-slate-900">Official HR & Staff Details</h2>
+          </div>
+
+          <div className="rounded-2xl bg-white border border-slate-200/90 shadow-sm p-6 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  Official Designation
+                </span>
+                <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  {employee?.title || (isOwner ? 'Club Owner & Executive' : user.role?.replace('_', ' ').toUpperCase())}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Registered employee record with The Champions Club administration.
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {employee?.status || 'Active'}
+              </span>
+            </div>
+
+            {/* Official Staff Meta Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <Building className="w-4 h-4 text-[#1B4D2E]" /> Department
+                </div>
+                <p className="text-sm font-bold text-slate-900 capitalize">
+                  {isOwner ? 'Executive Management' : user.role?.replace('_', ' ') || 'Operations'}
+                </p>
+              </div>
+
+              <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <Calendar className="w-4 h-4 text-[#1B4D2E]" /> Date of Joining
+                </div>
+                <p className="text-sm font-bold text-slate-900">
+                  {employee?.joined_on ? formatDate(employee.joined_on) : formatDate(user.created_at)}
+                </p>
+              </div>
+
+              <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <DollarSign className="w-4 h-4 text-emerald-600" /> Base Remuneration
+                </div>
+                <p className="text-sm font-bold text-slate-900">
+                  {employee?.base_salary ? `${formatCurrency(employee.base_salary)} / mo` : 'Executive Remuneration'}
+                </p>
+              </div>
+            </div>
+
+            {/* Staff ID code */}
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+              <span className="font-semibold flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#1B4D2E]" /> Official Employee ID:
+              </span>
+              <span className="font-mono font-bold text-slate-800">
+                {employee?.id || user.id}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SECTION: MEMBERSHIP DETAILS & VALIDITY (FOR MEMBERS ONLY - HIDDEN FOR OWNER & STAFF)
+          ========================================================================= */}
+      {isMember && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -503,7 +906,6 @@ export const Profile = () => {
               </div>
             </div>
           ) : (
-            /* No Active Membership Card */
             <div className="p-8 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-4">
               <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
                 <AlertCircle className="w-6 h-6" />
@@ -522,7 +924,7 @@ export const Profile = () => {
             </div>
           )}
 
-          {/* Membership History Table (If available) */}
+          {/* Membership History Table */}
           {membershipHistory.length > 1 && (
             <div className="rounded-2xl bg-white border border-slate-200/90 shadow-sm p-6 space-y-4">
               <h4 className="font-bold text-slate-900 text-sm">Membership Subscription History</h4>
@@ -566,146 +968,13 @@ export const Profile = () => {
       )}
 
       {/* =========================================================================
-          SECTION 2: STAFF & EMPLOYEE DETAILS (FOR STAFF / OWNER)
-          ========================================================================= */}
-      {isStaffOrOwner && (
-        <div className="space-y-6">
-          <div className="space-y-0.5">
-            <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#1B4D2E]">
-              Human Resources & Operations
-            </span>
-            <h2 className="text-xl font-bold text-slate-900">Staff Official Records</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Employment Record Card */}
-            <div className="md:col-span-2 rounded-2xl bg-white border border-slate-200/90 shadow-sm p-6 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                    Staff Designation
-                  </span>
-                  <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                    {employee?.title || user.role?.replace('_', ' ').toUpperCase() || 'Operations Staff'}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    The Champions Club Official Staff Roster
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  {employee?.status || 'Active'}
-                </span>
-              </div>
-
-              {/* Official Staff Meta Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <Building className="w-4 h-4 text-[#1B4D2E]" /> Department
-                  </div>
-                  <p className="text-sm font-bold text-slate-900 capitalize">
-                    {user.role === 'owner' ? 'Club Leadership' : user.role?.replace('_', ' ') || 'Operations'}
-                  </p>
-                </div>
-
-                <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <Calendar className="w-4 h-4 text-[#1B4D2E]" /> Date of Joining
-                  </div>
-                  <p className="text-sm font-bold text-slate-900">
-                    {employee?.joined_on ? formatDate(employee.joined_on) : formatDate(user.created_at)}
-                  </p>
-                </div>
-
-                <div className="bg-[#F8FAF6] p-4 rounded-xl border border-slate-200/60 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <DollarSign className="w-4 h-4 text-emerald-600" /> Base Remuneration
-                  </div>
-                  <p className="text-sm font-bold text-slate-900">
-                    {employee?.base_salary ? `${formatCurrency(employee.base_salary)} / mo` : 'Executive Remuneration'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Operational Responsibilities */}
-              <div className="space-y-3 pt-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Authorized Console Access & Privileges
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-700">
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Real-time Court Roster & Reservations</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Counter & Pro-Shop POS Checkout</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Café & Beverage Inventory Management</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Member Directory & Attendance Ledger</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Operations Shortcuts */}
-            <div className="rounded-2xl bg-white border border-slate-200/90 shadow-sm p-6 space-y-4 flex flex-col justify-between">
-              <div className="space-y-4">
-                <h4 className="font-bold text-slate-900 text-sm pb-2 border-b border-slate-100 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#1B4D2E]" /> Shift & Roster Shortcuts
-                </h4>
-                <div className="space-y-2">
-                  <Link
-                    to={user.role === 'owner' ? '/owner/shifts' : '/staff/shifts'}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-800 transition-colors border border-slate-200/60"
-                  >
-                    <span>View Scheduled Shifts</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  </Link>
-
-                  <Link
-                    to={user.role === 'owner' ? '/owner/leave' : '/staff/leave'}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-800 transition-colors border border-slate-200/60"
-                  >
-                    <span>My Leave Requests</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  </Link>
-
-                  <Link
-                    to="/staff/pos"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-800 transition-colors border border-slate-200/60"
-                  >
-                    <span>Launch Counter POS</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                  </Link>
-                </div>
-              </div>
-
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/80 text-[11px] text-amber-800 space-y-1">
-                <span className="font-bold block flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" /> Staff ID: {employee?.id?.slice(0, 8) || user.id?.slice(0, 8)}
-                </span>
-                <p className="text-amber-700">Official verified credentials registered with club administration.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SECTION 3: PERSONAL INFORMATION & EDIT PROFILE
+          SECTION: PERSONAL INFORMATION & EDIT PROFILE
           ========================================================================= */}
       <div className="rounded-2xl bg-white border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
             <h3 className="text-lg font-bold text-slate-900">Personal Information</h3>
-            <p className="text-xs text-slate-500">Contact details and emergency identification records.</p>
+            <p className="text-xs text-slate-500">Contact details and identification records.</p>
           </div>
 
           {!editMode && (
@@ -763,7 +1032,7 @@ export const Profile = () => {
                 />
               </div>
 
-              {isMemberRole && (
+              {isMember && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                     Date of Birth
@@ -845,7 +1114,7 @@ export const Profile = () => {
               </p>
             </div>
 
-            {isMemberRole && (
+            {isMember && (
               <div className="space-y-1">
                 <p className="font-semibold text-slate-400 uppercase tracking-wider">Date of Birth</p>
                 <p className="text-sm font-bold text-slate-900">
