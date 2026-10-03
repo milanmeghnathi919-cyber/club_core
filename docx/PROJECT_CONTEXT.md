@@ -33,10 +33,10 @@ Checkpoints: ☑CP0 contract frozen ☑CP1 backend ready & verified ☑FE login 
 Handoffs: ☑H-B1 auth ☑H-B2 discount helpers ☑H-B3 payments service ☑H-F1 UI kit ☑H-F2 auth/baseApi ☑H-F3 SlotGrid
 
 ## 6. Current work
-- **Current task:** Full-Stack Complete & Demo-Ready (Frontend & Backend Integrated).
-- **Last completed step:** Complete User Login & Registration flow implemented across backend and frontend. Polished `Login.jsx` (with show/hide password, remember me, error banners, demo accounts, forgot password modal), created `Register.jsx` (with real-time password strength, confirmation check, club etiquette terms, evaluator 1-click test fill, duplicate email/phone handling, automatic member code generation), session hydration in `authSlice.js`, and public header integration with `/register` and `/login`.
+- **Current task:** Full-Stack Complete & Demo-Ready (Pushed to GitHub main).
+- **Last completed step:** Resolved all frontend-backend connection errors: fixed Windows dual-stack IPv6/IPv4 host binding (0.0.0.0 on both backend and Vite proxy), resolved CORS allowed-origins list, relaxed Helmet CORP policies, raised rate limiting in development, added `optionalAuth` for public and authenticated availability checking, gracefully handled empty member profiles on `/mine` endpoints, and pushed commit `6b48338` cleanly to GitHub `origin/main`.
 - **Exact next step:** 7-Minute Judge Demo and walkthrough.
-- **Remaining tasks:** None. All backend and frontend tasks completed and verified against running servers.
+- **Remaining tasks:** None. Both servers live on `http://localhost:5000` and `http://localhost:5173`.
 
 ## 7. Known bugs
 | ID | Area | Description | Severity | Owner | Status |
