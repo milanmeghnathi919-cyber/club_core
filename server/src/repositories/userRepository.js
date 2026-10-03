@@ -1,87 +1,83 @@
-import supabase from '../config/supabase.js'
-import { queryOrConflict } from '../utils/supabaseQuery.js'
+import { query, queryOne } from '../utils/db.js'
 import { USER_COLUMNS } from '../models/User.js'
 
 const TABLE = 'users'
-
-const toDb = (data) => ({
-  email: data.email,
-  password_hash: data.passwordHash,
-  role: data.role ?? 'user',
-  name: data.name,
-  phone: data.phone ?? null,
-  is_active: data.isActive ?? true,
-})
+const PUBLIC_COLS = USER_COLUMNS.join(', ')
 
 export const userRepository = {
+  /** Includes password_hash; only the auth service may call this. */
   async findByEmail(email) {
-    const { data } = await supabase
-      .from(TABLE)
-      .select('*, password_hash')
-      .eq('email', String(email).toLowerCase())
-      .maybeSingle()
-    return data
+    return queryOne(
+      `select ${PUBLIC_COLS}, password_hash from public.${TABLE} where email = $1`,
+      [String(email).toLowerCase()],
+    )
   },
 
   async findById(id) {
-    const { data } = await supabase.from(TABLE).select(USER_COLUMNS).eq('id', id).maybeSingle()
-    return data
+    return queryOne(`select ${PUBLIC_COLS} from public.${TABLE} where id = $1`, [id])
   },
 
   async list({ page = 1, limit = 20, search } = {}) {
-    const from = (page - 1) * limit
+    const offset = (page - 1) * limit
+    const term = `%${String(search ?? '').toLowerCase()}%`
 
-    let query = supabase.from(TABLE).select(USER_COLUMNS, { count: 'exact' })
+    const rows = await query(
+      `select ${PUBLIC_COLS},
+              count(*) over ()::int as total_count
+         from public.${TABLE}
+        where ($1::text = '' or lower(name) like $2
+                           or lower(email) like $2
+                           or coalesce(phone, '') like $2)
+        order by created_at desc
+        limit $3 offset $4`,
+      [String(search ?? ''), term, limit, offset],
+    )
 
-    if (search) {
-      const term = `%${search}%`
-      query = query.or(`name.ilike.${term},email.ilike.${term},phone.ilike.${term}`)
-    }
-
-    const { data, count, error } = await query.range(from, from + limit - 1).order('created_at', {
-      ascending: false,
-    })
-
-    if (error) throw new Error(error.message)
-
-    return { items: data ?? [], total: count ?? 0 }
+    const total = rows.length ? Number(rows[0].total_count) : 0
+    return { items: rows, total }
   },
 
   async create(data) {
-    return queryOrConflict(supabase.from(TABLE).insert(toDb(data)).select().single(), 'Email already registered')
+    return queryOne(
+      `insert into public.${TABLE} (email, password_hash, role, name, phone, is_active)
+       values ($1, $2, $3, $4, $5, $6)
+       returning ${PUBLIC_COLS}`,
+      [
+        String(data.email).toLowerCase(),
+        data.passwordHash,
+        data.role ?? 'user',
+        data.name,
+        data.phone ?? null,
+        data.isActive ?? true,
+      ],
+    )
   },
 
   async updateLastLogin(id) {
-    return supabase
-      .from(TABLE)
-      .update({ last_login_at: new Date().toISOString() })
-      .eq('id', id)
-      .then(({ data }) => data)
+    return queryOne(
+      `update public.${TABLE} set last_login_at = now() where id = $1 returning ${PUBLIC_COLS}`,
+      [id],
+    )
   },
 
   async updateById(id, data) {
-    const patch = {}
-    if (data.name !== undefined) patch.name = data.name
-    if (data.phone !== undefined) patch.phone = data.phone
-    if (data.role !== undefined) patch.role = data.role
-    if (data.isActive !== undefined) patch.is_active = data.isActive
-    if (data.passwordHash !== undefined) patch.password_hash = data.passwordHash
-
-    const { data: updated, error } = await supabase
-      .from(TABLE)
-      .update(patch)
-      .eq('id', id)
-      .select(USER_COLUMNS)
-      .maybeSingle()
-
-    if (error) throw new Error(error.message)
-    return updated
+    return queryOne(
+      `update public.${TABLE}
+          set name         = coalesce($2, name),
+              phone        = coalesce($3, phone),
+              role         = coalesce($4, role),
+              is_active    = coalesce($5, is_active),
+              password_hash = coalesce($6, password_hash)
+        where id = $1
+        returning ${PUBLIC_COLS}`,
+      [id, data.name ?? null, data.phone ?? null, data.role ?? null,
+        data.isActive ?? null, data.passwordHash ?? null],
+    )
   },
 
   async deleteById(id) {
-    const { error } = await supabase.from(TABLE).delete().eq('id', id)
-    if (error) throw new Error(error.message)
-    return true
+    const row = await queryOne(`delete from public.${TABLE} where id = $1 returning id`, [id])
+    return Boolean(row)
   },
 }
 

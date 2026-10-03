@@ -1,23 +1,11 @@
-import supabase from '../config/supabase.js'
 import ApiError from '../utils/ApiError.js'
 import memberRepository from '../repositories/memberRepository.js'
 import { toDbMember, toClientMember } from '../models/Member.js'
 import { uploadImage, deleteImage } from '../utils/storage/cloudinary.js'
 
-const TABLE = 'members'
 const FOLDER = 'members'
 
-const nextMemberCode = async () => {
-  const { data } = await supabase
-    .from(TABLE)
-    .select('member_code')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  const last = Number(data?.member_code?.split('-')[1] ?? 0)
-  return `M-${String(last + 1).padStart(5, '0')}`
-}
+const nextMemberCode = () => memberRepository.nextMemberCode()
 
 /**
  * Upload the member photo to Cloudinary and return { photoUrl, publicId }.

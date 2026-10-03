@@ -25,7 +25,7 @@ export function errorHandler(err, req, res, next) {
         : err.message
   }
 
-  // supabase / postgres errors
+  // postgres errors; utils/db.js normally translates these to ApiError already
   if (err.code === '23505') {
     statusCode = 409
     message = 'Duplicate record'

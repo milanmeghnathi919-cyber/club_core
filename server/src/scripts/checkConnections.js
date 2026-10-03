@@ -2,43 +2,33 @@
  * Verifies every external connection the server depends on.
  *
  *   npm run db:check
- *
- * Placeholder values fail fast with a clear message so you know exactly which
- * env var still needs filling in.
  */
 import config, { assertConfig } from '../config/index.js'
-import { supabase } from '../config/supabase.js'
+import { pool } from '../config/postgres.js'
+import { queryOne } from '../utils/db.js'
 import cloudinary from '../config/cloudinary.js'
 import nodemailer from 'nodemailer'
 import { isRazorpayEnabled } from '../utils/razorpay.js'
 
 const PLACEHOLDER = /^(YOUR-|PASTE_|replace-with|your-)/i
-
 const looksLikePlaceholder = (value) => !value || PLACEHOLDER.test(value)
 
 const line = (ok, label, detail = '') =>
   console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? `  ${detail}` : ''}`)
 
-function checkSupabase() {
-  const { supabaseUrl, supabaseServiceRoleKey } = config
+async function checkPostgres() {
+  const { host, user, password, port } = config.db
 
-  if (looksLikePlaceholder(supabaseUrl) || looksLikePlaceholder(supabaseServiceRoleKey)) {
-    return line(false, 'supabase', 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY still placeholders')
+  if (looksLikePlaceholder(host) || looksLikePlaceholder(user) || looksLikePlaceholder(password)) {
+    return line(false, 'postgres', 'DB_HOST / DB_USER / DB_PASSWORD contain placeholders')
   }
 
-  // any trivial read proves the URL, key and network path all work
-  return supabase
-    .from('users')
-    .select('id')
-    .limit(1)
-    .then(({ error }) => {
-      if (error && !/does not exist|schema cache/i.test(error.message)) {
-        return line(false, 'supabase', error.message)
-      }
-      line(true, 'supabase', `connected (${supabaseUrl})`)
-      if (error) console.log('        note: users table not found yet — run npm run db:migrate')
-    })
-    .catch((err) => line(false, 'supabase', err.message))
+  try {
+    const row = await queryOne('select current_database() as db, current_user as usr')
+    line(true, 'postgres', `${row.db} as ${row.usr} via ${host}:${port}`)
+  } catch (err) {
+    line(false, 'postgres', err.message)
+  }
 }
 
 function checkCloudinary() {
@@ -48,7 +38,7 @@ function checkCloudinary() {
     return line(false, 'cloudinary', 'CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET still placeholders')
   }
 
-  // ping is authenticated and does not leave an uploaded asset behind
+  // ping is authenticated and leaves no uploaded asset behind
   return cloudinary.api
     .ping()
     .then((res) => line(res?.status === 'ok', 'cloudinary', `cloud: ${cloudName}`))
@@ -58,9 +48,7 @@ function checkCloudinary() {
 function checkSmtp() {
   const { host } = config.smtp
 
-  if (!host) {
-    return line(true, 'smtp', 'not configured — email sends are skipped')
-  }
+  if (!host) return line(true, 'smtp', 'not configured — email sends are skipped')
 
   const tx = nodemailer.createTransport({
     host: config.smtp.host,
@@ -94,15 +82,17 @@ async function main() {
 
   console.log(`  env: ${config.env}  port: ${config.port}\n`)
 
-  await checkSupabase()
+  await checkPostgres()
   await checkCloudinary()
   await checkSmtp()
   checkRazorpay()
 
-  console.log('\nRun `npm run dev` to exercise uploads and payments end to end.\n')
+  await pool.end()
+  console.log('')
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error('Check failed:', err.message)
+  await pool.end().catch(() => null)
   process.exit(1)
 })

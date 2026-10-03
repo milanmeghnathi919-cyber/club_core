@@ -1,71 +1,90 @@
-import supabase from '../config/supabase.js'
+import { query, queryOne } from '../utils/db.js'
 import { MEMBER_COLUMNS } from '../models/Member.js'
 
 const TABLE = 'members'
+const COLS = MEMBER_COLUMNS.join(', ')
 
 export const memberRepository = {
   async findById(id) {
-    const { data } = await supabase.from(TABLE).select(MEMBER_COLUMNS).eq('id', id).maybeSingle()
-    return data
+    return queryOne(`select ${COLS} from public.${TABLE} where id = $1`, [id])
   },
 
   async findByCode(memberCode) {
-    const { data } = await supabase
-      .from(TABLE)
-      .select(MEMBER_COLUMNS)
-      .eq('member_code', memberCode)
-      .maybeSingle()
-    return data
+    return queryOne(`select ${COLS} from public.${TABLE} where member_code = $1`, [memberCode])
   },
 
   async list({ page = 1, limit = 20, search } = {}) {
-    const from = (page - 1) * limit
+    const offset = (page - 1) * limit
+    const term = `%${String(search ?? '').toLowerCase()}%`
 
-    let query = supabase.from(TABLE).select(MEMBER_COLUMNS, { count: 'exact' })
+    const rows = await query(
+      `select ${COLS}, count(*) over ()::int as total_count
+         from public.${TABLE}
+        where ($1::text = '' or lower(full_name) like $2
+                           or phone like $2
+                           or lower(member_code) like $2)
+        order by created_at desc
+        limit $3 offset $4`,
+      [String(search ?? ''), term, limit, offset],
+    )
 
-    if (search) {
-      const term = `%${search}%`
-      query = query.or(`full_name.ilike.${term},phone.ilike.${term},member_code.ilike.${term}`)
-    }
+    return { items: rows, total: rows.length ? Number(rows[0].total_count) : 0 }
+  },
 
-    const { data, count, error } = await query.range(from, from + limit - 1).order('created_at', {
-      ascending: false,
-    })
-
-    if (error) throw new Error(error.message)
-    return { items: data ?? [], total: count ?? 0 }
+  /** Sequential member codes: M-00001, M-00002, ... */
+  async nextMemberCode() {
+    const row = await queryOne(
+      `select coalesce(max(nullif(regexp_replace(member_code, '\\D', '', 'g'), '')::int), 0) + 1 as n
+         from public.${TABLE}`,
+    )
+    return `M-${String(Number(row?.n ?? 1)).padStart(5, '0')}`
   },
 
   async create(data) {
-    const { data: created, error } = await supabase
-      .from(TABLE)
-      .insert(data)
-      .select(MEMBER_COLUMNS)
-      .single()
-
-    if (error) {
-      if (error.code === '23505') throw new Error('Member code already exists')
-      throw new Error(error.message)
-    }
-    return created
+    return queryOne(
+      `insert into public.${TABLE}
+         (member_code, user_id, full_name, phone, email, dob, address,
+          emergency_contact, photo_url, notes, created_by)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       returning ${COLS}`,
+      [
+        data.member_code,
+        data.user_id ?? null,
+        data.full_name,
+        data.phone,
+        data.email ?? null,
+        data.dob ?? null,
+        data.address ?? null,
+        data.emergency_contact ?? null,
+        data.photo_url ?? null,
+        data.notes ?? null,
+        data.created_by ?? null,
+      ],
+    )
   },
 
   async updateById(id, patch) {
-    const { data: updated, error } = await supabase
-      .from(TABLE)
-      .update(patch)
-      .eq('id', id)
-      .select(MEMBER_COLUMNS)
-      .maybeSingle()
-
-    if (error) throw new Error(error.message)
-    return updated
+    return queryOne(
+      `update public.${TABLE}
+          set full_name         = coalesce($2, full_name),
+              phone             = coalesce($3, phone),
+              email             = coalesce($4, email),
+              dob               = coalesce($5, dob),
+              address           = coalesce($6, address),
+              emergency_contact = coalesce($7, emergency_contact),
+              photo_url         = coalesce($8, photo_url),
+              notes             = coalesce($9, notes)
+        where id = $1
+        returning ${COLS}`,
+      [id, patch.full_name ?? null, patch.phone ?? null, patch.email ?? null,
+        patch.dob ?? null, patch.address ?? null, patch.emergency_contact ?? null,
+        patch.photo_url ?? null, patch.notes ?? null],
+    )
   },
 
   async deleteById(id) {
-    const { error } = await supabase.from(TABLE).delete().eq('id', id)
-    if (error) throw new Error(error.message)
-    return true
+    const row = await queryOne(`delete from public.${TABLE} where id = $1 returning id`, [id])
+    return Boolean(row)
   },
 }
 

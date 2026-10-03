@@ -1,13 +1,9 @@
-import supabase from '../config/supabase.js'
+import { query, queryOne, transaction } from '../utils/db.js'
 import ApiError from '../utils/ApiError.js'
 import { createOrder, verifyPaymentSignature } from '../utils/razorpay.js'
 
 const TABLE = 'payments'
-
-const nextPaymentNo = async () => {
-  const { data } = await supabase.rpc('next_payment_no').maybeSingle()
-  return data ?? null
-}
+const COLS = 'id, payment_no, source_type, source_id, member_id, amount, method, status, revenue_category, razorpay_order_id, razorpay_payment_id, received_by, paid_at, created_at'
 
 export const paymentService = {
   async record({
@@ -21,29 +17,69 @@ export const paymentService = {
     razorpayPaymentId = null,
     receivedBy = null,
   }) {
-    const paymentNo = await nextPaymentNo()
-
-    const { data, error } = await supabase
-      .from(TABLE)
-      .insert({
-        payment_no: paymentNo,
-        source_type: sourceType,
-        source_id: sourceId ?? null,
-        member_id: memberId,
+    // the number comes from the db sequence, never from the client
+    const row = await queryOne(
+      `insert into public.${TABLE}
+         (payment_no, source_type, source_id, member_id, amount, method,
+          status, revenue_category, razorpay_order_id, razorpay_payment_id,
+          received_by, paid_at)
+       values (next_payment_no(), $1,$2,$3,$4,$5,'success',$6,$7,$8,$9, now())
+       returning ${COLS}`,
+      [
+        sourceType,
+        sourceId ?? null,
+        memberId,
         amount,
         method,
-        status: 'success',
-        revenue_category: revenueCategory,
-        razorpay_order_id: razorpayOrderId,
-        razorpay_payment_id: razorpayPaymentId,
-        received_by: receivedBy,
-        paid_at: new Date().toISOString(),
-      })
-      .select()
-      .single()
+        revenueCategory,
+        razorpayOrderId,
+        razorpayPaymentId,
+        receivedBy,
+      ],
+    )
+    return row
+  },
 
-    if (error) throw new Error(error.message)
-    return data
+  /**
+   * Record a payment and mark its source document paid, atomically.
+   * Used after a Razorpay verification succeeds.
+   */
+  async recordAndMarkSourcePaid(payload, sourceTable) {
+    const allowed = ['memberships', 'bookings', 'shop_orders', 'bar_tabs', 'invoices']
+    if (!allowed.includes(sourceTable)) {
+      throw ApiError.badRequest(`Unsupported source table: ${sourceTable}`)
+    }
+
+    return transaction(async ({ query: tx }) => {
+      const insert = await tx.query(
+        `insert into public.${TABLE}
+           (payment_no, source_type, source_id, member_id, amount, method,
+            status, revenue_category, razorpay_order_id, razorpay_payment_id,
+            received_by, paid_at)
+         values (next_payment_no(), $1,$2,$3,$4,$5,'success',$6,$7,$8,$9, now())
+         returning ${COLS}`,
+        [
+          payload.sourceType,
+          payload.sourceId ?? null,
+          payload.memberId ?? null,
+          payload.amount,
+          payload.method,
+          payload.revenueCategory ?? 'other',
+          payload.razorpayOrderId ?? null,
+          payload.razorpayPaymentId ?? null,
+          payload.receivedBy ?? null,
+        ],
+      )
+
+      if (payload.sourceId) {
+        await tx.query(
+          `update public.${sourceTable} set payment_status = 'paid' where id = $1`,
+          [payload.sourceId],
+        )
+      }
+
+      return insert.rows[0]
+    })
   },
 
   async createRazorpayOrder({ amount, receipt, notes }) {
@@ -55,36 +91,41 @@ export const paymentService = {
     return true
   },
 
+  async findByRazorpayOrderId(orderId) {
+    return queryOne(`select ${COLS} from public.${TABLE} where razorpay_order_id = $1`, [orderId])
+  },
+
   async list({ page = 1, limit = 20, revenueCategory } = {}) {
-    const from = (page - 1) * limit
+    const offset = (page - 1) * limit
 
-    let query = supabase
-      .from(TABLE)
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
+    const rows = await query(
+      `select ${COLS}, count(*) over ()::int as total_count
+         from public.${TABLE}
+        where ($1::text is null or revenue_category = $1)
+        order by created_at desc
+        limit $2 offset $3`,
+      [revenueCategory ?? null, limit, offset],
+    )
 
-    if (revenueCategory) query = query.eq('revenue_category', revenueCategory)
-
-    const { data, count, error } = await query.range(from, from + limit - 1)
-    if (error) throw new Error(error.message)
-
-    return { items: data ?? [], total: count ?? 0, page, limit }
+    return {
+      items: rows,
+      total: rows.length ? Number(rows[0].total_count) : 0,
+      page,
+      limit,
+    }
   },
 
   async revenueSummary({ from, to }) {
-    const { data, error } = await supabase
-      .from(TABLE)
-      .select('revenue_category, amount')
-      .eq('status', 'success')
-      .gte('paid_at', from)
-      .lte('paid_at', to)
-
-    if (error) throw new Error(error.message)
-
-    return (data ?? []).reduce((acc, row) => {
-      acc[row.revenue_category] = (acc[row.revenue_category] ?? 0) + Number(row.amount)
-      return acc
-    }, {})
+    const rows = await query(
+      `select revenue_category, sum(amount)::numeric as total, count(*)::int as count
+         from public.${TABLE}
+        where status = 'success'
+          and paid_at >= $1 and paid_at <= $2
+        group by revenue_category
+        order by revenue_category`,
+      [from, to],
+    )
+    return rows
   },
 }
 

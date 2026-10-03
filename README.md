@@ -17,8 +17,8 @@ The planning documents describe the product requirements and intended architectu
 
 ```
 .
-├── client/   React + Vite (feature-based architecture)
-└── server/   Node + Express (routes → controllers → services → repositories → models)
+├── client/   React + Vite + Redux Toolkit (feature-based architecture)
+└── server/   Node + Express + pg + Cloudinary + Razorpay
 ```
 
 ## Run the client
@@ -38,15 +38,40 @@ Copy `client/.env.example` to `client/.env` to override `VITE_API_BASE_URL`. Dev
 ```bash
 cd server
 npm install
-cp .env.example .env   # set MONGO_URI and JWT_SECRET
+cp .env.example .env   # set DB_* , CLOUDINARY_* and JWT_SECRET
+npm run db:test        # verify the database connection
+npm run db:migrate     # create the 31 tables
 npm run dev            # http://localhost:5000
 npm start
 ```
 
-MongoDB must be running before the server starts. The server exits with a clear message if `MONGO_URI` or `JWT_SECRET` is missing.
+The database is a **direct Postgres connection** (`pg` with a connection pool) — no ORM and no Supabase REST client. Configure it in `.env`:
+
+```
+DB_HOST=db.<project-ref>.supabase.co
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=<password>
+DB_SSL=true
+```
+
+Remote Postgres requires TLS, so leave `DB_SSL=true` and set it to `false` only for a local socket. The server exits at startup with a clear message naming any missing variable.
+
+### Database scripts
+
+| Script | What it does |
+| --- | --- |
+| `npm run db:test` | Opens a real connection, authenticates, reports tables and doc-number functions |
+| `npm run db:migrate` | Applies pending SQL files, one transaction per file |
+| `npm run db:migrate -- --status` | Lists applied vs pending without changing anything |
+| `npm run db:check` | Checks Postgres, Cloudinary, SMTP and Razorpay together |
+| `npm run db:smoke` | End-to-end test: registers over HTTP, verifies the Postgres row, cleans up |
+
+Migrations live in `server/src/db/migrations/`. Each file is idempotent and applied inside a transaction, so a failure rolls the whole file back; `schema_migrations` records what has run, making `db:migrate` safe to repeat.
 
 ## Request flow
 
-Server requests flow through `routes → validators → controllers → services → repositories → models`. Successful responses use `{ success, data }`; errors use `{ success: false, message, details? }`.
+Server requests flow through `routes → validators → controllers → services → repositories`. SQL lives in `repositories/` and is always parameterised (`$1, $2`), never string-concatenated. Successful responses use `{ success, data }`; errors use `{ success: false, message, details? }`.
 
 In the client, each feature owns its slice, hooks, services, and components. Hooks call feature services, which use the shared `service/api.js` client. Pages import from feature barrels (for example, `@/feature/auth`).

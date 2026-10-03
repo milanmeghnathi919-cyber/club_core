@@ -8,24 +8,33 @@ const rootDir = path.resolve(__dirname, '../..')
 dotenv.config({ path: path.join(rootDir, '.env') })
 
 const required = [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
+  'DB_HOST',
+  'DB_USER',
+  'DB_PASSWORD',
   'JWT_SECRET',
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
 ]
 
-const optionalNumber = (value, fallback) => (Number.isFinite(Number(value)) ? Number(value) : fallback)
+const optionalNumber = (value, fallback) =>
+  Number.isFinite(Number(value)) ? Number(value) : fallback
 
 const config = {
   env: process.env.NODE_ENV ?? 'development',
   port: optionalNumber(process.env.PORT, 5000),
 
-  // Supabase (service role key bypasses RLS, keep it server-side only)
-  supabaseUrl: process.env.SUPABASE_URL,
-  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+  // Direct Postgres connection (Connect > Direct connection)
+  db: {
+    host: process.env.DB_HOST,
+    port: optionalNumber(process.env.DB_PORT, 5432),
+    name: process.env.DB_NAME ?? 'postgres',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    poolMax: optionalNumber(process.env.DB_POOL_MAX, 10),
+    // Supabase remote connections are always TLS; disable only for a local socket
+    ssl: process.env.DB_SSL !== 'false',
+  },
 
   // Auth
   jwtSecret: process.env.JWT_SECRET,
@@ -70,10 +79,7 @@ const config = {
 export function assertConfig() {
   const missing = required.filter((key) => !process.env[key])
   if (missing.length) {
-    throw new Error(
-      `Missing required env vars: ${missing.join(', ')}\n` +
-        `Copy .env.example to .env and fill them in.`,
-    )
+    throw new Error(`Missing required env vars: ${missing.join(', ')}\nCopy .env.example to .env and fill them in.`)
   }
 }
 

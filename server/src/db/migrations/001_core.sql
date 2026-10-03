@@ -1,7 +1,7 @@
 -- =============================================================================
 -- 001_core.sql
 -- Core schema: identity, membership, courts, bookings, payments, notifications
--- Run in Supabase SQL Editor, or: supabase db push
+-- Apply with: npm run db:migrate
 -- =============================================================================
 
 create extension if not exists "pgcrypto";
