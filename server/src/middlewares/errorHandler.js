@@ -1,3 +1,4 @@
+import multer from 'multer'
 import ApiError from '../utils/ApiError.js'
 import logger from '../utils/logger.js'
 import config from '../config/index.js'
@@ -13,20 +14,30 @@ export function errorHandler(err, req, res, next) {
   let message = err.message ?? 'Internal server error'
   let details = err.details ?? null
 
-  if (err.name === 'ValidationError') {
+  
+
+  // multer upload failures (size / count / mime)
+  if (err instanceof multer.MulterError) {
     statusCode = 400
-    message = 'Validation failed'
-    details = Object.values(err.errors).map((e) => e.message)
+    message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? `File too large. Max ${config.upload.maxFileSizeBytes / (1024 * 1024)}MB allowed`
+        : err.message
   }
 
-  if (err.name === 'CastError') {
-    statusCode = 400
-    message = `Invalid ${err.path}`
-  }
-
-  if (err.code === 11000) {
+  // supabase / postgres errors
+  if (err.code === '23505') {
     statusCode = 409
-    message = `Duplicate field: ${Object.keys(err.keyValue).join(', ')}`
+    message = 'Duplicate record'
+  }
+  if (err.code === '23503') {
+    statusCode = 400
+    message = 'Referenced record does not exist'
+  }
+  if (err.code === '22P02' || err.code === '23514') {
+    statusCode = 400
+    message = 'Invalid value for one or more fields'
+    details = err.message
   }
 
   if (statusCode >= 500) {

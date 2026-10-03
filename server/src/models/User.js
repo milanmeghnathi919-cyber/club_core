@@ -1,36 +1,27 @@
-import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
+/**
+ * Table/column constants for the users table.
+ * Postgres owns the schema (see src/db/migrations), so models here describe
+ * shape and allow-lists rather than defining storage.
+ */
 
-const userSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, trim: true },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-      index: true,
-    },
-    password: { type: String, required: true, select: false },
-    role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  },
-  { timestamps: true },
-)
+export const USER_COLUMNS = [
+  'id',
+  'email',
+  'role',
+  'name',
+  'phone',
+  'is_active',
+  'last_login_at',
+  'created_at',
+]
 
-userSchema.pre('save', async function hashPassword(next) {
-  if (!this.isModified('password')) return next()
-  this.password = await bcrypt.hash(this.password, 12)
-  next()
-})
+export const USER_ROLES = ['owner', 'admin', 'manager', 'staff', 'user']
 
-userSchema.methods.comparePassword = function comparePassword(candidate) {
-  return bcrypt.compare(candidate, this.password)
+/** Never leak password_hash outside the auth layer. */
+export const toPublicUser = (user) => {
+  if (!user) return null
+  const { password_hash: _hash, ...rest } = user
+  return rest
 }
 
-userSchema.methods.toPublic = function toPublic() {
-  return { id: this._id.toString(), name: this.name, email: this.email, role: this.role }
-}
-
-export const User = mongoose.model('User', userSchema)
-export default User
+export default { USER_COLUMNS, USER_ROLES, toPublicUser }
