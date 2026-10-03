@@ -1,54 +1,52 @@
 # The Champions Club — Sports Club Management System
 
-A unified digital platform for "The Champions Club" sports facility, supporting a public website, member portal, staff console (front desk, courts, shop, bar, kitchen, leads), and owner administration (finance, HR, tax, analytics).
+A unified digital platform for "The Champions Club" sports facility. This repository currently contains a React + Vite client and a Node + Express server.
 
-## Project Documentation (Canonical Source of Truth)
+## Project documentation
 
-Before contributing or modifying code, all developers and AI agents must review the root planning documents:
+The planning documents describe the product requirements and intended architecture:
 
-- [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) — Live project state, task board, and rules (read first)
-- [`MASTER_PLAN.md`](./MASTER_PLAN.md) — Master product requirements, scenes, timeline, and architecture overview
-- [`API_CONTRACT.md`](./API_CONTRACT.md) — Full REST API specifications, data contracts, and status codes
-- [`BACKEND_EXECUTION_PLAN.md`](./BACKEND_EXECUTION_PLAN.md) — Backend implementation guide, database schema, and test matrix
-- [`FRONTEND_EXECUTION_PLAN.md`](./FRONTEND_EXECUTION_PLAN.md) — Frontend architecture, component hierarchy, routes, and UI flows
-- [`STRUCTURE_NOTES.md`](./STRUCTURE_NOTES.md) — Structure analysis, conflicts, unknowns, assumptions, and setup decisions
+- [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) — Live project state, task board, and contributor rules
+- [`MASTER_PLAN.md`](./MASTER_PLAN.md) — Product requirements, timeline, and architecture overview
+- [`API_CONTRACT.md`](./API_CONTRACT.md) — REST API specifications and data contracts
+- [`BACKEND_EXECUTION_PLAN.md`](./BACKEND_EXECUTION_PLAN.md) — Backend implementation guide and database plan
+- [`FRONTEND_EXECUTION_PLAN.md`](./FRONTEND_EXECUTION_PLAN.md) — Frontend architecture and UI flows
+- [`STRUCTURE_NOTES.md`](./STRUCTURE_NOTES.md) — Structure analysis, unknowns, and assumptions
 
-## Repository Architecture
+## Repository layout
 
-```text
-├── client/                     # Frontend SPA (React 18, Vite, Tailwind, Redux Toolkit)
-│   ├── src/
-│   │   ├── app/                # RTK store, baseApi, routing, and role guards
-│   │   ├── components/         # Reusable UI kit, layout shells, and cross-domain components
-│   │   ├── features/           # Modular domain features (auth, members, bookings, shop, bar, etc.)
-│   │   ├── hooks/              # Custom React hooks (useRazorpay, useDebounce, usePolling)
-│   │   ├── mocks/              # MSW mock handlers and API fixture datasets
-│   │   └── utils/              # Formatting, club timezone conversions, and PDF generators
-├── server/                     # Backend REST API (Node.js, Express, Supabase Postgres)
-│   ├── db/
-│   │   ├── migrations/         # Numbered SQL schema definitions (001_core to 004_functions)
-│   │   └── seeds/              # Database seed data scripts (core + commerce)
-│   ├── src/
-│   │   ├── config/             # External service configurations (Supabase, Razorpay, Cloudinary, etc.)
-│   │   ├── jobs/               # Background cron jobs (membership expiry, order release, etc.)
-│   │   ├── middleware/         # Auth, validation, rate limiting, and error handling
-│   │   ├── modules/            # Domain-driven backend modules (routes, controller, service, repo, schema)
-│   │   └── utils/              # Standard responses, error classes, money math, and time helpers
-│   └── tests/                  # Concurrency verification, smoke tests, and Postman collection
+```
+.
+├── client/   React + Vite (feature-based architecture)
+└── server/   Node + Express (routes → controllers → services → repositories → models)
 ```
 
-## Quick Start
+## Run the client
 
-### Backend API
-```bash
-cd server
-npm install
-npm run dev
-```
-
-### Frontend Client
 ```bash
 cd client
 npm install
-npm run dev
+npm run dev        # http://localhost:5173
+npm run build
+npm run preview
 ```
+
+Copy `client/.env.example` to `client/.env` to override `VITE_API_BASE_URL`. Development requests to `/api` are proxied to the server.
+
+## Run the server
+
+```bash
+cd server
+npm install
+cp .env.example .env   # set MONGO_URI and JWT_SECRET
+npm run dev            # http://localhost:5000
+npm start
+```
+
+MongoDB must be running before the server starts. The server exits with a clear message if `MONGO_URI` or `JWT_SECRET` is missing.
+
+## Request flow
+
+Server requests flow through `routes → validators → controllers → services → repositories → models`. Successful responses use `{ success, data }`; errors use `{ success: false, message, details? }`.
+
+In the client, each feature owns its slice, hooks, services, and components. Hooks call feature services, which use the shared `service/api.js` client. Pages import from feature barrels (for example, `@/feature/auth`).
