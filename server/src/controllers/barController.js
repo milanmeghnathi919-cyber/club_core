@@ -129,6 +129,7 @@ export default {
   listMenu,
   createMenuItem,
   updateMenuItem,
+  deleteMenuItem,
   listTables,
   createTable,
   listTabs,
