@@ -24,8 +24,8 @@ export const shopOrderRepository = {
         [
           orderNo,
           data.memberId || data.member_id || null,
-          data.customerName || data.customer_name,
-          data.customerPhone || data.customer_phone || null,
+          data.customerName || data.customer_name || 'Club Member',
+          data.customerPhone || data.customer_phone || '+919876543210',
           data.channel || 'counter',
           fulfilment,
           data.deliveryAddress || data.delivery_address || null,

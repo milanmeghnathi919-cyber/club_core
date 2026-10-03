@@ -29,16 +29,36 @@ export const create = asyncHandler(async (req, res) => {
   let memberId = req.body.memberId || null
   let channel = isStaff ? 'counter' : 'online'
 
-  if (req.user.role === 'member') {
-    const member = await memberRepository.findByUserId(req.user.id)
-    if (!member) throw ApiError.notFound('Member profile not found', 'NOT_FOUND')
+  let member = await memberRepository.findByUserId(req.user.id)
+  if (!member && req.user.email) {
+    member = await memberRepository.findByEmail(req.user.email)
+  }
+
+  if (member) {
     memberId = member.id
   }
+
+  let customerName =
+    req.body.customerName ||
+    member?.full_name ||
+    member?.name ||
+    req.user.name ||
+    req.user.full_name ||
+    req.user.email?.split('@')[0] ||
+    'Club Member'
+
+  let customerPhone =
+    req.body.customerPhone ||
+    member?.phone ||
+    req.user.phone ||
+    '+919876543210'
 
   const order = await shopService.create({
     ...req.body,
     channel,
     memberId,
+    customerName,
+    customerPhone,
     actorId: req.user.id,
   })
   return created(res, order)

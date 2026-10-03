@@ -70,6 +70,8 @@ export const Checkout = () => {
         fulfilment,
         deliveryAddress: fulfilment === 'delivery' ? deliveryAddress : null,
         paymentMethod: paymentMethod,
+        customerName: user?.name || user?.full_name || user?.email?.split('@')[0],
+        customerPhone: user?.phone || null,
       })
 
       setOrderSuccess(res.order || res)
@@ -91,14 +93,16 @@ export const Checkout = () => {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-slate-900">Order Confirmed!</h2>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Your Pro Shop order has been placed. You will receive an SMS confirmation once your gear is ready.
+            Your Pro Shop order has been placed. You can view your receipt and status in your past orders history.
           </p>
         </div>
 
         <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
           <div className="flex justify-between">
             <span className="text-slate-500">Order Number:</span>
-            <strong className="font-mono text-slate-900 text-sm">{orderSuccess.orderNo}</strong>
+            <strong className="font-mono text-slate-900 text-sm">
+              {orderSuccess.orderNo || orderSuccess.order_no}
+            </strong>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">Fulfilment:</span>
@@ -113,17 +117,20 @@ export const Checkout = () => {
           <div className="flex justify-between">
             <span className="text-slate-500">Payment Status:</span>
             <span className="font-semibold capitalize text-amber-700">
-              {orderSuccess.paymentStatus || 'Pending on pickup'}
+              {orderSuccess.paymentStatus || orderSuccess.payment_status || 'Pending on pickup'}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-3">
-          <Link to="/app">
-            <Button variant="lawn">Back to Dashboard</Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link to="/shop?tab=orders">
+            <Button variant="lawn" className="font-bold">View in Past Orders</Button>
           </Link>
           <Link to="/shop">
             <Button variant="outline">Continue Shopping</Button>
+          </Link>
+          <Link to="/app">
+            <Button variant="ghost">Dashboard</Button>
           </Link>
         </div>
       </div>
