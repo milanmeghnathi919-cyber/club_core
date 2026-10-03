@@ -1,32 +1,40 @@
-import paymentService from '../services/paymentService.js'
+import paymentsService from '../services/paymentsService.js'
 import asyncHandler from '../utils/asyncHandler.js'
+import { ok, paginated } from '../utils/response.js'
 
-export const createOrder = asyncHandler(async (req, res) => {
-  const { amount, receipt, notes } = req.body
-  const order = await paymentService.createRazorpayOrder({ amount, receipt, notes })
-  res.status(201).json({ success: true, data: order })
+export const list = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 20, from, to, method, sourceType, revenueCategory } = req.query
+  const { items, total } = await paymentsService.list({
+    page: Number(page),
+    limit: Number(limit),
+    from,
+    to,
+    method,
+    sourceType,
+    revenueCategory,
+  })
+
+  return paginated(res, items, {
+    page: Number(page),
+    limit: Number(limit),
+    total,
+    totalPages: Math.ceil(total / Number(limit)) || 1,
+  })
 })
 
-export const verifyPayment = asyncHandler(async (req, res) => {
-  await paymentService.verifyRazorpayPayment(req.body)
-  res.json({ success: true, data: { verified: true } })
+export const refund = asyncHandler(async (req, res) => {
+  const { id } = req.params
+  const payment = await paymentsService.refund(id, req.user?.id)
+  return ok(res, payment)
 })
 
-export const recordCashPayment = asyncHandler(async (req, res) => {
-  const payment = await paymentService.record({ ...req.body, receivedBy: req.user.sub })
-  res.status(201).json({ success: true, data: payment })
+export const verifyRazorpay = asyncHandler(async (req, res) => {
+  const result = await paymentsService.verifyRazorpay(req.body)
+  return ok(res, result)
 })
 
-export const listPayments = asyncHandler(async (req, res) => {
-  const page = Math.max(Number(req.query.page) || 1, 1)
-  const limit = Math.min(Number(req.query.limit) || 20, 100)
-  const data = await paymentService.list({ page, limit, revenueCategory: req.query.category })
-  res.json({ success: true, ...data })
-})
-
-export const revenueSummary = asyncHandler(async (req, res) => {
-  const to = req.query.to ?? new Date().toISOString()
-  const from = req.query.from ?? new Date(Date.now() - 30 * 864e5).toISOString()
-  const summary = await paymentService.revenueSummary({ from, to })
-  res.json({ success: true, data: { from, to, summary } })
-})
+export default {
+  list,
+  refund,
+  verifyRazorpay,
+}

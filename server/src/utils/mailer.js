@@ -20,17 +20,12 @@ function getTransporter() {
 
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      host: config.mail.host,
-      port: config.mail.port,
-      secure: config.mail.secure,
+      service: 'gmail',
       auth: {
         user: config.mail.user,
-        // app passwords are shown in 4-char groups; the space is cosmetic
+        // Google pass keys / app passwords are shown in 4-char groups; spaces are stripped automatically
         pass: config.mail.pass.replace(/\s+/g, ''),
       },
-      pool: true,
-      maxConnections: 3,
-      connectionTimeout: 20_000,
     })
   }
 
@@ -40,7 +35,7 @@ function getTransporter() {
 /** Verify credentials without sending. Used by `npm run db:check`. */
 export async function verifyMail() {
   const tx = getTransporter()
-  if (!tx) throw new ApiError(503, 'EMAIL_USER / EMAIL_PASS not configured')
+  if (!tx) throw new ApiError(503, 'EMAIL_USER / EMAIL_PASS not configured in .env')
   return tx.verify()
 }
 
@@ -48,7 +43,7 @@ export async function sendMail({ to, subject, text, html, replyTo }) {
   const tx = getTransporter()
 
   if (!tx) {
-    logger.warn('EMAIL_USER/EMAIL_PASS not set, skipping email to', to)
+    logger.warn('EMAIL_USER / EMAIL_PASS not set, skipping email to', to)
     return { skipped: true }
   }
 

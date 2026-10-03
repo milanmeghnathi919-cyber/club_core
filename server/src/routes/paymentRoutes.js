@@ -1,25 +1,14 @@
 import { Router } from 'express'
-import * as paymentController from '../controllers/paymentController.js'
-import { authenticate, staffOnly, adminOnly, managerOnly } from '../middlewares/auth.js'
-import { verifyWebhookSignature } from '../utils/razorpay.js'
+import paymentController from '../controllers/paymentController.js'
+import { authenticate, authorize } from '../middlewares/auth.js'
 
 const router = Router()
 
-router.post('/webhook', (req, res) => {
-  // raw body is required for the HMAC check, so this route mounts before json parsing
-  const valid = verifyWebhookSignature(req.rawBody, req.get('x-razorpay-signature'))
-  if (!valid) return res.status(400).json({ success: false, message: 'Invalid signature' })
+// Static routes before /:id
+router.post('/razorpay/verify', paymentController.verifyRazorpay)
+router.post('/razorpay/webhook', (req, res) => res.status(200).json({ success: true, data: {} }))
 
-  const event = req.body?.event
-  res.json({ success: true, data: { received: event } })
-})
-
-router.use(authenticate)
-
-router.post('/order', managerOnly, paymentController.createOrder)
-router.post('/verify', paymentController.verifyPayment)
-router.post('/', staffOnly, paymentController.recordCashPayment)
-router.get('/', managerOnly, paymentController.listPayments)
-router.get('/revenue', adminOnly, paymentController.revenueSummary)
+router.get('/', authenticate, authorize('FD+'), paymentController.list)
+router.post('/:id/refund', authenticate, authorize('FD+'), paymentController.refund)
 
 export default router

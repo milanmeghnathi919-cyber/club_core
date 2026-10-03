@@ -1,18 +1,17 @@
 import { Router } from 'express'
-import * as authController from '../controllers/authController.js'
-import emailVerificationRoutes from './emailVerificationRoutes.js'
-import validate, { registerRules, loginRules, changePasswordRules, verifyCodeRules } from '../validators/authValidators.js'
+import authController from '../controllers/authController.js'
 import { authenticate } from '../middlewares/auth.js'
+import { validateBody } from '../middlewares/validate.js'
+import { registerSchema, loginSchema, changePasswordSchema } from '../validators/schemas.js'
 
 const router = Router()
 
-router.post('/register', validate(registerRules), authController.register)
-router.post('/login', validate(loginRules), authController.login)
-router.post('/logout', authController.logout)
+router.post('/register', validateBody(registerSchema), authController.register)
+router.post('/login', validateBody(loginSchema), authController.login)
+router.post('/logout', authenticate, authController.logout)
 router.get('/me', authenticate, authController.me)
-router.post('/change-password', authenticate, validate(changePasswordRules), authController.changePassword)
-
-// POST /api/auth/email/verify | /send-code | /resend | GET /status
-router.use('/email', emailVerificationRoutes)
+router.patch('/password', authenticate, validateBody(changePasswordSchema), authController.changePassword)
+router.post('/forgot-password', authController.forgotPassword)
+router.post('/reset-password', authController.resetPassword)
 
 export default router

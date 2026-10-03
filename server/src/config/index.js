@@ -12,9 +12,6 @@ const required = [
   'DB_USER',
   'DB_PASSWORD',
   'JWT_SECRET',
-  'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET',
 ]
 
 const optionalNumber = (value, fallback) =>
@@ -24,21 +21,21 @@ const config = {
   env: process.env.NODE_ENV ?? 'development',
   port: optionalNumber(process.env.PORT, 5000),
 
-  // Direct Postgres connection (Connect > Direct connection)
+  // Direct Postgres connection (Supabase direct connection)
   db: {
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST ?? 'db.rcfyaquqdrvlwyvfshow.supabase.co',
     port: optionalNumber(process.env.DB_PORT, 5432),
     name: process.env.DB_NAME ?? 'postgres',
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
+    user: process.env.DB_USER ?? 'postgres',
+    password: process.env.DB_PASSWORD ?? 'club_core@123',
     poolMax: optionalNumber(process.env.DB_POOL_MAX, 10),
     // Supabase remote connections are always TLS; disable only for a local socket
-    ssl: process.env.DB_SSL !== 'false',
+    ssl: process.env.DB_SSL === 'true' || process.env.DB_SSL !== 'false',
   },
 
   // Auth
   jwtSecret: process.env.JWT_SECRET,
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   cookieSecure: process.env.NODE_ENV === 'production',
 
   // Cloudinary
@@ -56,18 +53,17 @@ const config = {
       'image/jpeg,image/png,image/webp,image/avif').split(','),
   },
 
-  // Mail (nodemailer over Google SMTP)
-  // EMAIL_USER is the Google account, EMAIL_PASS is a 16-char App Password
-  // (not the account password). Generate at myaccount.google.com > Security > App passwords.
+  // Email OTP verification via Google Pass Key
+  // Only EMAIL_USER and EMAIL_PASS are needed in .env
   mail: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-    host: process.env.MAIL_HOST ?? 'smtp.gmail.com',
-    port: optionalNumber(process.env.MAIL_PORT, 587),
-    secure: process.env.MAIL_SECURE === 'true',
-    from: process.env.MAIL_FROM ?? process.env.EMAIL_USER,
-    codeTtlMinutes: optionalNumber(process.env.EMAIL_CODE_TTL_MINUTES, 10),
-    maxPerHour: optionalNumber(process.env.EMAIL_MAX_PER_HOUR, 5),
+    user: process.env.EMAIL_USER || process.env.email_user || process.env.EMAL_USER,
+    pass: process.env.EMAIL_PASS || process.env.email_pass,
+    from:
+      process.env.EMAIL_USER || process.env.email_user || process.env.EMAL_USER
+        ? `The Champions Club <${process.env.EMAIL_USER || process.env.email_user || process.env.EMAL_USER}>`
+        : 'The Champions Club <noreply@thechampionsclub.com>',
+    codeTtlMinutes: 10,
+    maxPerHour: 5,
   },
 
   // Razorpay
@@ -77,7 +73,7 @@ const config = {
     webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
   },
 
-  clientOrigin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+  clientOrigin: process.env.CLIENT_ORIGIN ?? process.env.CLIENT_URL ?? 'http://localhost:5173',
 }
 
 export function assertConfig() {
@@ -93,9 +89,13 @@ export function assertConfig() {
  * actually due to go out.
  */
 export function assertMailConfig() {
-  const missing = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key])
+  const user = process.env.EMAIL_USER || process.env.email_user || process.env.EMAL_USER
+  const pass = process.env.EMAIL_PASS || process.env.email_pass
+  const missing = []
+  if (!user) missing.push('EMAIL_USER')
+  if (!pass) missing.push('EMAIL_PASS')
   if (missing.length) {
-    throw new Error(`Mail is not configured: ${missing.join(', ')} missing`)
+    throw new Error(`Mail is not configured: ${missing.join(', ')} missing. Add EMAIL_USER and EMAIL_PASS to .env`)
   }
 }
 

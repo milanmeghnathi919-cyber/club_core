@@ -27,6 +27,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 if (config.env !== 'test') app.use(morgan('dev'))
 
+app.get('/health', (req, res) => res.json({ success: true, data: { status: 'ok', time: new Date().toISOString() } }))
+app.use('/api/v1', apiLimiter, routes)
 app.use('/api', apiLimiter, routes)
 
 app.use(notFoundHandler)

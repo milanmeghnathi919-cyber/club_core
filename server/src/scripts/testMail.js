@@ -17,20 +17,20 @@ async function main() {
   const { user, pass, host, port } = config.mail
 
   if (!user || !pass) {
-    console.log('  FAIL  EMAIL_USER / EMAIL_PASS not set')
-    console.log('        app password: https://myaccount.google.com/apppasswords\n')
+    console.log('  FAIL  EMAIL_USER / EMAIL_PASS not set in .env')
+    console.log('        Google pass key / app password: https://myaccount.google.com/apppasswords\n')
     process.exit(1)
   }
 
   if (PLACEHOLDER.test(user) || PLACEHOLDER.test(pass)) {
     console.log(`  FAIL  still placeholders`)
     console.log(`        EMAIL_USER=${user}`)
-    console.log('        replace EMAIL_PASS with a 16-character app password\n')
+    console.log('        replace EMAIL_PASS with a 16-character Google pass key / app password\n')
     process.exit(1)
   }
 
   console.log(`  account: ${user}`)
-  console.log(`  server:  ${host}:${port} (tls)`)
+  console.log('  service: Google Gmail')
   console.log(`  passkey: ${'*'.repeat(pass.replace(/\s+/g, '').length)} (${pass.replace(/\s+/g, '').length} chars)\n`)
 
   try {
@@ -43,12 +43,12 @@ async function main() {
 
     const code = err.responseCode ?? err.code
     if (code === 535 || /invalid login|authentication/i.test(err.message)) {
-      console.log('  535 = the app password is wrong, revoked, or belongs to another account.\n')
+      console.log('  535 = the app password / pass key is wrong, revoked, or belongs to another account.\n')
       console.log('  Check:')
-      console.log('    1. EMAIL_PASS is the APP password, not your Google account password')
+      console.log('    1. EMAIL_PASS is the Google APP password / pass key, not your Google account password')
       console.log('    2. The app password still exists at myaccount.google.com/apppasswords')
-      console.log('    3. EMAIL_USER is the account the app password was generated for')
-      console.log('    4. Spaces in the value are fine, they are stripped before use\n')
+      console.log('    3. EMAIL_USER is the Google account the app password was generated for')
+      console.log('    4. Spaces in the pass key are stripped automatically before use\n')
     } else if (code === 421 || /ECONNREFUSED|ETIMEDOUT|getaddrinfo/i.test(err.message)) {
       console.log('  Could not reach smtp.gmail.com. Check network or firewall.\n')
     } else {

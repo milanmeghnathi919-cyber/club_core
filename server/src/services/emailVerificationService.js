@@ -73,7 +73,7 @@ export const emailVerificationService = {
 
     // Never let a mail outage turn into a 500 on the request
     if (!isMailConfigured()) {
-      logger.warn(`EMAIL_USER/EMAIL_PASS not set; code for ${user.email} not sent`)
+      logger.warn(`EMAIL_USER / EMAIL_PASS not set; code for ${user.email} not sent`)
       return { sent: false, reason: 'mail_not_configured', expiresInMinutes: ttlMinutes }
     }
 

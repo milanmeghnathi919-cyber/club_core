@@ -1,0 +1,576 @@
+openapi: 3.0.3
+info:
+  title: Champions Club Sports Complex API
+  description: |
+    Production-ready API for Champions Club Sports Complex management system.
+    Strictly adheres to API_CONTRACT.md v1.1.
+    All responses follow the standard JSON envelope: { success, data, meta?, error? }.
+  version: 1.1.0
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local Development / Docker Server
+  - url: https://api.championsclub.in/api/v1
+    description: Production Server
+
+tags:
+  - name: Auth
+    description: Authentication, session management and cookie handling
+  - name: Public
+    description: Public guest and visitor endpoints (no authentication required)
+  - name: Settings
+    description: Club configuration and operating settings
+  - name: Plans & Members
+    description: Membership tiers, member profiles and lifecycles
+  - name: Courts & Bookings
+    description: Court catalog, availability engine and slot booking
+  - name: Social Sessions
+    description: Weekly community play and participant management
+  - name: Shop & Inventory
+    description: Pro shop catalog, stock movements, and cart checkout
+  - name: Bar & Kitchen
+    description: F&B POS, open tabs, kitchen queue, and settlement
+  - name: Payments
+    description: Unified immutable revenue ledger and Razorpay integration
+  - name: Leads CRM
+    description: Enquiries, activities, quotes, and customer conversion
+  - name: Notifications
+    description: In-app broadcast and targeted user notifications
+  - name: Finance & Invoices
+    description: B2B clients, tax-exclusive invoicing, and operational expenses
+  - name: HR & Payroll
+    description: Staff roster, shift clock-in, leave management, and monthly payroll
+  - name: Reports & Analytics
+    description: Revenue rollups, KPI dashboards, tax filings, and CSV exports
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                password: { type: string, minLength: 8 }
+      responses:
+        '201':
+          description: Member registered successfully
+        '409':
+          description: Email or phone already exists
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate user and issue cc_token cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: Logged in successfully
+        '401':
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Clear session cookie
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get currently authenticated user, member profile and active membership
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile details
+
+  /auth/password:
+    patch:
+      tags: [Auth]
+      summary: Change password
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword: { type: string }
+                newPassword: { type: string, minLength: 8 }
+      responses:
+        '200':
+          description: Password updated
+
+  /public/club:
+    get:
+      tags: [Public]
+      summary: Get public club information
+      responses:
+        '200':
+          description: Club info
+
+  /public/plans:
+    get:
+      tags: [Public]
+      summary: Get public membership plans
+      responses:
+        '200':
+          description: Plans array
+
+  /public/courts:
+    get:
+      tags: [Public]
+      summary: Get public courts catalog
+      responses:
+        '200':
+          description: Courts array
+
+  /public/availability:
+    get:
+      tags: [Public]
+      summary: 7-to-14 day availability window
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: days
+          in: query
+          schema: { type: integer, default: 7 }
+        - name: sport
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Weekly availability
+
+  /public/enquiries:
+    post:
+      tags: [Public]
+      summary: Submit visitor enquiry (leads CRM)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                phone: { type: string }
+                email: { type: string, format: email }
+                interest: { type: string }
+                message: { type: string }
+      responses:
+        '201':
+          description: Enquiry recorded
+
+  /public/trial-bookings:
+    post:
+      tags: [Public]
+      summary: Book a free/trial guest court slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, phone, courtId, startAt]
+              properties:
+                name: { type: string }
+                phone: { type: string }
+                courtId: { type: string }
+                startAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Trial booking created
+        '409':
+          description: Slot already taken
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get club configuration
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings object
+    patch:
+      tags: [Settings]
+      summary: Update club configuration (owner only)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Updated settings
+
+  /plans:
+    get:
+      tags: [Plans & Members]
+      summary: List all plans
+      responses:
+        '200':
+          description: Plans list
+    post:
+      tags: [Plans & Members]
+      summary: Create new plan (owner only)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Plan created
+
+  /members:
+    get:
+      tags: [Plans & Members]
+      summary: List members (staff only)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Member list
+    post:
+      tags: [Plans & Members]
+      summary: Create member with optional initial membership & payment
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Member created
+
+  /members/lookup:
+    get:
+      tags: [Plans & Members]
+      summary: Fast trigram search for top 10 members
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Matching members
+
+  /members/{id}:
+    get:
+      tags: [Plans & Members]
+      summary: Get member details
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Member profile
+    patch:
+      tags: [Plans & Members]
+      summary: Update member details
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Updated member
+
+  /members/{id}/history:
+    get:
+      tags: [Plans & Members]
+      summary: Unified timeline history for member
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Timeline events
+
+  /memberships/{id}/cancel:
+    patch:
+      tags: [Plans & Members]
+      summary: Cancel active membership
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Cancelled membership
+
+  /me/membership/purchase:
+    post:
+      tags: [Plans & Members]
+      summary: Self-service membership purchase by logged-in member
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planId]
+              properties:
+                planId: { type: string }
+      responses:
+        '201':
+          description: Pending membership and Razorpay order
+
+  /courts:
+    get:
+      tags: [Courts & Bookings]
+      summary: List courts
+      responses:
+        '200':
+          description: Courts list
+    post:
+      tags: [Courts & Bookings]
+      summary: Create court (owner only)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Court created
+
+  /courts/availability:
+    get:
+      tags: [Courts & Bookings]
+      summary: Real-time slot availability for specific date
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Day slots grid
+
+  /bookings:
+    get:
+      tags: [Courts & Bookings]
+      summary: List bookings
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bookings list
+    post:
+      tags: [Courts & Bookings]
+      summary: Create court booking
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [courtId, startAt]
+              properties:
+                courtId: { type: string }
+                startAt: { type: string, format: date-time }
+                paymentMethod: { type: string, enum: [cash, card, upi, online, pay_at_club] }
+      responses:
+        '201':
+          description: Booking confirmed
+        '409':
+          description: Slot taken or member overlap
+
+  /bookings/mine:
+    get:
+      tags: [Courts & Bookings]
+      summary: Current member bookings
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: My bookings
+
+  /bookings/{id}/cancel:
+    patch:
+      tags: [Courts & Bookings]
+      summary: Cancel booking
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Cancelled booking
+
+  /shop/orders/quote:
+    post:
+      tags: [Shop & Inventory]
+      summary: Calculate cart totals without updating stock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, qty]
+                    properties:
+                      productId: { type: string }
+                      qty: { type: integer }
+      responses:
+        '200':
+          description: Cart pricing breakdown
+
+  /shop/orders:
+    post:
+      tags: [Shop & Inventory]
+      summary: Place shop order with atomic stock decrement
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Order placed
+        '409':
+          description: Out of stock
+
+  /bar/tabs:
+    post:
+      tags: [Bar & Kitchen]
+      summary: Open a new bar tab
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Bar tab opened
+        '409':
+          description: Table occupied
+
+  /bar/tabs/{id}/settle:
+    post:
+      tags: [Bar & Kitchen]
+      summary: Settle tab payments and free table
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tab settled
+
+  /reports/dashboard:
+    get:
+      tags: [Reports & Analytics]
+      summary: KPI summary dashboard
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Analytics dashboard metrics
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: cc_token
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data:
+          type: object
+          properties:
+            status: { type: string, example: 'ok' }
+            time: { type: string, format: date-time }
+            uptime: { type: number }
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:
+          type: object
+          properties:
+            code: { type: string, example: 'VALIDATION_ERROR' }
+            message: { type: string }
+            details: { type: array, items: { type: object } }

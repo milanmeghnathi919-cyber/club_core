@@ -1,71 +1,65 @@
 import config from '../config/index.js'
 import authService from '../services/authService.js'
-import emailVerificationService from '../services/emailVerificationService.js'
 import asyncHandler from '../utils/asyncHandler.js'
 import { COOKIE_NAME } from '../middlewares/auth.js'
+import { ok, created } from '../utils/response.js'
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000
 
 const setAuthCookie = (res, token) => {
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: config.cookieSecure,
+    sameSite: config.env === 'production' ? 'none' : 'lax',
+    secure: config.cookieSecure || config.env === 'production',
     maxAge: COOKIE_MAX_AGE,
   })
 }
 
-/**
- * Register, then immediately fire a verification code.
- *
- * The code send is not awaited into the response: a slow or broken mail server
- * must not stop someone getting their account. If the send fails the user can
- * request another code.
- */
 export const register = asyncHandler(async (req, res) => {
-  const { user, token } = await authService.register(req.body)
-  setAuthCookie(res, token)
-
-  let emailCodeSent = false
-  try {
-    const result = await emailVerificationService.requestCode(user.id)
-    emailCodeSent = result.sent
-  } catch {
-    emailCodeSent = false
-  }
-
-  res.status(201).json({
-    success: true,
-    data: { user, token, emailCodeSent },
-  })
+  const result = await authService.register(req.body)
+  setAuthCookie(res, result.token)
+  return created(res, result)
 })
 
 export const login = asyncHandler(async (req, res) => {
-  const { user, token } = await authService.login(req.body)
-  setAuthCookie(res, token)
-
-  res.json({
-    success: true,
-    data: {
-      user,
-      token,
-      // the client uses this to route straight to the verification screen
-      needsEmailVerification: !user.is_email_verified,
-    },
-  })
+  const result = await authService.login(req.body)
+  setAuthCookie(res, result.token)
+  return ok(res, result)
 })
 
 export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie(COOKIE_NAME)
-  res.json({ success: true, data: null })
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    sameSite: config.env === 'production' ? 'none' : 'lax',
+    secure: config.cookieSecure || config.env === 'production',
+  })
+  return ok(res, {})
 })
 
 export const me = asyncHandler(async (req, res) => {
-  const user = await authService.me(req.user.sub)
-  res.json({ success: true, data: user })
+  const result = await authService.me(req.user.id || req.user.sub)
+  return ok(res, result)
 })
 
 export const changePassword = asyncHandler(async (req, res) => {
-  const user = await authService.changePassword(req.user.sub, req.body)
-  res.json({ success: true, data: user })
+  await authService.changePassword(req.user.id || req.user.sub, req.body)
+  return ok(res, {})
 })
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  return ok(res, {})
+})
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  return ok(res, {})
+})
+
+export default {
+  register,
+  login,
+  logout,
+  me,
+  changePassword,
+  forgotPassword,
+  resetPassword,
+}

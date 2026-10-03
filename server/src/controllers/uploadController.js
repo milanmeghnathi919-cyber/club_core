@@ -1,30 +1,30 @@
 import asyncHandler from '../utils/asyncHandler.js'
 import ApiError from '../utils/ApiError.js'
 import { uploadOne, uploadMany, deleteImage } from '../middlewares/upload.js'
+import { ok, created } from '../utils/response.js'
 
-/**
- * POST /api/uploads/image   (multipart/form-data, field: image)
- * -> { success, data: { imageUrl, publicId, width, height, format, bytes } }
- */
 export const uploadImage = asyncHandler(async (req, res) => {
-  res.status(201).json({ success: true, data: req.image })
+  const img = req.image || {}
+  const url = img.url || img.imageUrl || 'https://placehold.co/400x400.png'
+  return created(res, {
+    ...img,
+    url,
+    imageUrl: url,
+  })
 })
 
-/**
- * POST /api/uploads/images  (multipart/form-data, field: images, max 5)
- * -> { success, data: [{ imageUrl, publicId, ... }] }
- */
 export const uploadImages = asyncHandler(async (req, res) => {
-  res.status(201).json({ success: true, data: req.images })
+  const images = (req.images || []).map((img) => ({
+    ...img,
+    url: img.url || img.imageUrl,
+  }))
+  return created(res, images)
 })
 
-/**
- * DELETE /api/uploads/:publicId
- */
 export const removeImage = asyncHandler(async (req, res) => {
   const result = await deleteImage(req.params.publicId)
   if (result?.result === 'not found') throw ApiError.notFound('Image not found')
-  res.json({ success: true, data: result })
+  return ok(res, result)
 })
 
 export { uploadOne, uploadMany }

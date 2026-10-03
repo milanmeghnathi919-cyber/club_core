@@ -2,10 +2,15 @@ import app from './app.js'
 import config, { assertConfig } from './config/index.js'
 import logger from './utils/logger.js'
 import { isRazorpayEnabled } from './utils/razorpay.js'
+import { initJobs } from './jobs/index.js'
 
 function start() {
   try {
     assertConfig()
+
+    if (config.env !== 'test') {
+      initJobs()
+    }
 
     const server = app.listen(config.port, () => {
       logger.info(`API listening on http://localhost:${config.port} (${config.env})`)

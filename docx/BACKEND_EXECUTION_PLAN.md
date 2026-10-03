@@ -94,7 +94,7 @@ server/
   tests/ smoke/*.test.js  concurrency.test.js
   .env.example  package.json
 ```
-Env vars: `PORT, NODE_ENV, CLIENT_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, JWT_SECRET, JWT_EXPIRES_IN=7d, COOKIE_SECURE, CLOUDINARY_*, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, SMTP_HOST/PORT/USER/PASS, MAIL_FROM, JOB_SECRET, CLUB_TZ=Asia/Kolkata`.
+Env vars: `PORT, NODE_ENV, CLIENT_URL, DB_HOST, DB_PORT=5432, DB_NAME=postgres, DB_USER=postgres, DB_PASSWORD, DB_POOL_MAX=10, DB_SSL=true, JWT_SECRET, JWT_EXPIRES_IN=7d, COOKIE_SECURE, CLOUDINARY_*, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, EMAIL_USER, EMAIL_PASS, JOB_SECRET, CLUB_TZ=Asia/Kolkata`.
 
 ### B3. Middleware order
 `helmet → cors({origin: CLIENT_URL, credentials:true}) → morgan → express.json → cookieParser → rateLimit(on auth/public) → routes → notFound → errorHandler`. `errorHandler` converts `AppError`, zod errors, Postgres codes (`23P01`→SLOT_TAKEN, `23505`→409 unique, `23514`/RPC `RAISE EXCEPTION 'CODE:…'`→mapped code) into the error envelope.

@@ -1,18 +1,20 @@
 import { Router } from 'express'
-import * as memberController from '../controllers/memberController.js'
-import { authenticate, staffOnly, managerOnly } from '../middlewares/auth.js'
-import { uploadSingleImage } from '../middlewares/upload.js'
+import memberController from '../controllers/memberController.js'
+import { authenticate, authorize } from '../middlewares/auth.js'
+import { validateBody } from '../middlewares/validate.js'
+import { memberCreateSchema, memberPatchSchema } from '../validators/schemas.js'
 
 const router = Router()
 
-router.use(authenticate)
+// STATIC ROUTES FIRST (before /:id)
+router.get('/lookup', authenticate, authorize('staff'), memberController.lookup)
 
-router.get('/', staffOnly, memberController.listMembers)
-router.get('/:id', staffOnly, memberController.getMember)
+router.get('/', authenticate, authorize('FD+'), memberController.list)
+router.post('/', authenticate, authorize('FD+'), validateBody(memberCreateSchema), memberController.create)
 
-// photo is optional: send multipart/form-data with an "image" field, or plain JSON
-router.post('/', managerOnly, uploadSingleImage('image'), memberController.createMember)
-router.patch('/:id', managerOnly, uploadSingleImage('image'), memberController.updateMember)
-router.delete('/:id', managerOnly, memberController.deleteMember)
+router.get('/:id', authenticate, authorize('staff', 'member'), memberController.get)
+router.patch('/:id', authenticate, authorize('FD+'), validateBody(memberPatchSchema), memberController.update)
+router.get('/:id/history', authenticate, authorize('staff', 'member'), memberController.history)
+router.post('/:id/memberships', authenticate, authorize('FD+'), memberController.assignMembership)
 
 export default router

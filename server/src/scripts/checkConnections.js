@@ -47,13 +47,13 @@ function checkCloudinary() {
 
 function checkMail() {
   if (!isMailConfigured()) {
-    line(false, 'email', 'EMAIL_USER / EMAIL_PASS still placeholders')
-    console.log('        app password: https://myaccount.google.com/apppasswords')
+    line(false, 'email', 'EMAIL_USER / EMAIL_PASS not configured in .env')
+    console.log('        Google pass key / app password: https://myaccount.google.com/apppasswords')
     return Promise.resolve()
   }
 
   return verifyMail()
-    .then(() => line(true, 'email', `${config.mail.user} via ${config.mail.host}:${config.mail.port}`))
+    .then(() => line(true, 'email', `${config.mail.user} via Google Gmail`))
     .catch((err) => line(false, 'email', err.message))
 }
 
