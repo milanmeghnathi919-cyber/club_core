@@ -3,7 +3,6 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleCartDrawer } from '@/feature/shop/cartSlice'
 import CartDrawer from '@/components/common/CartDrawer'
-import RoleSwitcher from '@/components/common/RoleSwitcher'
 import { Trophy, ShoppingBag, User, Calendar, MapPin, Phone, Mail, Clock } from 'lucide-react'
 import Button from '@/components/ui/Button'
 
@@ -157,7 +156,6 @@ export const PublicLayout = () => {
 
       {/* Global Presenter & Cart Overlays */}
       <CartDrawer />
-      <RoleSwitcher />
 
       {/* Footer */}
       <footer className="bg-[#090D16] text-white pt-16 pb-12 border-t border-white/10">

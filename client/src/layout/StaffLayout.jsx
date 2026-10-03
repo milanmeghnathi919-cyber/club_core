@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { clearCredentials } from '@/feature/auth/slices/authSlice'
 import authService from '@/service/authService'
 import MemberQuickSearch from '@/components/common/MemberQuickSearch'
-import RoleSwitcher from '@/components/common/RoleSwitcher'
 import {
   getStaffDepartment,
   getDepartmentHome,
@@ -283,9 +282,6 @@ export const StaffLayout = () => {
           <Outlet />
         </main>
       </div>
-
-      {/* Presenter Widget */}
-      <RoleSwitcher />
     </div>
   )
 }

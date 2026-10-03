@@ -5,7 +5,6 @@ import { clearCredentials } from '@/feature/auth/slices/authSlice'
 import { toggleCartDrawer } from '@/feature/shop/cartSlice'
 import authService from '@/service/authService'
 import CartDrawer from '@/components/common/CartDrawer'
-import RoleSwitcher from '@/components/common/RoleSwitcher'
 import {
   Trophy,
   Calendar,
@@ -165,7 +164,6 @@ export const MemberLayout = () => {
 
       {/* Global Overlays */}
       <CartDrawer />
-      <RoleSwitcher />
     </div>
   )
 }
