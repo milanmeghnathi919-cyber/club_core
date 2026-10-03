@@ -1,4 +1,5 @@
 import barService from '../services/barService.js'
+import memberRepository from '../repositories/memberRepository.js'
 import asyncHandler from '../utils/asyncHandler.js'
 import { ok, created } from '../utils/response.js'
 
@@ -125,6 +126,34 @@ export const getSummary = asyncHandler(async (req, res) => {
   return ok(res, summary)
 })
 
+// Member Orders
+export const createMemberOrder = asyncHandler(async (req, res) => {
+  let member = await memberRepository.findByUserId(req.user.id)
+  if (!member && req.user.email) {
+    member = await memberRepository.findByEmail(req.user.email)
+  }
+
+  const order = await barService.createMemberOrder({
+    memberId: member?.id || null,
+    userId: req.user.id,
+    items: req.body.items || [],
+    notes: req.body.notes || null,
+    paymentMethod: req.body.paymentMethod || 'pay_at_counter',
+    delivery: req.body.delivery || 'pickup',
+  })
+
+  return created(res, order)
+})
+
+export const getMyOrders = asyncHandler(async (req, res) => {
+  let member = await memberRepository.findByUserId(req.user.id)
+  if (!member && req.user.email) {
+    member = await memberRepository.findByEmail(req.user.email)
+  }
+  const orders = await barService.getMyOrders(req.user.id, member?.id)
+  return ok(res, orders)
+})
+
 export default {
   listMenu,
   createMenuItem,
@@ -145,4 +174,6 @@ export default {
   getKitchenQueue,
   updateKitchenStatus,
   getSummary,
+  createMemberOrder,
+  getMyOrders,
 }

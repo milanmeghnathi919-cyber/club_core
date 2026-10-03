@@ -299,6 +299,57 @@ export const barService = {
       byMethod,
     }
   },
+
+  // Member Café Orders
+  async createMemberOrder({ memberId = null, userId, items = [], notes = null, paymentMethod = 'pay_at_counter', delivery = 'pickup' }) {
+    if (!items || items.length === 0) {
+      throw new ApiError(422, 'Please select at least one item to order', null, 'EMPTY_ORDER')
+    }
+
+    const tab = await this.openTab({
+      tableId: null,
+      memberId,
+      guestName: null,
+      actorId: userId,
+    })
+
+    for (const item of items) {
+      const menuItemId = item.menuItemId || item.id
+      const qty = Number(item.qty || 1)
+      const itemNotes = item.notes || null
+      await this.addItem(tab.id, {
+        menuItemId,
+        qty,
+        notes: itemNotes,
+        actorId: userId,
+      })
+    }
+
+    let updatedTab = await this.recalculateTab(tab.id)
+
+    const deliveryNote = delivery === 'court' ? 'Court-side Delivery' : 'Counter Pickup / Takeaway'
+    const fullNotes = notes ? `${deliveryNote} • ${notes}` : deliveryNote
+
+    await barRepository.updateTab(tab.id, {
+      notes: fullNotes,
+      source: 'member_web',
+    })
+
+    if (['cash', 'card', 'upi', 'online'].includes(paymentMethod)) {
+      try {
+        await this.settle(tab.id, {
+          payments: [{ method: paymentMethod, amount: updatedTab.total }],
+          actorId: userId,
+        })
+      } catch (err) {}
+    }
+
+    return this.getTab(tab.id)
+  },
+
+  async getMyOrders(userId, memberId = null) {
+    return barRepository.listTabs({ userId, memberId })
+  },
 }
 
 export default barService

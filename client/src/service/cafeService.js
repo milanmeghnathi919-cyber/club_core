@@ -11,6 +11,8 @@ export const cafeService = {
   getKitchenQueue: barService.getKitchenQueue,
   updateKitchenStatus: barService.updateKitchenStatus,
   getCaféSummary: barService.getBarSummary,
+  placeOrder: barService.placeMemberOrder,
+  getMyOrders: barService.getMyOrders,
 }
 
 export default cafeService

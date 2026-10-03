@@ -85,6 +85,16 @@ export const barService = {
     const res = await api.get('/bar/summary', { params: { date } })
     return res.data
   },
+
+  async placeMemberOrder(data) {
+    const res = await api.post('/cafe/order', data)
+    return res.data
+  },
+
+  async getMyOrders() {
+    const res = await api.get('/cafe/orders/mine')
+    return res.data || []
+  },
 }
 
 export default barService

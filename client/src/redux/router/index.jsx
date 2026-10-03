@@ -23,6 +23,7 @@ import MyBookings from '@/pages/member/MyBookings'
 import MemberSocial from '@/pages/member/MemberSocial'
 import Checkout from '@/pages/member/Checkout'
 import DigitalPass from '@/pages/member/DigitalPass'
+import MemberCafe from '@/pages/member/MemberCafe'
 
 // Staff Pages
 import StaffBookings from '@/pages/staff/StaffBookings'
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
       { index: true, element: <MemberDashboard /> },
       { path: 'book', element: <MemberBook /> },
       { path: 'bookings', element: <MyBookings /> },
+      { path: 'cafe', element: <MemberCafe /> },
       { path: 'social', element: <MemberSocial /> },
       { path: 'shop', element: <Shop /> },
       { path: 'checkout', element: <Checkout /> },

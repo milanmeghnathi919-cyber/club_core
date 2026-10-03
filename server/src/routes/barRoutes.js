@@ -1,16 +1,20 @@
 import { Router } from 'express'
 import barController from '../controllers/barController.js'
-import { authenticate, authorize } from '../middlewares/auth.js'
+import { authenticate, authorize, optionalAuth } from '../middlewares/auth.js'
 import { validateBody } from '../middlewares/validate.js'
 import { barTabOpenSchema, barTabAddItemSchema, barTabSettleSchema } from '../validators/schemas.js'
 
 const router = Router()
 
-// Menu
-router.get('/menu', authenticate, authorize('staff'), barController.listMenu)
+// Menu - public, members, and staff viewable
+router.get('/menu', optionalAuth, barController.listMenu)
 router.post('/menu', authenticate, authorize('staff'), barController.createMenuItem)
 router.patch('/menu/:id', authenticate, authorize('staff'), barController.updateMenuItem)
 router.delete('/menu/:id', authenticate, authorize('staff'), barController.deleteMenuItem)
+
+// Member Café Orders
+router.post('/order', authenticate, barController.createMemberOrder)
+router.get('/orders/mine', authenticate, barController.getMyOrders)
 
 // Tables
 router.get('/tables', authenticate, authorize('staff'), barController.listTables)

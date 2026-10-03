@@ -22,6 +22,10 @@ export const barRepository = {
   },
 
   async findMenuItemById(id) {
+    try {
+      const row = await queryOne('select * from public.menu_items where id = $1', [id])
+      if (row) return row
+    } catch {}
     return memoryStore.findOne('menu_items', (m) => m.id === id)
   },
 
@@ -152,11 +156,21 @@ export const barRepository = {
     return { ...tab, items }
   },
 
-  async listTabs({ status = null } = {}) {
+  async listTabs({ status = null, memberId = null, userId = null } = {}) {
     let items = memoryStore.find('bar_tabs')
     if (status) items = items.filter((t) => t.status === status)
+    if (memberId && userId) {
+      items = items.filter((t) => t.member_id === memberId || t.memberId === memberId || t.opened_by === userId || t.openedBy === userId)
+    } else if (memberId) {
+      items = items.filter((t) => t.member_id === memberId || t.memberId === memberId)
+    } else if (userId) {
+      items = items.filter((t) => t.opened_by === userId || t.openedBy === userId)
+    }
     items.sort((a, b) => new Date(b.opened_at) - new Date(a.opened_at))
-    return items
+    return items.map((t) => {
+      const orderItems = memoryStore.find('bar_order_items', (i) => i.tab_id === t.id)
+      return { ...t, items: orderItems }
+    })
   },
 
   async updateTab(id, updates) {

@@ -17,6 +17,7 @@ export const PublicLayout = () => {
 
   const navLinks = [
     { label: 'Club & Sports', path: '/' },
+    { label: 'The Café', path: '/#cafe' },
     { label: 'Court Availability', path: '/availability' },
     { label: 'Membership Plans', path: '/plans' },
     { label: 'Pro Shop', path: '/shop' },
@@ -187,6 +188,9 @@ export const PublicLayout = () => {
           <div>
             <h4 className="font-bold text-sm text-white uppercase tracking-wider mb-4">Quick Links</h4>
             <ul className="space-y-2 text-xs text-slate-400">
+              <li>
+                <a href="/#cafe" className="hover:text-amber-400">Club Café & Recovery Lounge</a>
+              </li>
               <li>
                 <Link to="/plans" className="hover:text-amber-400">Membership Tiers</Link>
               </li>

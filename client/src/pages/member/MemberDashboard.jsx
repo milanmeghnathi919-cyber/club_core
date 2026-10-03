@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   Sparkles,
+  Coffee,
+  Utensils,
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Card, { CardContent, CardHeader } from '@/components/ui/Card'
@@ -170,45 +172,96 @@ export const MemberDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Action Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <Link to="/app/book" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-[#1B4D2E]">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#1B4D2E] flex items-center justify-center mb-3">
-              <Calendar className="w-5 h-5" />
+      {/* Club Café & Athlete Fuel Banner */}
+      <div className="rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-[#1B4D2E] text-white p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 border border-amber-600/30">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/30 flex items-center justify-center shrink-0">
+            <Coffee className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full">
+                15% Member Discount Applied
+              </span>
+              <span className="text-xs text-amber-200">Court-Side Delivery Available</span>
             </div>
-            <h4 className="font-bold text-sm text-slate-900">Book Court</h4>
-            <p className="text-xs text-slate-500 mt-1">Select court & time slot</p>
+            <h3 className="text-base sm:text-lg font-bold text-white mt-1">
+              Fuel Up at The Club Café & Recovery Lounge
+            </h3>
+            <p className="text-xs text-slate-300 max-w-xl mt-0.5">
+              Order fresh artisanal pour-overs, cold-pressed juices, protein superbowls, or recovery shakes from your phone. Pre-order for post-match pickup.
+            </p>
+          </div>
+        </div>
+        <Link to="/app/cafe" className="shrink-0 w-full md:w-auto">
+          <Button variant="clay" className="w-full md:w-auto font-bold shadow-md gap-2">
+            <Utensils className="w-4 h-4" /> Order from Café
+          </Button>
+        </Link>
+      </div>
+
+      {/* Quick Action Cards Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <Link to="/app/book" className="group">
+          <Card hover className="p-4 border-slate-200 group-hover:border-[#1B4D2E] h-full flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#1B4D2E] flex items-center justify-center mb-3">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-slate-900">Book Court</h4>
+              <p className="text-xs text-slate-500 mt-1">Select court & time slot</p>
+            </div>
+          </Card>
+        </Link>
+
+        <Link to="/app/cafe" className="group">
+          <Card hover className="p-4 border-slate-200 group-hover:border-amber-500 h-full flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
+                <Coffee className="w-5 h-5" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <h4 className="font-bold text-sm text-slate-900">Club Café</h4>
+                <span className="text-[9px] font-extrabold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">15% Off</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Order food & recovery fuel</p>
+            </div>
           </Card>
         </Link>
 
         <Link to="/app/social" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-indigo-500">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-3">
-              <Users className="w-5 h-5" />
+          <Card hover className="p-4 border-slate-200 group-hover:border-indigo-500 h-full flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-3">
+                <Users className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-slate-900">Friday Social</h4>
+              <p className="text-xs text-slate-500 mt-1">Join the weekly mixer</p>
             </div>
-            <h4 className="font-bold text-sm text-slate-900">Friday Social</h4>
-            <p className="text-xs text-slate-500 mt-1">Join the weekly mixer</p>
           </Card>
         </Link>
 
         <Link to="/shop" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-[#C85A32]">
-            <div className="w-10 h-10 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center mb-3">
-              <ShoppingBag className="w-5 h-5" />
+          <Card hover className="p-4 border-slate-200 group-hover:border-[#C85A32] h-full flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center mb-3">
+                <ShoppingBag className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-slate-900">Pro Shop</h4>
+              <p className="text-xs text-slate-500 mt-1">15% member discount</p>
             </div>
-            <h4 className="font-bold text-sm text-slate-900">Pro Shop</h4>
-            <p className="text-xs text-slate-500 mt-1">15% member discount</p>
           </Card>
         </Link>
 
         <Link to="/app/pass" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-amber-500">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
-              <CreditCard className="w-5 h-5" />
+          <Card hover className="p-4 border-slate-200 group-hover:border-amber-500 h-full flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-slate-900">Digital Pass</h4>
+              <p className="text-xs text-slate-500 mt-1">Check-in at clubhouse</p>
             </div>
-            <h4 className="font-bold text-sm text-slate-900">Digital Pass</h4>
-            <p className="text-xs text-slate-500 mt-1">Check-in at clubhouse</p>
           </Card>
         </Link>
       </div>
