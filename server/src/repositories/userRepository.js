@@ -91,8 +91,8 @@ export const userRepository = {
         memoryStore.insert('users', { ...row, password_hash: data.passwordHash })
         return row
       }
-    } catch {
-      // fallback
+    } catch (err) {
+      console.error('[userRepository.create DB failed]', err)
     }
 
     const created = memoryStore.insert('users', {

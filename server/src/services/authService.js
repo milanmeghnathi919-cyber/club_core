@@ -46,7 +46,7 @@ export const authService = {
     })
 
     // Create corresponding member profile
-    const memberCode = nextMemberCode()
+    const memberCode = await nextMemberCode()
     const member = await memberRepository.create({
       memberCode,
       userId: user.id,

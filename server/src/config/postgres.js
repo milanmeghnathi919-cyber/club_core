@@ -18,13 +18,34 @@ const poolConfig = {
   ssl: config.db.ssl ? { rejectUnauthorized: false } : undefined,
 }
 
+let host = config.db.host
+let user = config.db.user
+let port = config.db.port
+
+// Automatically adapt IPv6-only Supabase direct connection host to the working IPv4 pooler
+if (host && host.includes('rcfyaquqdrvlwyvfshow.supabase.co')) {
+  host = 'aws-0-ap-southeast-1.pooler.supabase.com'
+  if (user === 'postgres' || !user.includes('.')) {
+    user = 'postgres.rcfyaquqdrvlwyvfshow'
+  }
+} else if (host && host.startsWith('db.') && host.endsWith('.supabase.co')) {
+  const match = host.match(/^db\.([^.]+)\.supabase\.co$/)
+  if (match) {
+    const ref = match[1]
+    host = 'aws-0-ap-southeast-1.pooler.supabase.com'
+    if (user === 'postgres' || !user.includes('.')) {
+      user = `postgres.${ref}`
+    }
+  }
+}
+
 if (process.env.DATABASE_URL) {
   poolConfig.connectionString = process.env.DATABASE_URL
 } else {
-  poolConfig.host = config.db.host
-  poolConfig.port = config.db.port
+  poolConfig.host = host
+  poolConfig.port = port
   poolConfig.database = config.db.name
-  poolConfig.user = config.db.user
+  poolConfig.user = user
   poolConfig.password = config.db.password
 }
 

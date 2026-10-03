@@ -1,5 +1,7 @@
+import { queryOne } from './db.js'
+
 let counters = {
-  member: 100,
+  member: 500,
   booking: 1000,
   payment: 5000,
   order: 200,
@@ -15,8 +17,19 @@ export const nextNo = (prefix, length = 6) => {
   return `${prefix}-${year}-${padded}`
 }
 
-export const nextMemberCode = () => {
-  counters.member = (counters.member || 100) + 1
+export const nextMemberCode = async () => {
+  try {
+    const row = await queryOne('select public.next_member_code() as code')
+    if (row && row.code) return row.code
+  } catch {
+    // fallback if DB sequence query fails
+  }
+  counters.member = (counters.member || 500) + 1
+  return `CC-${String(counters.member).padStart(6, '0')}`
+}
+
+export const nextMemberCodeSync = () => {
+  counters.member = (counters.member || 500) + 1
   return `CC-${String(counters.member).padStart(6, '0')}`
 }
 

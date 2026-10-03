@@ -170,7 +170,7 @@ export const memberService = {
       }).catch(() => {})
     }
 
-    const memberCode = nextMemberCode()
+    const memberCode = await nextMemberCode()
     const member = await memberRepository.create({
       memberCode,
       userId,

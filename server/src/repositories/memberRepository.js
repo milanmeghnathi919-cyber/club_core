@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 import { MEMBER_COLUMNS } from '../models/Member.js'
+import { nextMemberCode } from '../utils/numbering.js'
 
 const TABLE = 'members'
 const COLS = MEMBER_COLUMNS.join(', ')
@@ -99,32 +100,52 @@ export const memberRepository = {
   },
 
   async create(data) {
-    try {
-      const row = await queryOne(
-        `insert into public.${TABLE}
-           (member_code, user_id, full_name, phone, email, dob, address,
-            emergency_contact, photo_url, notes, created_by)
-         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-         returning ${COLS}`,
-        [
-          data.memberCode || data.member_code,
-          data.userId || data.user_id || null,
-          data.fullName || data.full_name,
-          data.phone,
-          data.email || null,
-          data.dob || null,
-          data.address || null,
-          data.emergencyContact || data.emergency_contact || null,
-          data.photoUrl || data.photo_url || null,
-          data.notes || null,
-          data.createdBy || data.created_by || null,
-        ],
-      )
-      if (row) {
-        memoryStore.insert('members', row)
-        return row
+    let memberCode = data.memberCode || data.member_code
+    if (!memberCode) {
+      memberCode = await nextMemberCode()
+    }
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const row = await queryOne(
+          `insert into public.${TABLE}
+             (member_code, user_id, full_name, phone, email, dob, address,
+              emergency_contact, photo_url, notes, created_by)
+           values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+           returning ${COLS}`,
+          [
+            memberCode,
+            data.userId || data.user_id || null,
+            data.fullName || data.full_name,
+            data.phone,
+            data.email || null,
+            data.dob || null,
+            data.address || null,
+            data.emergencyContact || data.emergency_contact || null,
+            data.photoUrl || data.photo_url || null,
+            data.notes || null,
+            data.createdBy || data.created_by || null,
+          ],
+        )
+        if (row) {
+          memoryStore.insert('members', row)
+          return row
+        }
+      } catch (err) {
+        if (
+          err.message?.includes('member_code') ||
+          err.details?.includes('member_code') ||
+          err.code === '23505' ||
+          err.statusCode === 409
+        ) {
+          console.warn(`[memberRepository.create] member_code ${memberCode} conflict, generating new code...`)
+          memberCode = await nextMemberCode()
+          continue
+        }
+        console.error('[memberRepository.create DB failed]', err)
+        break
       }
-    } catch {}
+    }
 
     return memoryStore.insert('members', {
       id: data.id || crypto.randomUUID(),
