@@ -363,7 +363,7 @@ export const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((p) => {
+            {plans.slice(0, 3).map((p) => {
               const isGold = p.code?.toLowerCase().includes('gold')
               return (
                 <div

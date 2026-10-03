@@ -3,7 +3,7 @@ import ApiError from '../utils/ApiError.js'
 
 export const plansService = {
   async list(isStaff = false) {
-    const plans = await planRepository.list(isStaff ? undefined : true)
+    const plans = await planRepository.list({ isActive: isStaff ? undefined : true })
     return plans.map((p) => ({
       id: p.id,
       code: p.code,

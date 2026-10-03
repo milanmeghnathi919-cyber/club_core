@@ -40,7 +40,7 @@ export const Plans = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-          {plans.map((p) => {
+          {plans.slice(0, 3).map((p) => {
             const isGold = p.code?.toLowerCase().includes('gold')
             const isJunior = p.code?.toLowerCase().includes('junior')
 

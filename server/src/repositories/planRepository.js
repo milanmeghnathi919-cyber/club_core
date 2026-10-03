@@ -2,7 +2,8 @@ import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 
 export const planRepository = {
-  async list({ isActive } = {}) {
+  async list(options = {}) {
+    const isActive = typeof options === 'boolean' ? options : options?.isActive
     try {
       let sql = 'select * from public.plans'
       const params = []
