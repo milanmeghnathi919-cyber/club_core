@@ -8,6 +8,7 @@ const router = Router()
 
 // STATIC ROUTES FIRST (before /:id)
 router.get('/lookup', authenticate, authorize('staff'), memberController.lookup)
+router.post('/membership/purchase', authenticate, authorize('member'), memberController.purchaseMembership)
 
 router.get('/', authenticate, authorize('FD+'), memberController.list)
 router.post('/', authenticate, authorize('FD+'), validateBody(memberCreateSchema), memberController.create)

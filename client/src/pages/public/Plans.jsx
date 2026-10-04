@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import publicService from '@/service/publicService'
 import { formatCurrency } from '@/utils/format'
 import { Check, ShieldCheck, Trophy, Sparkles, ArrowRight, Zap } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
+import FakePaymentModal from '@/components/common/FakePaymentModal'
+import useToast from '@/components/ui/Toast'
 
 export const Plans = () => {
+  const toast = useToast()
+  const user = useSelector((state) => state.auth.user)
   const [plans, setPlans] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState(null)
 
   useEffect(() => {
     publicService
@@ -140,21 +146,51 @@ export const Plans = () => {
                 </div>
 
                 <div className="pt-8">
-                  <Link to={`/register?plan=${encodeURIComponent(p.name)}`}>
+                  {user ? (
                     <Button
                       variant={isGold ? 'clay' : 'lawn'}
                       size="lg"
                       className="w-full font-bold justify-between cursor-pointer shadow-md"
+                      onClick={() => setSelectedPlanForPayment(p)}
                     >
-                      <span>Join as {p.name.split(' ')[0]}</span>
+                      <span>Upgrade to {p.name.split(' ')[0]} (Simulate Pay)</span>
                       <ArrowRight className="w-4 h-4" />
                     </Button>
-                  </Link>
+                  ) : (
+                    <Link to={`/register?plan=${encodeURIComponent(p.name)}`}>
+                      <Button
+                        variant={isGold ? 'clay' : 'lawn'}
+                        size="lg"
+                        className="w-full font-bold justify-between cursor-pointer shadow-md"
+                      >
+                        <span>Join as {p.name.split(' ')[0]}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             )
           })}
         </div>
+      )}
+
+      {selectedPlanForPayment && (
+        <FakePaymentModal
+          isOpen={Boolean(selectedPlanForPayment)}
+          onClose={() => setSelectedPlanForPayment(null)}
+          amount={selectedPlanForPayment.price || 0}
+          title={`${selectedPlanForPayment.name} Annual Tier`}
+          description="Instant membership tier subscription simulation"
+          sourceType="membership"
+          sourceId={selectedPlanForPayment.id}
+          planId={selectedPlanForPayment.id}
+          customerName={user?.name || user?.full_name || 'Champion Member'}
+          onSuccess={() => {
+            toast.success(`Successfully activated ${selectedPlanForPayment.name}! Your privileges are now active.`)
+            setSelectedPlanForPayment(null)
+          }}
+        />
       )}
     </div>
   )

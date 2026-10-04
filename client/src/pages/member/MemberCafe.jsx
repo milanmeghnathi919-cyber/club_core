@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import Card, { CardContent } from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
+import FakePaymentModal from '@/components/common/FakePaymentModal'
 import {
   Coffee,
   ShoppingBag,
@@ -49,6 +50,7 @@ export const MemberCafe = () => {
   const [paymentMethod, setPaymentMethod] = useState('pay_at_counter')
   const [submittingOrder, setSubmittingOrder] = useState(false)
   const [placedOrder, setPlacedOrder] = useState(null)
+  const [paymentTargetTab, setPaymentTargetTab] = useState(null)
 
   // Past orders tab
   const [activeTab, setActiveTab] = useState('menu') // 'menu' | 'orders'
@@ -183,9 +185,19 @@ export const MemberCafe = () => {
       }
 
       const res = await cafeService.placeOrder(payload)
-      setPlacedOrder(res)
+      const newOrder = res.order || res
+      setPlacedOrder(newOrder)
       clearCart()
-      toast.success('Your Café order has been placed!')
+
+      if (paymentMethod === 'upi' || paymentMethod === 'card') {
+        setPaymentTargetTab({
+          id: newOrder.id || newOrder.tabId,
+          tab_no: newOrder.tab_no || newOrder.tabNo,
+          total: Number(newOrder.total) || finalTotal,
+        })
+      } else {
+        toast.success('Your Café order has been placed!')
+      }
       fetchMyOrders()
     } catch (err) {
       toast.error(err.message || 'Failed to place café order')
@@ -622,13 +634,23 @@ export const MemberCafe = () => {
                     </div>
                   </div>
 
-                  <div className="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+                  <div className="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-slate-100 gap-2">
                     <span className="text-base font-extrabold text-[#1B4D2E] tabular-nums">
                       {formatCurrency(ord.total || 0)}
                     </span>
                     <span className="text-[11px] text-slate-400">
                       {new Date(ord.opened_at || ord.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
+                    {ord.status === 'open' && (
+                      <Button
+                        size="xs"
+                        variant="lawn"
+                        className="font-bold text-xs cursor-pointer"
+                        onClick={() => setPaymentTargetTab(ord)}
+                      >
+                        Pay Online (Simulate)
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -665,6 +687,30 @@ export const MemberCafe = () => {
               <span className="text-slate-500">Total Payable:</span>
               <strong className="text-slate-900 tabular-nums">{formatCurrency(placedOrder?.total || 0)}</strong>
             </div>
+            <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
+              <span className="text-slate-500">Payment Status:</span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`font-semibold capitalize px-2 py-0.5 rounded-full text-[11px] ${
+                    placedOrder?.status === 'settled'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}
+                >
+                  {placedOrder?.status === 'settled' ? 'Paid & Settled' : 'Open / Unpaid'}
+                </span>
+                {placedOrder?.status !== 'settled' && (
+                  <Button
+                    size="xs"
+                    variant="lawn"
+                    className="font-bold cursor-pointer"
+                    onClick={() => setPaymentTargetTab(placedOrder)}
+                  >
+                    Pay Online Now
+                  </Button>
+                )}
+              </div>
+            </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Instructions:</span>
               <span className="text-slate-700 font-medium">{placedOrder?.notes || 'Counter Pickup'}</span>
@@ -694,6 +740,26 @@ export const MemberCafe = () => {
           </div>
         </div>
       </Modal>
+
+      {paymentTargetTab && (
+        <FakePaymentModal
+          isOpen={Boolean(paymentTargetTab)}
+          onClose={() => setPaymentTargetTab(null)}
+          amount={paymentTargetTab.total || finalTotal || 0}
+          title={`Café Order #${paymentTargetTab.tab_no || paymentTargetTab.tabNo || 'ORDER'}`}
+          description="Instant Club Café & Lounge checkout simulation"
+          sourceType="bar_tab"
+          sourceId={paymentTargetTab.id}
+          customerName={user?.name || user?.full_name || 'Champion Member'}
+          onSuccess={() => {
+            fetchMyOrders()
+            if (placedOrder && (placedOrder.id === paymentTargetTab.id || placedOrder.tab_no === paymentTargetTab.tab_no)) {
+              setPlacedOrder((p) => ({ ...p, status: 'settled' }))
+            }
+            setPaymentTargetTab(null)
+          }}
+        />
+      )}
     </div>
   )
 }

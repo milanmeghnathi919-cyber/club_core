@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Calendar, Clock, Trophy, XCircle, AlertCircle, Plus } from 'lucide-react'
+import FakePaymentModal from '@/components/common/FakePaymentModal'
 
 export const MyBookings = () => {
   const toast = useToast()
@@ -16,6 +17,7 @@ export const MyBookings = () => {
   const [loading, setLoading] = useState(true)
   const [cancelModalBooking, setCancelModalBooking] = useState(null)
   const [cancelling, setCancelling] = useState(false)
+  const [paymentTargetBooking, setPaymentTargetBooking] = useState(null)
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -127,16 +129,37 @@ export const MyBookings = () => {
                         {formatDate(start)} • {formatTime(start)} – {formatTime(end)}
                       </p>
 
-                      <div className="flex items-center gap-3 text-[11px] text-slate-500 font-mono">
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 font-mono">
                         <span>Ref: {bookingRef}</span>
                         <span>•</span>
                         <span>Amount: {formatCurrency(b.price || 0)}</span>
+                        <span>•</span>
+                        <span
+                          className={`capitalize font-semibold px-2 py-0.5 rounded-full text-[10px] ${
+                            b.payment_status === 'paid' || b.payment_status === 'waived'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          Payment: {b.payment_status || 'Unpaid'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {isConfirmed && !isPast && (
-                    <div className="flex items-center gap-2 self-end sm:self-center">
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    {b.payment_status === 'unpaid' && Number(b.price) > 0 && (
+                      <Button
+                        variant="lawn"
+                        size="sm"
+                        onClick={() => setPaymentTargetBooking(b)}
+                        className="text-xs font-bold cursor-pointer"
+                      >
+                        Pay Online (Simulate)
+                      </Button>
+                    )}
+
+                    {isConfirmed && !isPast && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -145,8 +168,8 @@ export const MyBookings = () => {
                       >
                         Cancel Booking
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )
@@ -191,6 +214,23 @@ export const MyBookings = () => {
           </div>
         </div>
       </Modal>
+
+      {paymentTargetBooking && (
+        <FakePaymentModal
+          isOpen={Boolean(paymentTargetBooking)}
+          onClose={() => setPaymentTargetBooking(null)}
+          amount={paymentTargetBooking.price || 0}
+          title={`Court Reservation #${paymentTargetBooking.bookingNo || paymentTargetBooking.booking_no || paymentTargetBooking.id?.slice(0, 8)}`}
+          description={`${paymentTargetBooking.court?.name || paymentTargetBooking.court_name || 'Court'} Session`}
+          sourceType="booking"
+          sourceId={paymentTargetBooking.id}
+          customerName="Club Member"
+          onSuccess={() => {
+            fetchBookings()
+            setPaymentTargetBooking(null)
+          }}
+        />
+      )}
     </div>
   )
 }

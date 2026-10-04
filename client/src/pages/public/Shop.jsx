@@ -29,6 +29,7 @@ import Card, { CardContent } from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Modal from '@/components/ui/Modal'
 import useToast from '@/components/ui/Toast'
+import FakePaymentModal from '@/components/common/FakePaymentModal'
 
 export const Shop = () => {
   const dispatch = useDispatch()
@@ -53,6 +54,7 @@ export const Shop = () => {
   const [myOrders, setMyOrders] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(false)
   const [selectedReceipt, setSelectedReceipt] = useState(null)
+  const [paymentTargetOrder, setPaymentTargetOrder] = useState(null)
 
   useEffect(() => {
     Promise.all([publicService.getCategories(), publicService.getProducts()])
@@ -546,11 +548,26 @@ export const Shop = () => {
                         </p>
                       </div>
 
-                      <div className="flex items-baseline gap-2 sm:text-right">
-                        <span className="text-slate-500">Total Paid:</span>
-                        <span className="text-base sm:text-lg font-extrabold text-[#1B4D2E] tabular-nums">
-                          {formatCurrency(order.total)}
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-baseline gap-2 sm:text-right">
+                          <span className="text-slate-500">
+                            {order.payment_status === 'paid' ? 'Total Paid:' : 'Total Amount:'}
+                          </span>
+                          <span className="text-base sm:text-lg font-extrabold text-[#1B4D2E] tabular-nums">
+                            {formatCurrency(order.total)}
+                          </span>
+                        </div>
+
+                        {order.payment_status !== 'paid' && (
+                          <Button
+                            size="xs"
+                            variant="lawn"
+                            className="font-bold cursor-pointer shrink-0"
+                            onClick={() => setPaymentTargetOrder(order)}
+                          >
+                            Pay Online (Simulate)
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -653,6 +670,25 @@ export const Shop = () => {
               </div>
             </div>
 
+            {selectedReceipt.payment_status !== 'paid' && (
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-bold text-amber-900 block">Payment Pending</span>
+                  <span className="text-[11px] text-amber-700">Simulate online payment now</span>
+                </div>
+                <Button
+                  size="xs"
+                  variant="lawn"
+                  className="font-bold"
+                  onClick={() => {
+                    setPaymentTargetOrder(selectedReceipt)
+                  }}
+                >
+                  Pay Now (Simulate)
+                </Button>
+              </div>
+            )}
+
             <div className="pt-2 flex gap-2">
               <Button
                 variant="outline"
@@ -671,6 +707,26 @@ export const Shop = () => {
             </div>
           </div>
         </Modal>
+      )}
+
+      {paymentTargetOrder && (
+        <FakePaymentModal
+          isOpen={Boolean(paymentTargetOrder)}
+          onClose={() => setPaymentTargetOrder(null)}
+          amount={paymentTargetOrder.total || 0}
+          title={`Pro Shop Order #${paymentTargetOrder.order_no || paymentTargetOrder.orderNo || paymentTargetOrder.id?.slice(0, 8)}`}
+          description="Instant sports equipment checkout simulation"
+          sourceType="shop_order"
+          sourceId={paymentTargetOrder.id}
+          customerName={user?.name || user?.full_name || 'Valued Member'}
+          onSuccess={() => {
+            fetchMyOrders()
+            if (selectedReceipt && selectedReceipt.id === paymentTargetOrder.id) {
+              setSelectedReceipt((r) => ({ ...r, payment_status: 'paid' }))
+            }
+            setPaymentTargetOrder(null)
+          }}
+        />
       )}
     </div>
   )

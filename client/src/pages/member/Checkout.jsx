@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card, { CardContent, CardHeader } from '@/components/ui/Card'
 import { ShoppingBag, Store, Truck, CheckCircle2, ArrowRight, ShieldCheck, CreditCard, AlertCircle } from 'lucide-react'
+import FakePaymentModal from '@/components/common/FakePaymentModal'
 
 export const Checkout = () => {
   const dispatch = useDispatch()
@@ -23,6 +24,8 @@ export const Checkout = () => {
   const [submitting, setSubmitting] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('pay_at_club')
   const [orderSuccess, setOrderSuccess] = useState(null)
+  const [pendingPaymentOrder, setPendingPaymentOrder] = useState(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   const hasOutOfStock = quote?.hasOutOfStock || quote?.lines?.some((l) => l.isOutOfStock || l.exceedsStock)
 
@@ -74,9 +77,16 @@ export const Checkout = () => {
         customerPhone: user?.phone || null,
       })
 
-      setOrderSuccess(res.order || res)
+      const placedOrder = res.order || res
+      setOrderSuccess(placedOrder)
+      setPendingPaymentOrder(placedOrder)
       dispatch(clearCart())
-      toast.success('Order placed successfully!')
+
+      if (paymentMethod === 'online') {
+        setShowPaymentModal(true)
+      } else {
+        toast.success('Order placed successfully!')
+      }
     } catch (err) {
       toast.error(err.message || 'Failed to place order')
     } finally {
@@ -85,13 +95,18 @@ export const Checkout = () => {
   }
 
   if (orderSuccess) {
+    const isPaid =
+      orderSuccess.paymentStatus === 'paid' || orderSuccess.payment_status === 'paid'
+
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6 font-sans">
         <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900">Order Confirmed!</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            {isPaid ? 'Order Confirmed & Paid!' : 'Order Confirmed!'}
+          </h2>
           <p className="text-sm text-slate-600 leading-relaxed">
             Your Pro Shop order has been placed. You can view your receipt and status in your past orders history.
           </p>
@@ -114,11 +129,32 @@ export const Checkout = () => {
               {formatCurrency(orderSuccess.total)}
             </strong>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
             <span className="text-slate-500">Payment Status:</span>
-            <span className="font-semibold capitalize text-amber-700">
-              {orderSuccess.paymentStatus || orderSuccess.payment_status || 'Pending on pickup'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`font-semibold capitalize px-2 py-0.5 rounded-full text-[11px] ${
+                  isPaid
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                    : 'bg-amber-100 text-amber-800 border border-amber-200'
+                }`}
+              >
+                {isPaid ? 'Paid' : 'Pending'}
+              </span>
+              {!isPaid && (
+                <Button
+                  size="xs"
+                  variant="lawn"
+                  className="font-bold cursor-pointer"
+                  onClick={() => {
+                    setPendingPaymentOrder(orderSuccess)
+                    setShowPaymentModal(true)
+                  }}
+                >
+                  Pay Now (Simulate)
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -133,6 +169,27 @@ export const Checkout = () => {
             <Button variant="ghost">Dashboard</Button>
           </Link>
         </div>
+
+        {showPaymentModal && pendingPaymentOrder && (
+          <FakePaymentModal
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            amount={pendingPaymentOrder.total || quote?.total || 0}
+            title={`Pro Shop Order #${pendingPaymentOrder.orderNo || pendingPaymentOrder.order_no || pendingPaymentOrder.id?.slice(0, 8)}`}
+            description="Instant sports equipment checkout simulation"
+            sourceType="shop_order"
+            sourceId={pendingPaymentOrder.id}
+            customerName={user?.name || user?.full_name || 'Valued Member'}
+            onSuccess={(result) => {
+              setOrderSuccess((prev) => ({
+                ...(prev || pendingPaymentOrder),
+                paymentStatus: 'paid',
+                payment_status: 'paid',
+              }))
+              setShowPaymentModal(false)
+            }}
+          />
+        )}
       </div>
     )
   }
@@ -239,9 +296,9 @@ export const Checkout = () => {
                   />
                   <div>
                     <span className="font-bold text-xs text-slate-900 block">
-                      Razorpay Online Gateway (Test Mode)
+                      Pay Online (Dummy Simulation Gateway)
                     </span>
-                    <span className="text-[11px] text-slate-500">UPI, NetBanking, Cards</span>
+                    <span className="text-[11px] text-slate-500">Instant Card, UPI / QR, NetBanking simulation</span>
                   </div>
                 </div>
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
