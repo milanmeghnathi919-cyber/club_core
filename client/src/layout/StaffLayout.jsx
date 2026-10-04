@@ -117,10 +117,10 @@ export const StaffLayout = () => {
   return (
     <div className="min-h-screen bg-[#F8FAF6] text-slate-900 flex font-sans">
       {/* Sidebar (Desktop / Tablet) */}
-      <aside className="w-64 bg-slate-950 text-white shrink-0 hidden lg:flex flex-col border-r border-slate-800">
+      <aside className="w-64 bg-slate-950 text-white shrink-0 hidden lg:flex flex-col border-r border-slate-800/90 shadow-md">
         {/* Brand */}
         <div className="p-4 border-b border-slate-800/80 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#1B4D2E] flex items-center justify-center text-white">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1B4D2E] to-[#12351F] flex items-center justify-center text-white shadow-xs">
             <Trophy className="w-5 h-5 text-amber-400" />
           </div>
           <div>
@@ -142,13 +142,13 @@ export const StaffLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   active
                     ? 'bg-[#1B4D2E] text-white shadow-xs font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-900/90'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${active ? 'text-amber-400' : 'text-slate-400'}`} />
                 {item.label}
               </Link>
             )
