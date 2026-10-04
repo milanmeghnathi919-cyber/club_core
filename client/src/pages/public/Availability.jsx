@@ -98,35 +98,40 @@ export const Availability = () => {
               </strong>
             </div>
             <div className="flex justify-between text-emerald-700">
-              <span className="font-semibold">Gold Member Privilege:</span>
-              <strong className="font-bold">100% Free Included</strong>
+              <span>Club Member Rate:</span>
+              <strong>₹0.00 (Gold) or 30-50% Off</strong>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Court reservations require an active club membership account or a booked trial session pass.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+          <div className="space-y-3">
             <Button
               variant="lawn"
-              className="w-full font-bold shadow-xs"
+              size="lg"
+              className="w-full justify-between"
               onClick={() => {
-                const cId = selectedSlotInfo?.court?.courtId || selectedSlotInfo?.court?.id
-                const time = selectedSlotInfo?.slot?.startAt?.split('T')[1]?.slice(0, 5) || ''
-                navigate(`/contact?trial=true&courtId=${cId}&date=${selectedDate}&time=${time}`)
+                navigate(`/login?redirect=/app/book?date=${selectedDate}`)
               }}
             >
-              Book as Guest Trial Pass <ArrowRight className="w-4 h-4 ml-1" />
+              <span className="flex items-center gap-2">
+                <UserCheck className="w-4 h-4" /> Sign In as Member to Book
+              </span>
+              <ArrowRight className="w-4 h-4" />
             </Button>
+
             <Button
               variant="outline"
-              className="w-full font-bold"
-              onClick={() => navigate('/login')}
+              size="lg"
+              className="w-full justify-between border-slate-300"
+              onClick={() => {
+                navigate(
+                  `/contact?trial=true&courtId=${selectedSlotInfo?.court?.courtId || selectedSlotInfo?.court?.id}&date=${selectedDate}&time=${selectedSlotInfo?.slot?.time}`,
+                )
+              }}
             >
-              Sign In to Reserve
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" /> Book as Guest Trial
+              </span>
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
