@@ -71,23 +71,32 @@ export const Login = () => {
       dispatch(setCredentials({ user: data.user, token: data.token }))
       toast.success(`Welcome back, ${data.user.name}!`)
 
-      if (redirect) {
-        navigate(redirect)
-      } else if (data.user.role === 'owner') {
-        navigate('/owner')
-      } else if (data.user.role === 'member') {
-        navigate('/app')
-      } else if (data.user.role === 'shop_staff' || data.user.email?.toLowerCase().includes('shop')) {
-        navigate('/staff/products')
+      const userRole = (data.user?.role || '').toLowerCase()
+
+      if (userRole === 'member' || userRole === 'user') {
+        // Members must NEVER be redirected to /owner or /staff
+        if (redirect && !redirect.startsWith('/owner') && !redirect.startsWith('/staff')) {
+          navigate(redirect)
+        } else {
+          navigate('/app')
+        }
+      } else if (userRole === 'owner') {
+        if (redirect && !redirect.startsWith('/app')) {
+          navigate(redirect)
+        } else {
+          navigate('/owner')
+        }
+      } else if (userRole === 'shop_staff' || data.user?.email?.toLowerCase().includes('shop')) {
+        navigate(redirect && redirect.startsWith('/staff') ? redirect : '/staff/products')
       } else if (
-        data.user.role === 'cafe_staff' ||
-        data.user.role === 'bar_staff' ||
-        data.user.email?.toLowerCase().includes('cafe') ||
-        data.user.email?.toLowerCase().includes('bar')
+        userRole === 'cafe_staff' ||
+        userRole === 'bar_staff' ||
+        data.user?.email?.toLowerCase().includes('cafe') ||
+        data.user?.email?.toLowerCase().includes('bar')
       ) {
-        navigate('/staff/cafe/inventory')
+        navigate(redirect && redirect.startsWith('/staff') ? redirect : '/staff/cafe/inventory')
       } else {
-        navigate('/staff/bookings')
+        navigate(redirect && redirect.startsWith('/staff') ? redirect : '/staff/bookings')
       }
     } catch (err) {
       let msg = err.message || 'Invalid email or password'

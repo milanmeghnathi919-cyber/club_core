@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import courtService from '@/service/courtService'
+import authService from '@/service/authService'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
@@ -12,6 +14,7 @@ export const MemberSocial = () => {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
   const [joiningId, setJoiningId] = useState(null)
+  const [membership, setMembership] = useState(null)
 
   const fetchSessions = async () => {
     setLoading(true)
@@ -27,7 +30,12 @@ export const MemberSocial = () => {
 
   useEffect(() => {
     fetchSessions()
+    authService.me().then((res) => {
+      if (res?.membership) setMembership(res.membership)
+    }).catch(() => {})
   }, [])
+
+  const hasActiveMembership = Boolean(membership && (membership.status === 'active' || !membership.status))
 
   const handleJoin = async (session) => {
     setJoiningId(session.id)
@@ -110,8 +118,12 @@ export const MemberSocial = () => {
                   </div>
 
                   <div className="flex items-center justify-between text-xs p-3 rounded-lg bg-slate-50 border border-slate-100">
-                    <span className="text-slate-600">Price for Gold Pass:</span>
-                    <strong className="text-emerald-700">₹0.00 (Complimentary)</strong>
+                    <span className="text-slate-600">
+                      {hasActiveMembership ? `Price for ${membership?.plan_name || 'Member'}:` : 'Price for Club Guest:'}
+                    </span>
+                    <strong className={hasActiveMembership ? 'text-emerald-700 font-bold' : 'text-slate-800 font-bold'}>
+                      {hasActiveMembership ? '₹0.00 (Complimentary)' : 'Standard Entry Fee'}
+                    </strong>
                   </div>
 
                   <Button

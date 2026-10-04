@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearCredentials } from '@/feature/auth/slices/authSlice'
 import authService from '@/service/authService'
@@ -26,6 +26,15 @@ export const OwnerLayout = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+
+  // Route Protection Guard
+  if (!user) {
+    return <Navigate to="/login?redirect=/owner" replace />
+  }
+
+  if (user.role !== 'owner') {
+    return <Navigate to="/app" replace />
+  }
 
   const handleLogout = async () => {
     await authService.logout()

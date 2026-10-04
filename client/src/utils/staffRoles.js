@@ -64,6 +64,7 @@ export const getDepartmentTitle = (department) => {
  * Validates if the given staff user is permitted to view a specific pathname
  */
 export const isStaffPathAllowed = (user, pathname) => {
+  if (!user || user.role === 'member' || user.role === 'user') return false
   const dept = getStaffDepartment(user)
   if (dept === 'owner') return true
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearCredentials } from '@/feature/auth/slices/authSlice'
 import { toggleCartDrawer } from '@/feature/shop/cartSlice'
@@ -24,6 +24,11 @@ export const MemberLayout = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+
+  // Route Protection Guard
+  if (!user) {
+    return <Navigate to="/login?redirect=/app" replace />
+  }
   const cartItems = useSelector((state) => state.cart.items)
   const cartCount = cartItems.reduce((acc, curr) => acc + curr.qty, 0)
 

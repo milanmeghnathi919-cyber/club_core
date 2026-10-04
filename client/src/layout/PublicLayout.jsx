@@ -40,7 +40,17 @@ export const PublicLayout = () => {
           </span>
           {user ? (
             <Link
-              to={user.role === 'owner' ? '/owner' : user.role === 'member' ? '/app' : user.role === 'bar_staff' ? '/bar/pos' : '/staff/bookings'}
+              to={
+                user.role === 'owner'
+                  ? '/owner'
+                  : user.role === 'member' || user.role === 'user'
+                  ? '/app'
+                  : user.role === 'shop_staff'
+                  ? '/staff/products'
+                  : user.role === 'cafe_staff' || user.role === 'bar_staff'
+                  ? '/staff/cafe/inventory'
+                  : '/staff/bookings'
+              }
               className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 transition-colors"
             >
               <User className="w-3.5 h-3.5" /> Portal ({user.name?.split(' ')[0] || 'User'})
@@ -121,10 +131,12 @@ export const PublicLayout = () => {
                   window.location.assign(
                     user.role === 'owner'
                       ? '/owner'
-                      : user.role === 'member'
+                      : user.role === 'member' || user.role === 'user'
                       ? '/app'
-                      : user.role === 'bar_staff'
-                      ? '/bar/pos'
+                      : user.role === 'shop_staff'
+                      ? '/staff/products'
+                      : user.role === 'cafe_staff' || user.role === 'bar_staff'
+                      ? '/staff/cafe/inventory'
                       : '/staff/bookings',
                   )
                 }

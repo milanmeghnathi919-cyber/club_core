@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import SlotGrid from '@/components/common/SlotGrid'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import useToast from '@/components/ui/Toast'
 import courtService from '@/service/courtService'
+import authService from '@/service/authService'
 import { formatCurrency, formatTime, formatDate } from '@/utils/format'
-import { Calendar, Trophy, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react'
+import { Calendar, Trophy, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react'
 
 const SPORTS = [
   { label: 'All Sports', value: '' },
@@ -28,6 +29,13 @@ export const MemberBook = () => {
   const [loading, setLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [membership, setMembership] = useState(null)
+
+  useEffect(() => {
+    authService.me().then((res) => {
+      if (res?.membership) setMembership(res.membership)
+    }).catch(() => {})
+  }, [])
 
   const handleSelectSlot = ({ court, slot }) => {
     setSelectedSlotInfo({ court, slot })
@@ -64,6 +72,12 @@ export const MemberBook = () => {
     }
   }
 
+  const hasActiveMembership = Boolean(membership && (membership.status === 'active' || !membership.status))
+  const courtDiscountPct = hasActiveMembership ? Number(membership.court_discount_pct ?? 100) : 0
+  const ratePerHour = Number(selectedSlotInfo?.court?.ratePerHour || selectedSlotInfo?.court?.rate_per_hour || 600)
+  const discountAmount = Math.round((ratePerHour * courtDiscountPct) / 100)
+  const payableAmount = Math.max(0, ratePerHour - discountAmount)
+
   return (
     <div className="space-y-6 font-sans">
       {/* Title & Filter Bar */}
@@ -76,7 +90,9 @@ export const MemberBook = () => {
             Book Championship Court
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Gold Pass: 100% complimentary access applied automatically across all courts.
+            {hasActiveMembership
+              ? `${membership?.plan_name || 'Member'}: ${courtDiscountPct}% complimentary access applied automatically across all courts.`
+              : 'Standard Club Guest: Standard hourly rates apply. Upgrade to a Membership Plan for complimentary court sessions.'}
           </p>
         </div>
 
@@ -168,7 +184,7 @@ export const MemberBook = () => {
               onClick={handleConfirmBooking}
               className="font-bold"
             >
-              Confirm Reservation (Free)
+              {payableAmount === 0 ? 'Confirm Reservation (Free)' : `Confirm Reservation (${formatCurrency(payableAmount)})`}
             </Button>
           </div>
         }
@@ -189,19 +205,37 @@ export const MemberBook = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Standard Walk-In Rate:</span>
-              <span className="text-slate-400 line-through tabular-nums">
-                {formatCurrency(selectedSlotInfo?.court?.ratePerHour || 600)}
+              <span className={`tabular-nums ${courtDiscountPct > 0 ? 'text-slate-400 line-through' : 'text-slate-900 font-semibold'}`}>
+                {formatCurrency(ratePerHour)}
               </span>
             </div>
-            <div className="flex justify-between text-emerald-700 font-semibold border-t border-slate-200 pt-2">
-              <span>Member Gold Discount:</span>
-              <span>100% Off (-{formatCurrency(selectedSlotInfo?.court?.ratePerHour || 600)})</span>
-            </div>
+            {courtDiscountPct > 0 ? (
+              <div className="flex justify-between text-emerald-700 font-semibold border-t border-slate-200 pt-2">
+                <span>Member {membership?.plan_name || 'Gold'} Discount:</span>
+                <span>{courtDiscountPct}% Off (-{formatCurrency(discountAmount)})</span>
+              </div>
+            ) : (
+              <div className="flex justify-between text-slate-500 font-medium border-t border-slate-200 pt-2">
+                <span>Member Plan Discount:</span>
+                <span>₹0.00 (Standard Guest)</span>
+              </div>
+            )}
             <div className="flex justify-between text-base font-extrabold text-slate-900 border-t border-slate-200 pt-2">
               <span>Payable Amount:</span>
-              <span className="text-emerald-700 tabular-nums">₹0.00 (Waived)</span>
+              <span className={payableAmount === 0 ? 'text-emerald-700 tabular-nums' : 'text-slate-900 tabular-nums'}>
+                {payableAmount === 0 ? '₹0.00 (Waived)' : formatCurrency(payableAmount)}
+              </span>
             </div>
           </div>
+
+          {!hasActiveMembership && (
+            <div className="p-3 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 text-[11px] flex items-center justify-between gap-2">
+              <span>Want free court access? Subscribe to a membership tier.</span>
+              <Link to="/plans" className="font-bold underline text-[#1B4D2E] shrink-0">
+                View Plans
+              </Link>
+            </div>
+          )}
 
           <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px] leading-relaxed">
             <strong>Cancellation Policy:</strong> You may cancel up to 2 hours before the start time without penalty.

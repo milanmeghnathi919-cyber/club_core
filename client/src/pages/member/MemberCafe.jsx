@@ -9,6 +9,7 @@ import Card, { CardContent } from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import FakePaymentModal from '@/components/common/FakePaymentModal'
+import authService from '@/service/authService'
 import {
   Coffee,
   ShoppingBag,
@@ -38,9 +39,17 @@ export const MemberCafe = () => {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [membership, setMembership] = useState(null)
 
-  // Member discount rate (e.g., Gold gets 15% discount on F&B)
-  const discountPct = 15
+  useEffect(() => {
+    authService.me().then((res) => {
+      if (res?.membership) setMembership(res.membership)
+    }).catch(() => {})
+  }, [])
+
+  const hasActiveMembership = Boolean(membership && (membership.status === 'active' || !membership.status))
+  // Member discount rate dynamically derived from active membership (0% if none)
+  const discountPct = hasActiveMembership ? Number(membership.bar_discount_pct ?? 15) : 0
 
   // Order tray state
   const [cart, setCart] = useState({}) // { [itemId]: { item, qty, notes } }
@@ -214,10 +223,17 @@ export const MemberCafe = () => {
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Gold Pass Privilege • 15% Off All Café & Kitchen Items</span>
-            </div>
+            {discountPct > 0 ? (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>{membership?.plan_name || 'Member'} Privilege • {discountPct}% Off All Café & Kitchen Items</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 text-amber-300 text-xs font-bold border border-amber-400/30">
+                <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                <span>Club Café & Recovery Lounge • Fresh to Order</span>
+              </div>
+            )}
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
               The Club Café & Recovery Lounge
             </h1>
@@ -331,9 +347,11 @@ export const MemberCafe = () => {
                         <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider">
                           {item.category || 'Café Item'}
                         </span>
-                        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider shadow-xs">
-                          {discountPct}% OFF
-                        </span>
+                        {discountPct > 0 && (
+                          <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider shadow-xs">
+                            {discountPct}% OFF
+                          </span>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -346,12 +364,16 @@ export const MemberCafe = () => {
                             <span className="text-base font-black text-slate-900 tabular-nums">
                               {formatCurrency(memberPrice)}
                             </span>
-                            <span className="text-xs text-slate-400 line-through tabular-nums">
-                              {formatCurrency(basePrice)}
-                            </span>
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                              Member Rate
-                            </span>
+                            {discountPct > 0 && (
+                              <>
+                                <span className="text-xs text-slate-400 line-through tabular-nums">
+                                  {formatCurrency(basePrice)}
+                                </span>
+                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                                  Member Rate
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
 
@@ -429,7 +451,7 @@ export const MemberCafe = () => {
                         <div className="min-w-0 flex-1">
                           <span className="font-bold text-slate-800 block truncate">{item.name}</span>
                           <span className="text-[11px] text-slate-400 tabular-nums">
-                            {formatCurrency(Math.round(item.price * 0.85))} × {qty}
+                            {formatCurrency(Math.round(item.price * (1 - discountPct / 100)))} × {qty}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -539,10 +561,17 @@ export const MemberCafe = () => {
                       <span>Subtotal:</span>
                       <span className="tabular-nums font-semibold">{formatCurrency(rawSubtotal)}</span>
                     </div>
-                    <div className="flex justify-between text-emerald-700 font-semibold">
-                      <span>Gold Member 15% Discount:</span>
-                      <span className="tabular-nums">- {formatCurrency(discountAmount)}</span>
-                    </div>
+                    {discountPct > 0 ? (
+                      <div className="flex justify-between text-emerald-700 font-semibold">
+                        <span>{membership?.plan_name || 'Member'} {discountPct}% Discount:</span>
+                        <span className="tabular-nums">- {formatCurrency(discountAmount)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between text-slate-500 font-medium">
+                        <span>Member Discount:</span>
+                        <span className="tabular-nums">₹0.00 (Standard Guest)</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-slate-900 font-extrabold text-sm pt-2 border-t border-slate-200">
                       <span>Total Payable:</span>
                       <span className="tabular-nums text-base text-[#1B4D2E]">{formatCurrency(finalTotal)}</span>

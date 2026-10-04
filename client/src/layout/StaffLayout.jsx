@@ -42,6 +42,15 @@ export const StaffLayout = () => {
     navigate('/login')
   }
 
+  // Route Protection Guard
+  if (!user) {
+    return <Navigate to="/login?redirect=/staff" replace />
+  }
+
+  if (user.role === 'member' || user.role === 'user') {
+    return <Navigate to="/app" replace />
+  }
+
   const dept = getStaffDepartment(user)
 
   // Automatic Route Protection Guard:

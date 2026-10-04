@@ -62,8 +62,8 @@ const UniversalProfileRedirect = () => {
     if (raw) role = JSON.parse(raw)?.role || 'member'
   } catch {}
   if (role === 'owner') return <Navigate to="/owner/profile" replace />
-  if (role !== 'member') return <Navigate to="/staff/profile" replace />
-  return <Navigate to="/app/profile" replace />
+  if (role === 'member' || role === 'user') return <Navigate to="/app/profile" replace />
+  return <Navigate to="/staff/profile" replace />
 }
 
 export const router = createBrowserRouter([

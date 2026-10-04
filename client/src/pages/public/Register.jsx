@@ -123,7 +123,7 @@ export const Register = () => {
 
       if (plan) {
         navigate(`/plans?selected=${encodeURIComponent(plan)}`)
-      } else if (redirect) {
+      } else if (redirect && !redirect.startsWith('/owner') && !redirect.startsWith('/staff')) {
         navigate(redirect)
       } else {
         navigate('/app')

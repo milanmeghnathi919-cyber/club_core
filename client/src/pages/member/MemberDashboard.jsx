@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import authService from '@/service/authService'
 import courtService from '@/service/courtService'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 import {
@@ -16,6 +17,7 @@ import {
   Sparkles,
   Coffee,
   Utensils,
+  AlertCircle,
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Card, { CardContent, CardHeader } from '@/components/ui/Card'
@@ -25,8 +27,24 @@ export const MemberDashboard = () => {
   const user = useSelector((state) => state.auth.user)
   const [upcoming, setUpcoming] = useState([])
   const [loading, setLoading] = useState(true)
+  const [membership, setMembership] = useState(null)
+  const [loadingMembership, setLoadingMembership] = useState(true)
 
   useEffect(() => {
+    authService
+      .me()
+      .then((data) => {
+        if (data?.membership) {
+          setMembership(data.membership)
+        } else {
+          setMembership(null)
+        }
+      })
+      .catch(() => {
+        setMembership(null)
+      })
+      .finally(() => setLoadingMembership(false))
+
     courtService
       .getMyBookings(true)
       .then((data) => {
@@ -38,38 +56,65 @@ export const MemberDashboard = () => {
   }, [])
 
   const nextBooking = upcoming.find((b) => b.status === 'confirmed')
+  const hasActiveMembership = Boolean(membership && membership.status === 'active')
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Gold Welcome Hero Card */}
+      {/* Welcome Hero Card (Dynamic Membership vs Guest) */}
       <div className="rounded-2xl bg-gradient-to-r from-[#1B4D2E] via-[#12351F] to-[#0A1F13] text-white p-6 sm:p-8 shadow-md relative overflow-hidden border border-[#1B4D2E]/40">
         <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.2),transparent_70%)] pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Active Gold Pass • 100% Free Court Access</span>
-            </div>
+            {hasActiveMembership ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Active {membership.plan_name || 'Gold'} Pass • {membership.court_discount_pct ?? 100}% Court Discount</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                <span>Standard Club Guest • No Active Membership Tier</span>
+              </div>
+            )}
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Welcome back, {user?.name || 'Champion'}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100 max-w-xl">
-              Your membership entitles you to priority booking, complimentary court access on clay & hard courts, and 15% off at the Pro Shop & Café.
+              {hasActiveMembership
+                ? `Your ${membership.plan_name || 'membership'} entitles you to priority booking, complimentary court access on clay & hard courts, and ${membership.shop_discount_pct ?? 15}% off at the Pro Shop & Café.`
+                : 'You currently do not have an active membership subscription. Subscribe to a tier to unlock complimentary court sessions, 15% discounts at the Pro Shop & Café, and priority reservations.'}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Link to="/app/book">
-              <Button variant="clay" size="lg" className="font-bold shadow-md">
-                <Calendar className="w-4 h-4 mr-1.5" /> Book a Court
-              </Button>
-            </Link>
-            <Link to="/app/pass">
-              <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
-                <CreditCard className="w-4 h-4 mr-1.5" /> Digital Pass
-              </Button>
-            </Link>
+            {hasActiveMembership ? (
+              <>
+                <Link to="/app/book">
+                  <Button variant="clay" size="lg" className="font-bold shadow-md">
+                    <Calendar className="w-4 h-4 mr-1.5" /> Book a Court
+                  </Button>
+                </Link>
+                <Link to="/app/pass">
+                  <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
+                    <CreditCard className="w-4 h-4 mr-1.5" /> Digital Pass
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/plans">
+                  <Button variant="clay" size="lg" className="font-bold shadow-md">
+                    <Sparkles className="w-4 h-4 mr-1.5" /> Explore Plans
+                  </Button>
+                </Link>
+                <Link to="/app/book">
+                  <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
+                    <Calendar className="w-4 h-4 mr-1.5" /> Book Court
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -142,31 +187,50 @@ export const MemberDashboard = () => {
         {/* Quick Privileges Tile */}
         <div>
           <Card className="border-slate-200 h-full flex flex-col justify-between">
-            <CardHeader title="Your Gold Entitlements" subtitle="Tier: Gold Individual" />
+            <CardHeader
+              title={hasActiveMembership ? `Your ${membership.plan_name || 'Member'} Entitlements` : 'Club Guest Status'}
+              subtitle={hasActiveMembership ? `Tier: ${membership.plan_name || 'Active Member'}` : 'Tier: No Active Plan'}
+            />
             <CardContent className="space-y-3 text-xs">
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <span className="text-slate-600 font-medium">Court Booking:</span>
-                <strong className="text-emerald-700 font-bold">100% Free Access</strong>
+                <strong className={hasActiveMembership ? 'text-emerald-700 font-bold' : 'text-slate-800 font-bold'}>
+                  {hasActiveMembership ? `${membership.court_discount_pct ?? 100}% Discount` : 'Standard Rates (0% Off)'}
+                </strong>
               </div>
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <span className="text-slate-600 font-medium">Daily Limit:</span>
-                <strong className="text-slate-900 font-bold">Up to 4 Bookings / Day</strong>
+                <strong className="text-slate-900 font-bold">
+                  {hasActiveMembership ? `Up to ${membership.max_bookings_per_day || 2} Bookings / Day` : '2 Bookings / Day'}
+                </strong>
               </div>
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <span className="text-slate-600 font-medium">Pro Shop Discount:</span>
-                <strong className="text-slate-900 font-bold">15% Off All Gear</strong>
+                <strong className="text-slate-900 font-bold">
+                  {hasActiveMembership ? `${membership.shop_discount_pct ?? 15}% Off All Gear` : '0% Off (Standard)'}
+                </strong>
               </div>
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <span className="text-slate-600 font-medium">Club Cafe & Bar:</span>
-                <strong className="text-slate-900 font-bold">15% Off Food & Drink</strong>
+                <strong className="text-slate-900 font-bold">
+                  {hasActiveMembership ? `${membership.bar_discount_pct ?? 15}% Off Food & Drink` : '0% Off (Standard)'}
+                </strong>
               </div>
             </CardContent>
             <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-              <Link to="/app/pass">
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  View Pass QR Code
-                </Button>
-              </Link>
+              {hasActiveMembership ? (
+                <Link to="/app/pass">
+                  <Button variant="outline" size="sm" className="w-full text-xs">
+                    View Pass QR Code
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/plans">
+                  <Button variant="lawn" size="sm" className="w-full text-xs font-bold">
+                    Unlock Membership Perks
+                  </Button>
+                </Link>
+              )}
             </div>
           </Card>
         </div>
@@ -181,7 +245,9 @@ export const MemberDashboard = () => {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full">
-                15% Member Discount Applied
+                {hasActiveMembership
+                  ? `${membership.bar_discount_pct ?? 15}% Member Discount Applied`
+                  : 'Standard Café Rates • Subscribe for 15% Off'}
               </span>
               <span className="text-xs text-amber-200">Court-Side Delivery Available</span>
             </div>
@@ -222,7 +288,11 @@ export const MemberDashboard = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <h4 className="font-bold text-sm text-slate-900">Club Café</h4>
-                <span className="text-[9px] font-extrabold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">15% Off</span>
+                {hasActiveMembership && (
+                  <span className="text-[9px] font-extrabold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
+                    {membership.bar_discount_pct || 15}% Off
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500 mt-1">Order food & recovery fuel</p>
             </div>
@@ -248,7 +318,9 @@ export const MemberDashboard = () => {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <h4 className="font-bold text-sm text-slate-900">Pro Shop</h4>
-              <p className="text-xs text-slate-500 mt-1">15% member discount</p>
+              <p className="text-xs text-slate-500 mt-1">
+                {hasActiveMembership ? `${membership.shop_discount_pct || 15}% member discount` : 'Official club equipment'}
+              </p>
             </div>
           </Card>
         </Link>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { Trophy, ShieldCheck, QrCode, Sparkles, CheckCircle2 } from 'lucide-react'
+import { Trophy, ShieldCheck, QrCode, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react'
 import Card, { CardContent } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import authService from '@/service/authService'
@@ -18,9 +19,11 @@ export const DigitalPass = () => {
     }).catch(() => {})
   }, [])
 
-  const memberCode = memberData?.member_code || 'CC-000225'
-  const planName = membershipData?.plan_name ? `${membershipData.plan_name.toUpperCase()} PASS` : 'GOLD PASS'
-  const validThru = membershipData?.end_date ? formatDate(membershipData.end_date) : 'Sep 2027'
+  const hasActivePass = Boolean(membershipData && (membershipData.status === 'active' || !membershipData.status))
+  const memberCode = memberData?.member_code || (user?.id ? `CC-${String(user.id).padStart(6, '0')}` : 'CC-GUEST')
+  const planName = hasActivePass && membershipData?.plan_name ? `${membershipData.plan_name.toUpperCase()} PASS` : 'NO ACTIVE PLAN'
+  const validThru = hasActivePass && membershipData?.end_date ? formatDate(membershipData.end_date) : 'Not Subscribed'
+  const passStatus = hasActivePass ? (membershipData?.status?.toUpperCase() || 'ACTIVE') : 'INACTIVE'
 
   return (
     <div className="max-w-md mx-auto py-8 space-y-6 font-sans">
@@ -34,8 +37,32 @@ export const DigitalPass = () => {
         </p>
       </div>
 
-      {/* The Prestige Athletic Member Pass */}
-      <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-[#0A1F13] to-slate-950 text-white p-6 sm:p-7 shadow-2xl border-2 border-amber-500/80 relative overflow-hidden space-y-6">
+      {/* No Active Plan Upgrade Alert */}
+      {!hasActivePass && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div>
+            <h4 className="font-bold text-sm flex items-center gap-1.5">
+              <AlertCircle className="w-4 h-4 text-amber-600" />
+              <span>No Active Membership Subscription</span>
+            </h4>
+            <p className="text-xs text-amber-800 mt-0.5">
+              Subscribe to a membership plan to activate digital pass privileges and unlock free court reservations.
+            </p>
+          </div>
+          <Link to="/plans" className="shrink-0">
+            <Button variant="clay" size="sm" className="font-bold">
+              Explore Plans
+            </Button>
+          </Link>
+        </div>
+      )}
+
+      {/* The Athletic Member Pass Card */}
+      <div
+        className={`rounded-3xl bg-gradient-to-br from-slate-900 via-[#0A1F13] to-slate-950 text-white p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-6 ${
+          hasActivePass ? 'border-2 border-amber-500/80' : 'border border-slate-700'
+        }`}
+      >
         {/* Metallic Sheen Effect */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-amber-400/20 via-emerald-500/10 to-transparent blur-2xl pointer-events-none" />
 
@@ -54,7 +81,13 @@ export const DigitalPass = () => {
               </p>
             </div>
           </div>
-          <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold uppercase tracking-wider shadow-2xs">
+          <span
+            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-2xs ${
+              hasActivePass
+                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+                : 'bg-slate-800 border border-slate-700 text-slate-400'
+            }`}
+          >
             {planName}
           </span>
         </div>
@@ -78,9 +111,15 @@ export const DigitalPass = () => {
             </div>
             <div>
               <p className="text-[9px] text-slate-400 uppercase font-semibold">Status</p>
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {membershipData?.status?.toUpperCase() || 'ACTIVE'}
-              </span>
+              {hasActivePass ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> {passStatus}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400" /> {passStatus}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -112,12 +151,21 @@ export const DigitalPass = () => {
         <CardContent className="p-4 space-y-2 text-xs">
           <div className="flex items-center gap-2 text-slate-700 font-medium">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Show to reception staff for fast court check-in</span>
+            <span>Present at clubhouse front desk for member check-in</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-700 font-medium">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Auto-applies 15% discount on all Bar and Pro Shop orders</span>
-          </div>
+          {hasActivePass ? (
+            <div className="flex items-center gap-2 text-slate-700 font-medium">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Auto-applies {membershipData?.bar_discount_pct || 15}% discount on all Café and Pro Shop orders</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+              <span className="text-slate-500">Subscribe to unlock 100% complimentary court access & 15% discount</span>
+              <Link to="/plans" className="text-xs font-bold text-[#1B4D2E] hover:underline">
+                View Plans
+              </Link>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
