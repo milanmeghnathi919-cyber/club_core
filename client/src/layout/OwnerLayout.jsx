@@ -50,11 +50,11 @@ export const OwnerLayout = () => {
   return (
     <div className="min-h-screen bg-[#F8FAF6] text-slate-900 flex font-sans">
       {/* Executive Dark Sidebar */}
-      <aside className="w-64 bg-[#090D16] text-white shrink-0 hidden lg:flex flex-col border-r border-slate-800">
+      <aside className="w-64 bg-[#090D16] text-white shrink-0 hidden lg:flex flex-col border-r border-slate-800/90 shadow-md">
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold">
-              <Trophy className="w-5 h-5 text-amber-400" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-bold shadow-xs">
+              <Trophy className="w-5 h-5 text-slate-950" />
             </div>
             <div>
               <h2 className="font-extrabold text-sm leading-tight text-white tracking-tight">
@@ -76,10 +76,10 @@ export const OwnerLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   active
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold shadow-2xs'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-900/90'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${active ? 'text-amber-400' : 'text-slate-400'}`} />
