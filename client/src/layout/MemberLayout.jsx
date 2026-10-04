@@ -46,18 +46,18 @@ export const MemberLayout = () => {
   return (
     <div className="min-h-screen bg-[#F8FAF6] text-slate-900 flex flex-col font-sans pb-16 md:pb-0">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/app" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#1B4D2E] flex items-center justify-center text-white shadow-xs">
+            <Link to="/app" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1B4D2E] to-[#12351F] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
                 <Trophy className="w-5 h-5 text-amber-400" />
               </div>
               <div className="hidden sm:block">
                 <span className="font-extrabold text-sm sm:text-base text-slate-950 block leading-tight tracking-tight">
                   THE CHAMPIONS CLUB
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
+                <span className="text-[10px] font-bold text-[#1B4D2E] uppercase tracking-widest block">
                   Member Portal
                 </span>
               </div>
@@ -66,14 +66,14 @@ export const MemberLayout = () => {
             {/* Member Identity Badge */}
             <Link
               to="/app/profile"
-              className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-slate-200 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-slate-200 hover:opacity-85 transition-opacity"
               title="View Profile & Membership Validity"
             >
               <div className="w-7 h-7 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] font-bold text-xs flex items-center justify-center border border-[#1B4D2E]/20">
                 {user?.name?.charAt(0)?.toUpperCase() || 'M'}
               </div>
               <span className="text-xs font-bold text-slate-800">{user?.name || 'Member'}</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/90 flex items-center gap-1 shadow-2xs">
                 <ShieldCheck className="w-3 h-3 text-amber-600" /> Member Profile
               </span>
             </Link>
@@ -83,12 +83,12 @@ export const MemberLayout = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => dispatch(toggleCartDrawer(true))}
-              className="relative p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors"
+              className="relative p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
               title="Equipment Bag"
             >
               <ShoppingBag className="w-4 h-4" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#C85A32] text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#C85A32] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
                   {cartCount}
                 </span>
               )}
@@ -96,7 +96,7 @@ export const MemberLayout = () => {
 
             <Link
               to="/app/profile"
-              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors"
+              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
               title="My Profile & Membership Validity"
             >
               <User className="w-4 h-4" />
@@ -104,7 +104,7 @@ export const MemberLayout = () => {
 
             <button
               onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
@@ -113,8 +113,8 @@ export const MemberLayout = () => {
         </div>
 
         {/* Desktop sub-navigation bar */}
-        <div className="hidden md:block border-t border-slate-100 bg-slate-50/70">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center gap-1 py-1.5">
+        <div className="hidden md:block border-t border-slate-100 bg-slate-50/80">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center gap-1.5 py-1.5">
             {navItems.map((item) => {
               const active = location.pathname === item.path
               const Icon = item.icon
@@ -122,10 +122,10 @@ export const MemberLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     active
-                      ? 'bg-[#1B4D2E] text-white shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                      ? 'bg-[#1B4D2E] text-white shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />

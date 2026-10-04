@@ -42,16 +42,16 @@ export const MemberDashboard = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Gold Welcome Hero Card */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#1B4D2E] via-[#12351F] to-[#0A1F13] text-white p-6 sm:p-8 shadow-md relative overflow-hidden">
+      <div className="rounded-2xl bg-gradient-to-r from-[#1B4D2E] via-[#12351F] to-[#0A1F13] text-white p-6 sm:p-8 shadow-md relative overflow-hidden border border-[#1B4D2E]/40">
         <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.2),transparent_70%)] pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Active Gold Pass • 100% Free Court Access</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Welcome back, {user?.name || 'Champion'}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100 max-w-xl">
