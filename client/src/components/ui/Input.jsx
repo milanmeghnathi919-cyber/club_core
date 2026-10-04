@@ -22,13 +22,13 @@ export const Input = React.forwardRef(
     return (
       <div className={twMerge('flex flex-col gap-1.5 text-left', containerClassName)}>
         {label && (
-          <label htmlFor={inputId} className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <label htmlFor={inputId} className="text-xs font-bold uppercase tracking-wider text-slate-700">
             {label}
           </label>
         )}
         <div className="relative flex items-center">
           {Icon && (
-            <div className="absolute left-3 text-slate-400 pointer-events-none">
+            <div className="absolute left-3.5 text-slate-400 pointer-events-none">
               <Icon className="w-4 h-4" />
             </div>
           )}
@@ -38,18 +38,18 @@ export const Input = React.forwardRef(
             type={type}
             className={twMerge(
               clsx(
-                'w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-1',
-                Icon ? 'pl-9' : 'pl-3.5',
+                'w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-3 focus:ring-offset-0 shadow-2xs',
+                Icon ? 'pl-10' : 'pl-3.5',
                 error
                   ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-200'
-                  : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/20',
+                  : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/15',
                 className,
               ),
             )}
             {...props}
           />
         </div>
-        {error && <span className="text-xs text-rose-600 font-medium">{error}</span>}
+        {error && <span className="text-xs text-rose-600 font-semibold">{error}</span>}
         {!error && helperText && <span className="text-xs text-slate-500">{helperText}</span>}
       </div>
     )

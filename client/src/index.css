@@ -2,24 +2,32 @@
 
 @theme {
   --color-clay: #C85A32;
-  --color-clay-hover: #AF4924;
+  --color-clay-hover: #B54D27;
   --color-clay-dark: #8F3415;
   --color-clay-light: #FBF2EE;
+  --color-clay-surface: #F9EBE5;
   
   --color-lawn: #1B4D2E;
   --color-lawn-hover: #153E24;
-  --color-lawn-dark: #0F2A18;
+  --color-lawn-dark: #0D2818;
   --color-lawn-light: #EDF5F0;
+  --color-lawn-surface: #E8F2EC;
   
   --color-chalk: #F8FAF6;
+  --color-chalk-pure: #FFFFFF;
+  --color-chalk-muted: #F2F5F0;
+  
   --color-sand: #F3EFE6;
   --color-sand-light: #FAF8F5;
+  --color-sand-warm: #EBE4D5;
   
   --color-brass: #C5832B;
   --color-brass-light: #FEF3C7;
+  --color-brass-gold: #D4AF37;
   
-  --color-night: #090D16;
+  --color-night: #070B12;
   --color-midnight: #0F172A;
+  --color-court-dark: #0B1321;
 }
 
 :root {
@@ -27,8 +35,9 @@
   color-scheme: light;
 }
 
-h1, h2, h3, .font-display {
+h1, h2, h3, h4, .font-display {
   font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.015em;
 }
 
 body {
@@ -38,6 +47,7 @@ body {
   background-color: #F8FAF6;
   color: #0F172A;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Tabular figures for athletic scores, slot times, and currency */
@@ -45,7 +55,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Subtle scrollbar */
+/* Athletic subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -54,9 +64,107 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(100, 116, 139, 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: rgba(27, 77, 46, 0.5);
+}
+
+/* Athletic Visual Patterns (Pure Vector SVG inlined, zero external network dependency) */
+.bg-court-mesh {
+  background-image: radial-gradient(rgba(27, 77, 46, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-court-mesh-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-clay-grain {
+  background-image: radial-gradient(rgba(200, 90, 50, 0.09) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.bg-court-lines {
+  background-image: 
+    linear-gradient(to right, rgba(27, 77, 46, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 77, 46, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Athletic Elevation Shadows */
+.athletic-shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+}
+
+.athletic-shadow {
+  box-shadow: 0 4px 16px -3px rgba(15, 23, 42, 0.07), 0 2px 6px -2px rgba(15, 23, 42, 0.04);
+}
+
+.athletic-shadow-lg {
+  box-shadow: 0 12px 32px -6px rgba(15, 23, 42, 0.10), 0 4px 12px -3px rgba(27, 77, 46, 0.06);
+}
+
+.athletic-shadow-lawn {
+  box-shadow: 0 10px 25px -5px rgba(27, 77, 46, 0.25), 0 4px 10px -4px rgba(27, 77, 46, 0.15);
+}
+
+.athletic-shadow-clay {
+  box-shadow: 0 10px 25px -5px rgba(200, 90, 50, 0.25), 0 4px 10px -4px rgba(200, 90, 50, 0.15);
+}
+
+/* Tactile Athletic Micro-interactions */
+.athletic-interactive {
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms ease;
+}
+
+.athletic-interactive:hover {
+  transform: translateY(-1px);
+}
+
+.athletic-interactive:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Animations (Pure CSS keyframes) */
+@keyframes athleticFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floodlightPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
+}
+
+.animate-athletic-reveal {
+  animation: athleticFadeIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Strict prefers-reduced-motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .athletic-interactive:hover,
+  .athletic-interactive:active {
+    transform: none !important;
+  }
 }

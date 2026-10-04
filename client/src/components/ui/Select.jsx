@@ -22,7 +22,7 @@ export const Select = React.forwardRef(
     return (
       <div className={twMerge('flex flex-col gap-1.5 text-left', containerClassName)}>
         {label && (
-          <label htmlFor={selectId} className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <label htmlFor={selectId} className="text-xs font-bold uppercase tracking-wider text-slate-700">
             {label}
           </label>
         )}
@@ -31,10 +31,10 @@ export const Select = React.forwardRef(
           id={selectId}
           className={twMerge(
             clsx(
-              'w-full rounded-lg border bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1',
+              'w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-all focus:outline-none focus:ring-3 focus:ring-offset-0 shadow-2xs',
               error
                 ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-200'
-                : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/20',
+                : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/15',
               className,
             ),
           )}
@@ -49,7 +49,7 @@ export const Select = React.forwardRef(
               ))
             : children}
         </select>
-        {error && <span className="text-xs text-rose-600 font-medium">{error}</span>}
+        {error && <span className="text-xs text-rose-600 font-semibold">{error}</span>}
       </div>
     )
   },
