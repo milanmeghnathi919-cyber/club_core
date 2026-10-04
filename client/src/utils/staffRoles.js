@@ -39,7 +39,7 @@ export const getDepartmentHome = (department) => {
     case 'cafe':
       return '/staff/cafe/inventory'
     case 'owner':
-      return '/owner'
+      return '/staff/bookings'
     case 'court':
     default:
       return '/staff/bookings'

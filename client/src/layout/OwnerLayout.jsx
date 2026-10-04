@@ -47,11 +47,8 @@ export const OwnerLayout = () => {
     { label: 'Invoices & Billing', path: '/owner/invoices', icon: Receipt },
     { label: 'Expenses & Payables', path: '/owner/expenses', icon: CreditCard },
     { label: 'Tax & GST Reports', path: '/owner/tax', icon: FileSpreadsheet },
-    { label: 'Payroll Runs', path: '/owner/payroll', icon: Users2 },
     { label: 'Employee Staff', path: '/owner/employees', icon: Users2 },
     { label: 'Café Inventory', path: '/owner/cafe-inventory', icon: Coffee },
-    { label: 'Shift Roster', path: '/owner/shifts', icon: CalendarCheck },
-    { label: 'Leave Requests', path: '/owner/leave', icon: ClipboardList },
     { label: 'Club Settings', path: '/owner/settings', icon: Sliders },
     { label: 'Executive Profile', path: '/owner/profile', icon: UserCheck },
   ]
@@ -99,7 +96,7 @@ export const OwnerLayout = () => {
 
           <div className="pt-3 mt-3 border-t border-white/10">
             <Link
-              to="/staff"
+              to="/staff/bookings"
               className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-900 transition-colors"
             >
               <span>Staff Operations Console</span>
