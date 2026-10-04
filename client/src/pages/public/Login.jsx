@@ -14,7 +14,6 @@ import {
   Mail,
   Eye,
   EyeOff,
-  Sparkles,
   User,
   ShieldCheck,
   AlertCircle,
@@ -102,12 +101,6 @@ export const Login = () => {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fillQuickDemo = (demoEmail, demoPw) => {
-    setEmail(demoEmail)
-    setPassword(demoPw)
-    setErrorMessage('')
   }
 
   const handleForgotSubmit = (e) => {
@@ -226,60 +219,6 @@ export const Login = () => {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </form>
-
-            {/* Quick Demo Credentials for Hackathon Evaluators */}
-            <div className="pt-4 border-t border-slate-100 space-y-2.5">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Instant Demo Accounts (Click to Fill)</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('member@championsclub.in', 'Member@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-400 text-left transition-colors cursor-pointer group"
-                >
-                  <p className="font-bold text-slate-800 group-hover:text-amber-800">Arun Kumar</p>
-                  <p className="text-[10px] text-amber-600 font-medium">Gold Member</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('courts@championsclub.in', 'Staff@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-400 text-left transition-colors cursor-pointer group"
-                >
-                  <p className="font-bold text-slate-800 group-hover:text-emerald-800">Priya Patel</p>
-                  <p className="text-[10px] text-emerald-600 font-medium">Court Staff</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('shop@championsclub.in', 'Staff@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-400 text-left transition-colors cursor-pointer group"
-                >
-                  <p className="font-bold text-slate-800 group-hover:text-blue-800">Vikram Singh</p>
-                  <p className="text-[10px] text-blue-600 font-medium">Shop Staff</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('cafe@championsclub.in', 'Staff@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-400 text-left transition-colors cursor-pointer group"
-                >
-                  <p className="font-bold text-slate-800 group-hover:text-amber-800">Ananya Rao</p>
-                  <p className="text-[10px] text-amber-600 font-medium">Café Staff</p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('owner@championsclub.in', 'Admin@123')}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-400 text-left transition-colors cursor-pointer group sm:col-span-2"
-                >
-                  <p className="font-bold text-slate-800 group-hover:text-indigo-800">Rajesh Sharma</p>
-                  <p className="text-[10px] text-indigo-600 font-medium">Club Owner / Executive</p>
-                </button>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
