@@ -28,12 +28,12 @@ export const Availability = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 space-y-8 font-sans">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/90 pb-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
             Live Schedule
           </span>
-          <h1 className="text-3xl font-extrabold text-slate-900 mt-1">Court Availability Matrix</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 mt-1 font-display">Court Availability Matrix</h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Browse real-time open slots across all 6 championship courts.
           </p>
@@ -41,26 +41,26 @@ export const Availability = () => {
 
         {/* Controls: Date Picker + Sport Pills */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-300 text-xs shadow-2xs">
-            <Calendar className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-slate-300/90 text-xs shadow-2xs focus-within:ring-2 focus-within:ring-[#1B4D2E]/20 focus-within:border-[#1B4D2E]">
+            <Calendar className="w-4 h-4 text-[#1B4D2E]" />
             <input
               type="date"
               value={selectedDate}
               min={todayStr}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="font-bold text-slate-800 focus:outline-none"
+              className="font-bold text-slate-900 focus:outline-none cursor-pointer"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200/80">
+          <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200/80 shadow-2xs">
             {SPORTS.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setSport(s.value)}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   sport === s.value
-                    ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-slate-900 shadow-xs font-bold'
+                    : 'text-slate-600 hover:text-slate-950'
                 }`}
               >
                 {s.label}
@@ -86,7 +86,7 @@ export const Availability = () => {
         subtitle={`${selectedSlotInfo?.court?.courtName || selectedSlotInfo?.court?.name || 'Court'} • ${formatDate(selectedDate)} at ${formatTime(selectedSlotInfo?.slot?.startAt)}`}
       >
         <div className="space-y-5 py-2">
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+          <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-2.5 text-xs">
             <div className="flex justify-between">
               <span className="text-slate-500">Duration:</span>
               <strong className="text-slate-800">60 Minutes Standard Session</strong>
@@ -98,40 +98,35 @@ export const Availability = () => {
               </strong>
             </div>
             <div className="flex justify-between text-emerald-700">
-              <span>Club Member Rate:</span>
-              <strong>₹0.00 (Gold) or 30-50% Off</strong>
+              <span className="font-semibold">Gold Member Privilege:</span>
+              <strong className="font-bold">100% Free Included</strong>
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Court reservations require an active club membership account or a booked trial session pass.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
             <Button
               variant="lawn"
-              size="lg"
-              className="w-full justify-between"
+              className="w-full font-bold shadow-xs"
               onClick={() => {
-                navigate(`/login?redirect=/app/book?date=${selectedDate}`)
+                const cId = selectedSlotInfo?.court?.courtId || selectedSlotInfo?.court?.id
+                const time = selectedSlotInfo?.slot?.startAt?.split('T')[1]?.slice(0, 5) || ''
+                navigate(`/contact?trial=true&courtId=${cId}&date=${selectedDate}&time=${time}`)
               }}
             >
-              <span className="flex items-center gap-2">
-                <UserCheck className="w-4 h-4" /> Sign In as Member to Book
-              </span>
-              <ArrowRight className="w-4 h-4" />
+              Book as Guest Trial Pass <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
-
             <Button
               variant="outline"
-              size="lg"
-              className="w-full justify-between border-slate-300"
-              onClick={() => {
-                navigate(
-                  `/contact?trial=true&courtId=${selectedSlotInfo?.court?.courtId || selectedSlotInfo?.court?.id}&date=${selectedDate}&time=${selectedSlotInfo?.slot?.time}`,
-                )
-              }}
+              className="w-full font-bold"
+              onClick={() => navigate('/login')}
             >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500" /> Book as Guest Trial
-              </span>
-              <ArrowRight className="w-4 h-4" />
+              Sign In to Reserve
             </Button>
           </div>
         </div>

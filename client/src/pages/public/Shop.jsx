@@ -248,7 +248,7 @@ export const Shop = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search rackets, balls, shoes..."
-                className="w-full pl-9 pr-3 py-2 bg-white rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/20 focus:border-[#1B4D2E]"
+                className="w-full pl-9 pr-3.5 py-2.5 bg-white rounded-xl border border-slate-300 text-xs sm:text-sm transition-all focus:outline-none focus:ring-3 focus:ring-[#1B4D2E]/15 focus:border-[#1B4D2E]"
               />
             </div>
           </div>

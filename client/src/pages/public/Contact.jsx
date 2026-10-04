@@ -245,7 +245,7 @@ export const Contact = () => {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     placeholder="Tell us about your sports background or schedule preferences..."
-                    className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/20 focus:border-[#1B4D2E]"
+                    className="w-full rounded-xl border border-slate-300 p-3.5 text-sm transition-all focus:outline-none focus:ring-3 focus:ring-[#1B4D2E]/15 focus:border-[#1B4D2E]"
                   />
                 </div>
 

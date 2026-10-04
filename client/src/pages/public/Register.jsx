@@ -253,7 +253,7 @@ export const Register = () => {
                   Password
                 </label>
                 <div className="relative flex items-center">
-                  <div className="absolute left-3 text-slate-400 pointer-events-none">
+                  <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -262,13 +262,13 @@ export const Register = () => {
                     placeholder="At least 8 characters"
                     value={form.password}
                     onChange={handleChange}
-                    className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-10 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1B4D2E] focus:ring-2 focus:ring-[#1B4D2E]/20"
+                    className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1B4D2E] focus:ring-3 focus:ring-[#1B4D2E]/15 shadow-2xs transition-all"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -307,11 +307,11 @@ export const Register = () => {
 
               {/* Confirm Password */}
               <div className="space-y-1.5 text-left">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
                   Confirm Password
                 </label>
                 <div className="relative flex items-center">
-                  <div className="absolute left-3 text-slate-400 pointer-events-none">
+                  <div className="absolute left-3.5 text-slate-400 pointer-events-none">
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <input
@@ -320,19 +320,19 @@ export const Register = () => {
                     placeholder="Re-enter password"
                     value={form.confirmPassword}
                     onChange={handleChange}
-                    className={`w-full rounded-lg border bg-white pl-9 pr-10 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                    className={`w-full rounded-xl border bg-white pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-3 shadow-2xs transition-all ${
                       form.confirmPassword && !passwordsMatch
                         ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-200'
                         : form.confirmPassword && passwordsMatch
                         ? 'border-emerald-500 focus:border-emerald-600 focus:ring-emerald-200'
-                        : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/20'
+                        : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/15'
                     }`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                     tabIndex={-1}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

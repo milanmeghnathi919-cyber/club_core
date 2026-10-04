@@ -49,21 +49,36 @@ export const Landing = () => {
   }, [cafeItems])
 
   return (
-    <div className="space-y-20 pb-20 font-sans">
-      {/* Hero Section */}
-      <section className="relative bg-[#090D16] text-white overflow-hidden py-24 sm:py-32 px-4 sm:px-8 border-b border-white/10">
+    <div className="space-y-24 pb-24 font-sans">
+      {/* Hero Section with Signature Court Line Architecture */}
+      <section className="relative bg-[#070B12] text-white overflow-hidden py-24 sm:py-36 px-4 sm:px-8 border-b border-white/10">
         {/* Subtle athletic grid backdrop */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#1B4D2E]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#C85A32]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-court-mesh-dark opacity-15 pointer-events-none" />
+        
+        {/* Vector Tennis Court Lines (Pure SVG, zero layout shift) */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+          <svg className="w-full max-w-6xl h-full" viewBox="0 0 1000 600" fill="none" stroke="currentColor">
+            <rect x="50" y="50" width="900" height="500" strokeWidth="2" />
+            <line x1="50" y1="120" x2="950" y2="120" strokeWidth="1.5" />
+            <line x1="50" y1="480" x2="950" y2="480" strokeWidth="1.5" />
+            <line x1="500" y1="50" x2="500" y2="550" strokeWidth="3" strokeDasharray="6 6" />
+            <line x1="250" y1="120" x2="250" y2="480" strokeWidth="1.5" />
+            <line x1="750" y1="120" x2="750" y2="480" strokeWidth="1.5" />
+            <line x1="250" y1="300" x2="750" y2="300" strokeWidth="1.5" />
+          </svg>
+        </div>
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-amber-300">
+        {/* Ambient Stadium Lighting Sheens */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#1B4D2E]/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#C85A32]/20 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-5xl mx-auto text-center space-y-7">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-300 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Welcome to Bengaluru&rsquo;s Premier Sports Sanctuary</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1]">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] font-display">
             Where Champions <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-[#C85A32]">
               Train, Play & Connect.
@@ -74,36 +89,36 @@ export const Landing = () => {
             World-class Roland Garros clay tennis courts, panoramic padel glass cages, BWF standard badminton, and artisanal club dining. Powered by real-time scheduling.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
             <Link to="/availability">
-              <Button variant="lawn" size="lg" className="gap-2 bg-[#1B4D2E] text-white">
+              <Button variant="lawn" size="lg" className="gap-2.5 bg-[#1B4D2E] text-white shadow-md">
                 <Calendar className="w-4 h-4" /> Check Court Availability
               </Button>
             </Link>
             <Link to="/plans">
-              <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10">
+              <Button variant="outline" size="lg" className="border-white/25 text-white hover:bg-white/10 hover:border-white/40">
                 Explore Membership Tiers
               </Button>
             </Link>
           </div>
 
-          {/* Quick Metrics Bar */}
+          {/* Quick Metrics Chronograph Bar */}
           <div className="pt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto border-t border-white/10">
-            <div className="p-3 text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums">6</p>
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Championship Courts</p>
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums font-display">6</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Championship Courts</p>
             </div>
-            <div className="p-3 text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums">06:00</p>
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Morning First Serve</p>
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums font-display">06:00</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Morning First Serve</p>
             </div>
-            <div className="p-3 text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums">100%</p>
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Gold Court Access</p>
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums font-display">100%</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Gold Court Access</p>
             </div>
-            <div className="p-3 text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums">0</p>
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider">Double-Booking Guarantee</p>
+            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums font-display">0</p>
+              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Double-Booking Guarantee</p>
             </div>
           </div>
         </div>
@@ -115,7 +130,7 @@ export const Landing = () => {
           <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
             Athletic Excellence
           </span>
-          <h2 className="text-3xl font-bold text-slate-900 mt-1">Tournament-Grade Facilities</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900 mt-1 font-display">Tournament-Grade Facilities</h2>
           <p className="text-sm text-slate-500 mt-2">
             Every arena is maintained to strict international federation tolerances.
           </p>
@@ -123,7 +138,7 @@ export const Landing = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {courts.slice(0, 3).map((court) => (
-            <Card key={court.id} hover className="border-slate-200">
+            <Card key={court.id} hover className="border-slate-200/90 overflow-hidden">
               <div className="h-48 bg-slate-100 overflow-hidden relative">
                 {court.imageUrl ? (
                   <img
@@ -136,14 +151,14 @@ export const Landing = () => {
                     <Trophy className="w-12 h-12" />
                   </div>
                 )}
-                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider">
+                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-900/85 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider border border-white/10 shadow-xs">
                   {court.sport}
                 </span>
               </div>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-base text-slate-900">{court.name}</h3>
-                  <span className="text-xs font-bold text-[#1B4D2E] tabular-nums">
+                  <h3 className="font-bold text-base text-slate-900 font-display">{court.name}</h3>
+                  <span className="text-xs font-extrabold text-[#1B4D2E] tabular-nums">
                     {formatCurrency(court.ratePerHour)}/hr
                   </span>
                 </div>
@@ -151,7 +166,7 @@ export const Landing = () => {
                   Competition floodlighting, high-traction athletic surfacing, and court-side hydration coolers.
                 </p>
                 <Link to="/availability" className="block pt-2">
-                  <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Button variant="outline" size="sm" className="w-full text-xs font-bold">
                     View Schedule <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
                 </Link>
@@ -166,14 +181,14 @@ export const Landing = () => {
         {/* Header Strip */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-200">
               <Coffee className="w-3.5 h-3.5 text-amber-700" />
               <span>Nutrition & Recovery Lounge</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
               The Club Café & Recovery Bar
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+            <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
               Artisan single-origin brews, nutrient-dense protein bowls, fresh superfood smoothies, and court-side hydration coolers.
             </p>
           </div>
@@ -197,8 +212,8 @@ export const Landing = () => {
 
         {/* Feature Highlights Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          <div className="flex items-center gap-3.5 p-4 rounded-xl bg-amber-50/70 border border-amber-200/80">
-            <div className="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
               <Coffee className="w-5 h-5" />
             </div>
             <div>
@@ -206,8 +221,8 @@ export const Landing = () => {
               <p className="text-[11px] text-slate-600">Fresh Arabica, pour-overs & Nitro Cold Brew</p>
             </div>
           </div>
-          <div className="flex items-center gap-3.5 p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80">
-            <div className="w-10 h-10 rounded-lg bg-[#1B4D2E] text-white flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-[#1B4D2E] text-white flex items-center justify-center shrink-0 shadow-xs">
               <Zap className="w-5 h-5 text-amber-400" />
             </div>
             <div>
@@ -215,8 +230,8 @@ export const Landing = () => {
               <p className="text-[11px] text-slate-600">Clean proteins, electrolyte elixirs & fresh bowls</p>
             </div>
           </div>
-          <div className="flex items-center gap-3.5 p-4 rounded-xl bg-blue-50/70 border border-blue-200/80">
-            <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-blue-50/70 border border-blue-200/80 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -240,79 +255,86 @@ export const Landing = () => {
 
           return (
             <>
-              {categories.length > 1 && (
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCafeCategory(cat)}
-                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                        activeCafeCategory === cat
-                          ? 'bg-slate-900 text-white shadow-xs'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {/* Category Filter Buttons */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCafeCategory(cat)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                      activeCafeCategory === cat
+                        ? 'bg-[#1B4D2E] text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
 
-              {/* Menu Items Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Menu Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {displayed.map((item) => (
                   <div
                     key={item.id}
-                    className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                    className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] overflow-hidden flex flex-col justify-between hover:shadow-[0_10px_25px_-5px_rgba(27,77,46,0.12)] hover:-translate-y-0.5 transition-all duration-200 group"
                   >
-                    <div>
-                      <div className="h-44 bg-slate-100 relative overflow-hidden">
+                    {/* Image / Thumbnail */}
+                    <div className="h-40 bg-slate-100 overflow-hidden relative">
+                      {item.image_url ? (
                         <img
-                          src={item.image_url || item.imageUrl || 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80'}
+                          src={item.image_url}
                           alt={item.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
                         />
-                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold">
-                          {item.category}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-amber-50 text-amber-700">
+                          <Coffee className="w-8 h-8" />
+                        </div>
+                      )}
+                      {item.calories && (
+                        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-bold tabular-nums border border-white/10">
+                          {item.calories} kcal
                         </span>
-                        {item.calories && (
-                          <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-semibold">
-                            {item.calories} kcal
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="p-4 space-y-1.5">
-                        <h4 className="font-bold text-sm text-slate-900 line-clamp-1">{item.name}</h4>
-                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                          {item.description || 'Nutrient-rich post-match fuel crafted by club chefs.'}
-                        </p>
-                      </div>
+                      )}
+                      <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold uppercase tracking-wider">
+                        {item.category}
+                      </span>
                     </div>
 
-                    <div className="p-4 pt-0">
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                    {/* Content */}
+                    <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-bold text-slate-900 text-sm leading-snug group-hover:text-[#1B4D2E] transition-colors">
+                            {item.name}
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                         <div>
                           <span className="text-sm font-extrabold text-slate-900 tabular-nums">
                             {formatCurrency(item.price)}
                           </span>
-                          <span className="block text-[10px] font-bold text-emerald-700">
-                            Member: {formatCurrency(item.price * 0.85)}
+                          <span className="text-[10px] text-emerald-700 font-bold ml-1.5">
+                            (₹{Math.round(item.price * 0.85)} Gold)
                           </span>
                         </div>
-
                         {user ? (
                           <Link to="/app/cafe">
-                            <Button variant="lawn" size="sm" className="text-xs py-1 px-2.5 bg-[#1B4D2E]">
-                              Order
-                            </Button>
+                            <span className="text-[11px] font-bold text-[#1B4D2E] hover:underline flex items-center gap-0.5">
+                              Order <ArrowRight className="w-3 h-3" />
+                            </span>
                           </Link>
                         ) : (
                           <Link to="/login">
-                            <Button variant="outline" size="sm" className="text-xs py-1 px-2.5">
-                              Order
-                            </Button>
+                            <span className="text-[11px] font-bold text-slate-400 hover:text-slate-700 flex items-center gap-0.5">
+                              Sign in <ArrowRight className="w-3 h-3" />
+                            </span>
                           </Link>
                         )}
                       </div>
@@ -325,19 +347,20 @@ export const Landing = () => {
         })()}
 
         {/* Member Pre-order Court Delivery Banner */}
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-[#C85A32] text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
-          <div className="space-y-1.5 max-w-xl">
+        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-[#C85A32] text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md relative overflow-hidden">
+          <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
+          <div className="space-y-1.5 max-w-xl relative z-10">
             <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-wider">
               Exclusive Member Perk
             </span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-white">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-white font-display">
               Court-Side Delivery & Locker Pickup
             </h3>
-            <p className="text-xs sm:text-sm text-white/90">
+            <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
               Match running into a third set? Order hydration drinks or post-match protein shakes from your phone and our café team delivers directly to your court bench.
             </p>
           </div>
-          <div className="shrink-0 flex items-center gap-3">
+          <div className="shrink-0 flex items-center gap-3 relative z-10">
             <Link to={user ? '/app/cafe' : '/register'}>
               <Button size="lg" className="bg-slate-950 hover:bg-slate-900 text-white font-bold border-0 shadow-lg">
                 {user ? 'Open Café Menu' : 'Join & Get 15% Off'}
@@ -348,13 +371,14 @@ export const Landing = () => {
       </section>
 
       {/* Membership Tiers Teaser */}
-      <section className="bg-slate-900 text-white py-20 px-4 sm:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="bg-[#070B12] text-white py-24 px-4 sm:px-8 border-y border-white/10 relative overflow-hidden">
+        <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
               Club Privileges
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mt-1 text-white">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mt-1 text-white font-display">
               Designed For High Performers
             </h2>
             <p className="text-sm text-slate-400 mt-2">
@@ -370,8 +394,8 @@ export const Landing = () => {
                   key={p.id}
                   className={`rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all ${
                     isGold
-                      ? 'bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-2 border-amber-500/80 shadow-2xl relative'
-                      : 'bg-white/5 border border-white/10 hover:border-white/20'
+                      ? 'bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-2 border-amber-500/80 shadow-2xl relative scale-102'
+                      : 'bg-white/5 border border-white/10 hover:border-white/25'
                   }`}
                 >
                   {isGold && (
@@ -382,12 +406,12 @@ export const Landing = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xl font-bold text-white">{p.name}</h3>
+                      <h3 className="text-xl font-bold text-white font-display">{p.name}</h3>
                       <p className="text-xs text-slate-400 mt-1">Full 365-day athletic access</p>
                     </div>
 
                     <div className="py-2 border-y border-white/10">
-                      <span className="text-3xl font-extrabold text-white tabular-nums">
+                      <span className="text-3xl font-extrabold text-white tabular-nums font-display">
                         {formatCurrency(p.price)}
                       </span>
                       <span className="text-xs text-slate-400 ml-1">/ year</span>
@@ -420,7 +444,7 @@ export const Landing = () => {
                     <Link to="/contact">
                       <Button
                         variant={isGold ? 'clay' : 'outline'}
-                        className={`w-full font-bold ${!isGold ? 'border-white/20 text-white' : ''}`}
+                        className={`w-full font-bold ${!isGold ? 'border-white/20 text-white hover:bg-white/10' : ''}`}
                       >
                         Enquire for Membership
                       </Button>
@@ -435,19 +459,20 @@ export const Landing = () => {
 
       {/* Friday Social Play Invitation */}
       <section className="max-w-5xl mx-auto px-4 sm:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-[#1B4D2E] to-[#12351F] text-white p-8 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 max-w-xl">
+        <div className="rounded-3xl bg-gradient-to-r from-[#1B4D2E] to-[#12351F] text-white p-8 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden border border-[#143B23]/50">
+          <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
+          <div className="space-y-3 max-w-xl relative z-10">
             <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider">
               Every Friday Evening
             </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
               Friday Social Doubles & Padel Mixer
             </h3>
             <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
               Shared court rotations, dynamic partner matching, and post-match drinks at the Club Lounge. Open to all skill levels.
             </p>
           </div>
-          <Link to="/contact">
+          <Link to="/contact" className="relative z-10">
             <Button variant="clay" size="lg" className="whitespace-nowrap font-bold shadow-lg">
               Book a Trial Session
             </Button>
