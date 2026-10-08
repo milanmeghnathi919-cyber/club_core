@@ -5,6 +5,7 @@ import { clearCredentials } from '@/feature/auth/slices/authSlice'
 import { toggleCartDrawer } from '@/feature/shop/cartSlice'
 import authService from '@/service/authService'
 import CartDrawer from '@/components/common/CartDrawer'
+import RoleSwitcher from '@/components/common/RoleSwitcher'
 import {
   Trophy,
   Calendar,
@@ -24,12 +25,12 @@ export const MemberLayout = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
+  const cartItems = useSelector((state) => state.cart.items)
 
   // Route Protection Guard
   if (!user) {
     return <Navigate to="/login?redirect=/app" replace />
   }
-  const cartItems = useSelector((state) => state.cart.items)
   const cartCount = cartItems.reduce((acc, curr) => acc + curr.qty, 0)
 
   const handleLogout = async () => {
@@ -49,20 +50,20 @@ export const MemberLayout = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-[#F8FAF6] text-slate-900 flex flex-col font-sans pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#090B0E] text-white flex flex-col font-sans pb-16 md:pb-0 selection:bg-[#CCFF00] selection:text-black">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
+      <header className="sticky top-0 z-40 bg-[#0E1217]/90 backdrop-blur-xl border-b border-white/10 shadow-2xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/app" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1B4D2E] to-[#12351F] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-                <Trophy className="w-5 h-5 text-amber-400" />
+              <div className="w-9 h-9 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30 flex items-center justify-center shadow-md shadow-[#CCFF00]/20 group-hover:scale-105 transition-transform">
+                <Trophy className="w-5 h-5 text-[#CCFF00]" />
               </div>
               <div className="hidden sm:block">
-                <span className="font-extrabold text-sm sm:text-base text-slate-950 block leading-tight tracking-tight">
+                <span className="font-black text-sm sm:text-base text-white block leading-tight tracking-tight font-display">
                   THE CHAMPIONS CLUB
                 </span>
-                <span className="text-[10px] font-bold text-[#1B4D2E] uppercase tracking-widest block">
+                <span className="text-[10px] font-black text-[#CCFF00] uppercase tracking-widest block">
                   Member Portal
                 </span>
               </div>
@@ -71,15 +72,15 @@ export const MemberLayout = () => {
             {/* Member Identity Badge */}
             <Link
               to="/app/profile"
-              className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-slate-200 hover:opacity-85 transition-opacity"
+              className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-white/10 hover:opacity-85 transition-opacity"
               title="View Profile & Membership Validity"
             >
-              <div className="w-7 h-7 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] font-bold text-xs flex items-center justify-center border border-[#1B4D2E]/20">
+              <div className="w-7 h-7 rounded-full bg-[#CCFF00]/20 text-[#CCFF00] font-extrabold text-xs flex items-center justify-center border border-[#CCFF00]/40">
                 {user?.name?.charAt(0)?.toUpperCase() || 'M'}
               </div>
-              <span className="text-xs font-bold text-slate-800">{user?.name || 'Member'}</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/90 flex items-center gap-1 shadow-2xs">
-                <ShieldCheck className="w-3 h-3 text-amber-600" /> Member Profile
+              <span className="text-xs font-bold text-white">{user?.name || 'Member'}</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/5 text-[#CCFF00] border border-[#CCFF00]/30 flex items-center gap-1 shadow-xs">
+                <ShieldCheck className="w-3 h-3 text-[#CCFF00]" /> Member
               </span>
             </Link>
           </div>
@@ -88,12 +89,12 @@ export const MemberLayout = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => dispatch(toggleCartDrawer(true))}
-              className="relative p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
+              className="relative p-2 rounded-xl border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white transition-colors cursor-pointer"
               title="Equipment Bag"
             >
               <ShoppingBag className="w-4 h-4" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#C85A32] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[#CCFF00] text-black text-[10px] font-black flex items-center justify-center shadow-md shadow-[#CCFF00]/30">
                   {cartCount}
                 </span>
               )}
@@ -101,7 +102,7 @@ export const MemberLayout = () => {
 
             <Link
               to="/app/profile"
-              className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
+              className="p-2 rounded-xl border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white transition-colors"
               title="My Profile & Membership Validity"
             >
               <User className="w-4 h-4" />
@@ -109,7 +110,7 @@ export const MemberLayout = () => {
 
             <button
               onClick={handleLogout}
-              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
@@ -118,7 +119,7 @@ export const MemberLayout = () => {
         </div>
 
         {/* Desktop sub-navigation bar */}
-        <div className="hidden md:block border-t border-slate-100 bg-slate-50/80">
+        <div className="hidden md:block border-t border-white/10 bg-[#12161F]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center gap-1.5 py-1.5">
             {navItems.map((item) => {
               const active = location.pathname === item.path
@@ -127,10 +128,10 @@ export const MemberLayout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     active
-                      ? 'bg-[#1B4D2E] text-white shadow-2xs font-bold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                      ? 'bg-[#CCFF00] text-black font-black shadow-md shadow-[#CCFF00]/25'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -147,8 +148,8 @@ export const MemberLayout = () => {
         <Outlet />
       </main>
 
-      {/* Mobile Bottom Navigation Bar (Wimbledon Touch Standard) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 flex items-center justify-around py-2 px-1 shadow-lg">
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1217]/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around py-2 px-1 shadow-2xl">
         {navItems.map((item) => {
           const active = location.pathname === item.path
           const Icon = item.icon
@@ -156,8 +157,8 @@ export const MemberLayout = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-semibold transition-colors ${
-                active ? 'text-[#1B4D2E]' : 'text-slate-400 hover:text-slate-700'
+              className={`flex flex-col items-center gap-1 py-1 px-2 rounded-lg text-[10px] font-bold transition-colors ${
+                active ? 'text-[#CCFF00]' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -169,6 +170,7 @@ export const MemberLayout = () => {
 
       {/* Global Overlays */}
       <CartDrawer />
+      <RoleSwitcher />
     </div>
   )
 }

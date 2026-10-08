@@ -7,7 +7,7 @@ export function notFoundHandler(req, res, next) {
   next(ApiError.notFound(`Route ${req.method} ${req.originalUrl} not found`, 'NOT_FOUND'))
 }
 
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res, _next) {
   let statusCode = err.statusCode ?? 500
   let code = err.code ?? null
   let message = err.message ?? 'Internal server error'

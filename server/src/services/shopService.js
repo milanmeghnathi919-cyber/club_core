@@ -13,7 +13,6 @@ export const shopService = {
     const deliveryFee = fulfilment === 'delivery' ? Number(settings.deliveryFee || 50) : 0
 
     let subtotal = 0
-    let totalTax = 0
     const lines = []
 
     for (const item of items) {
@@ -30,9 +29,7 @@ export const shopService = {
       const lineTotal = round2(unitPrice * qty)
       const taxRate = Number(product.tax_rate_pct || 18)
       const lineTax = calcInclusiveTax(lineTotal, taxRate)
-
       subtotal += lineTotal
-      totalTax += lineTax
 
       lines.push({
         productId: product.id,
@@ -235,7 +232,7 @@ export const shopService = {
       return this.cancel(id, actorId, true)
     }
 
-    const updated = await shopOrderRepository.update(id, { status: newStatus })
+    await shopOrderRepository.update(id, { status: newStatus })
     return this.get(id)
   },
 

@@ -1,4 +1,4 @@
-import crypto, { randomUUID } from 'crypto'
+import crypto from 'crypto'
 
 /**
  * In-memory fallback repository store.
@@ -77,7 +77,6 @@ class MemoryStore {
 
   update(collection, filterFn, updates) {
     const list = this.get(collection)
-    let updatedCount = 0
     let lastUpdated = null
 
     for (let i = 0; i < list.length; i++) {
@@ -88,7 +87,6 @@ class MemoryStore {
           updated_at: new Date().toISOString(),
         }
         lastUpdated = list[i]
-        updatedCount++
       }
     }
     return lastUpdated ? { ...lastUpdated } : null

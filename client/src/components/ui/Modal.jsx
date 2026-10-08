@@ -32,26 +32,26 @@ export const Modal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-200"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
       />
 
       {/* Dialog container */}
       <div
-        className={`relative w-full ${maxWidth} bg-white rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden transform transition-all z-10 my-8`}
+        className={`relative w-full ${maxWidth} bg-[#111418] text-white rounded-2xl shadow-2xl border border-white/15 overflow-hidden transform transition-all z-10 my-8`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
         {(title || subtitle) && (
-          <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-white/10 bg-white/[0.02]">
             <div>
-              {title && <h3 className="text-lg font-bold text-slate-900 leading-snug font-display tracking-tight">{title}</h3>}
-              {subtitle && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{subtitle}</p>}
+              {title && <h3 className="text-lg font-bold text-white leading-snug font-display tracking-tight">{title}</h3>}
+              {subtitle && <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
@@ -60,10 +60,10 @@ export const Modal = ({
         )}
 
         {/* Body */}
-        <div className="px-6 py-5 max-h-[75vh] overflow-y-auto text-slate-700">{children}</div>
+        <div className="px-6 py-5 max-h-[75vh] overflow-y-auto text-slate-300">{children}</div>
 
         {/* Optional Footer */}
-        {footer && <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">{footer}</div>}
+        {footer && <div className="px-6 py-4 bg-white/[0.02] border-t border-white/10 flex items-center justify-end gap-3">{footer}</div>}
       </div>
     </div>
   )

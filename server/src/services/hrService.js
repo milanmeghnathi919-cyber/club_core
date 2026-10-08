@@ -101,7 +101,7 @@ export const hrService = {
     if (emp.user_id) {
       try {
         await userRepository.delete(emp.user_id)
-      } catch (err) {
+      } catch {
         await userRepository.update(emp.user_id, { is_active: false })
       }
     }
@@ -338,7 +338,7 @@ export const hrService = {
     })
   },
 
-  async finalizePayrollRun(id, actorId) {
+  async finalizePayrollRun(id, _actorId) {
     const run = await hrRepository.findPayrollRunById(id)
     if (!run) throw new ApiError(404, 'Payroll run not found', null, 'NOT_FOUND')
     if (run.status !== 'draft') return run

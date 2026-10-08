@@ -70,24 +70,24 @@ export const CartDrawer = () => {
     <div className="fixed inset-0 z-50 overflow-hidden font-sans">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
         onClick={() => dispatch(toggleCartDrawer(false))}
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-200">
+        <div className="w-screen max-w-md bg-[#0E1217] text-white shadow-2xl flex flex-col border-l border-white/10 animate-in slide-in-from-right duration-200">
           {/* Header */}
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div className="px-6 py-4 bg-[#12161F] border-b border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-[#1B4D2E]" />
-              <h3 className="font-bold text-slate-900 text-base">Club Pro Shop Cart</h3>
-              <span className="px-2 py-0.5 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] text-xs font-bold">
+              <ShoppingBag className="w-5 h-5 text-[#CCFF00]" />
+              <h3 className="font-black text-white text-base font-display uppercase tracking-tight">Pro Shop Equipment Bag</h3>
+              <span className="px-2 py-0.5 rounded-full bg-[#CCFF00] text-black text-xs font-black">
                 {items.reduce((acc, curr) => acc + curr.qty, 0)}
               </span>
             </div>
             <button
               onClick={() => dispatch(toggleCartDrawer(false))}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -97,9 +97,9 @@ export const CartDrawer = () => {
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {items.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
-                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-slate-300 stroke-1" />
-                <p className="font-medium text-slate-600 text-sm">Your equipment bag is empty</p>
-                <p className="text-xs text-slate-400 mt-1">Browse rackets, apparel, and strings.</p>
+                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-slate-600 stroke-1" />
+                <p className="font-bold text-white text-sm">Your equipment bag is empty</p>
+                <p className="text-xs text-slate-400 mt-1">Browse rackets, apparel, strings, and balls.</p>
               </div>
             ) : (
               items.map((item) => {
@@ -118,20 +118,20 @@ export const CartDrawer = () => {
                 return (
                   <div
                     key={item.productId}
-                    className={`flex items-start gap-3 p-3 rounded-xl border transition-colors ${
+                    className={`flex items-start gap-3 p-3 rounded-2xl border transition-colors ${
                       exceedsStock || isOutOfStock
-                        ? 'border-rose-300 bg-rose-50/40'
-                        : 'border-slate-200/80 bg-white hover:border-slate-300'
+                        ? 'border-rose-500/40 bg-rose-950/30'
+                        : 'border-white/10 bg-white/[0.03] hover:border-white/20'
                     }`}
                   >
-                    <div className="w-14 h-14 rounded-lg bg-slate-100 border border-slate-200/60 overflow-hidden shrink-0 flex items-center justify-center relative">
+                    <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center relative">
                       {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
-                        <ShoppingBag className="w-6 h-6 text-slate-300" />
+                        <ShoppingBag className="w-6 h-6 text-slate-500" />
                       )}
                       {isOutOfStock && (
-                        <div className="absolute inset-0 bg-slate-900/65 backdrop-blur-2xs flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center">
                           <span className="text-[9px] font-bold text-white uppercase tracking-wider text-center px-1">
                             Sold Out
                           </span>
@@ -141,19 +141,19 @@ export const CartDrawer = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="text-xs font-bold text-slate-900 truncate" title={item.name}>
+                        <h4 className="text-xs font-bold text-white truncate" title={item.name}>
                           {item.name}
                         </h4>
                         <button
                           onClick={() => dispatch(removeFromCart(item.productId))}
-                          className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors shrink-0"
+                          className="text-slate-400 hover:text-rose-400 p-0.5 transition-colors shrink-0 cursor-pointer"
                           title="Remove item"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <p className="text-xs font-semibold text-[#1B4D2E] mt-0.5 tabular-nums">
+                      <p className="text-xs font-bold text-[#CCFF00] mt-0.5 tabular-nums font-mono">
                         {formatCurrency(item.price)}
                       </p>
 
@@ -241,28 +241,28 @@ export const CartDrawer = () => {
 
           {/* Fulfilment Toggle & Footer */}
           {items.length > 0 && (
-            <div className="p-6 bg-slate-50/90 border-t border-slate-200 space-y-4">
+            <div className="p-6 bg-[#12161F] border-t border-white/10 space-y-4">
               <div className="space-y-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Fulfilment Method
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => dispatch(setFulfilment('pickup'))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                       fulfilment === 'pickup'
-                        ? 'bg-[#1B4D2E] text-white border-[#1B4D2E] shadow-2xs'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-[#CCFF00] text-black border-[#CCFF00] shadow-md shadow-[#CCFF00]/25'
+                        : 'bg-white/5 text-slate-300 border-white/10 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     <Store className="w-3.5 h-3.5" /> Club Pickup
                   </button>
                   <button
                     onClick={() => dispatch(setFulfilment('delivery'))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                       fulfilment === 'delivery'
-                        ? 'bg-[#1B4D2E] text-white border-[#1B4D2E] shadow-2xs'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-[#CCFF00] text-black border-[#CCFF00] shadow-md shadow-[#CCFF00]/25'
+                        : 'bg-white/5 text-slate-300 border-white/10 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     <Truck className="w-3.5 h-3.5" /> Home Delivery
@@ -271,28 +271,28 @@ export const CartDrawer = () => {
               </div>
 
               {/* Price Breakdown from Server Quote */}
-              <div className="space-y-1 text-xs border-t border-slate-200/80 pt-3">
-                <div className="flex justify-between text-slate-500">
+              <div className="space-y-1 text-xs border-t border-white/10 pt-3">
+                <div className="flex justify-between text-slate-400">
                   <span>Subtotal</span>
-                  <span className="tabular-nums font-medium text-slate-800">
+                  <span className="tabular-nums font-medium text-white font-mono">
                     {formatCurrency(quote?.subtotal || items.reduce((a, b) => a + b.price * b.qty, 0))}
                   </span>
                 </div>
                 {quote?.discount > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-medium">
-                    <span>Member Discount ({quote.discountPct}%)</span>
-                    <span className="tabular-nums">-{formatCurrency(quote.discount)}</span>
+                  <div className="flex justify-between text-[#CCFF00] font-bold">
+                    <span>Member Privilege ({quote.discountPct}%)</span>
+                    <span className="tabular-nums font-mono">-{formatCurrency(quote.discount)}</span>
                   </div>
                 )}
                 {fulfilment === 'delivery' && (
-                  <div className="flex justify-between text-slate-500">
+                  <div className="flex justify-between text-slate-400">
                     <span>Delivery Fee</span>
-                    <span className="tabular-nums">{formatCurrency(quote?.deliveryFee || 50)}</span>
+                    <span className="tabular-nums font-mono">{formatCurrency(quote?.deliveryFee || 50)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
-                  <span>Total Amount</span>
-                  <span className="text-[#1B4D2E] tabular-nums">
+                <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-white/10">
+                  <span className="font-display uppercase tracking-tight">Total Amount</span>
+                  <span className="text-[#CCFF00] tabular-nums font-mono font-black text-lg">
                     {loadingQuote ? (
                       <Loader2 className="w-4 h-4 animate-spin inline" />
                     ) : (
@@ -304,11 +304,11 @@ export const CartDrawer = () => {
 
               {/* Out of stock warning banner */}
               {hasOutOfStockError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="font-bold text-rose-800">Items exceed available stock</p>
-                    <p className="text-[11px] text-rose-700 leading-relaxed">
+                    <p className="font-bold text-rose-300">Items exceed available stock</p>
+                    <p className="text-[11px] text-rose-400 leading-relaxed">
                       Please adjust quantities or remove out-of-stock items before checkout.
                     </p>
                     <button
@@ -318,7 +318,7 @@ export const CartDrawer = () => {
                           dispatch(capItemToStock(it.productId))
                         })
                       }}
-                      className="text-[11px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded transition-colors inline-block mt-1"
+                      className="text-[11px] font-bold text-black bg-[#CCFF00] hover:bg-[#B4E600] px-2.5 py-1 rounded-lg transition-colors inline-block mt-1 cursor-pointer"
                     >
                       Auto-adjust all items to available stock
                     </button>
@@ -327,11 +327,11 @@ export const CartDrawer = () => {
               )}
 
               <Button
-                variant="lawn"
+                variant="volt"
                 size="lg"
                 disabled={hasOutOfStockError}
-                className={`w-full gap-2 font-bold ${
-                  hasOutOfStockError ? 'opacity-60 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : ''
+                className={`w-full gap-2 font-black shadow-lg shadow-[#CCFF00]/25 cursor-pointer ${
+                  hasOutOfStockError ? 'opacity-60 cursor-not-allowed' : ''
                 }`}
                 onClick={() => {
                   if (hasOutOfStockError) return
@@ -342,7 +342,7 @@ export const CartDrawer = () => {
                 {hasOutOfStockError ? (
                   <>Out of Stock — Adjust Items</>
                 ) : (
-                  <>Proceed to Checkout <ArrowRight className="w-4 h-4" /></>
+                  <>Proceed to Checkout <ArrowRight className="w-4 h-4 stroke-[3]" /></>
                 )}
               </Button>
             </div>

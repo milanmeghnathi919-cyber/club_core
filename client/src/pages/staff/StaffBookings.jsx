@@ -97,7 +97,7 @@ export const StaffBookings = () => {
 
       const res = await courtService.getAllBookings(params)
       setBookings(res.items || [])
-    } catch (err) {
+    } catch {
       toast.error('Failed to load court bookings directory')
     } finally {
       setDirectoryLoading(false)
@@ -293,47 +293,47 @@ export const StaffBookings = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Title & View Navigation Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
+            <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#CCFF00] text-black">
               Front Desk Operations
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] font-black border border-[#CCFF00]/30">
               Live Club Schedule
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mt-3">
             Court Bookings & Schedule
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Real-time court availability, instant walk-in reservations, and comprehensive member booking directory.
           </p>
         </div>
 
         {/* View Mode Switcher Toggle */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shadow-2xs">
+          <div className="flex items-center p-1 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
             <button
               onClick={() => setViewMode('grid')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
                 viewMode === 'grid'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#CCFF00] text-black shadow-xs'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              <LayoutGrid className="w-4 h-4 text-[#1B4D2E]" />
+              <LayoutGrid className="w-4 h-4" />
               <span>Schedule Grid</span>
             </button>
             <button
               onClick={() => setViewMode('directory')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
                 viewMode === 'directory'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#CCFF00] text-black shadow-xs'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              <ListOrdered className="w-4 h-4 text-[#1B4D2E]" />
+              <ListOrdered className="w-4 h-4" />
               <span>All Bookings Directory</span>
             </button>
           </div>
@@ -344,25 +344,25 @@ export const StaffBookings = () => {
       {viewMode === 'grid' && (
         <div className="space-y-4">
           {/* Grid Controls Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs shadow-2xs">
-                <Calendar className="w-4 h-4 text-slate-400" />
+              <div className="flex items-center gap-2 bg-[#0D1117] px-3 py-1.5 rounded-lg border border-white/15 text-xs shadow-2xs">
+                <Calendar className="w-4 h-4 text-[#CCFF00]" />
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="font-bold text-slate-800 focus:outline-none bg-transparent"
+                  className="font-bold text-white focus:outline-none bg-transparent"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => setSelectedDate(todayStr)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold border transition-all ${
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-bold border transition-all ${
                   selectedDate === todayStr
-                    ? 'bg-[#1B4D2E] text-white border-[#1B4D2E]'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    ? 'bg-[#CCFF00] text-black border-[#CCFF00]'
+                    : 'bg-white/5 text-slate-300 border-white/10 hover:border-white/20'
                 }`}
               >
                 Today
@@ -382,9 +382,9 @@ export const StaffBookings = () => {
               </Select>
             </div>
 
-            <div className="text-xs text-slate-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Click any <strong>available</strong> slot to book • Click any <strong>booked</strong> slot to inspect member</span>
+            <div className="text-xs text-slate-400 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
+              <span>Click any <strong className="text-white">available</strong> slot to book • Click any <strong className="text-white">booked</strong> slot to inspect member</span>
             </div>
           </div>
 
@@ -404,55 +404,55 @@ export const StaffBookings = () => {
         <div className="space-y-4">
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Bookings</span>
-              <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1">{totalCount}</p>
+            <div className="p-3.5 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Bookings</span>
+              <p className="text-xl sm:text-2xl font-black text-white font-mono mt-1">{totalCount}</p>
             </div>
-            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Active / Confirmed</span>
-              <p className="text-xl sm:text-2xl font-black text-emerald-700 mt-1">{confirmedCount}</p>
+            <div className="p-3.5 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
+              <span className="text-[11px] font-bold text-[#CCFF00] uppercase tracking-wider">Active / Confirmed</span>
+              <p className="text-xl sm:text-2xl font-black text-[#CCFF00] font-mono mt-1">{confirmedCount}</p>
             </div>
-            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Paid Revenue</span>
-              <p className="text-xl sm:text-2xl font-black text-blue-700 mt-1 tabular-nums">{formatCurrency(totalRevenue)}</p>
+            <div className="p-3.5 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
+              <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Paid Revenue</span>
+              <p className="text-xl sm:text-2xl font-black text-blue-400 mt-1 tabular-nums font-mono">{formatCurrency(totalRevenue)}</p>
             </div>
-            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Pending Collect</span>
-              <p className="text-xl sm:text-2xl font-black text-amber-700 mt-1">{pendingCollectionCount}</p>
+            <div className="p-3.5 bg-[#111418] rounded-xl border border-white/10 shadow-2xs">
+              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Pending Collect</span>
+              <p className="text-xl sm:text-2xl font-black text-amber-400 font-mono mt-1">{pendingCollectionCount}</p>
             </div>
           </div>
 
           {/* Search & Filter Controls */}
-          <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-3">
+          <div className="p-4 bg-[#111418] rounded-xl border border-white/10 shadow-2xs space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               {/* Search */}
               <div className="md:col-span-2 relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search by member name, phone, member code, or ref..."
                   value={directorySearch}
                   onChange={(e) => setDirectorySearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-[#1B4D2E] focus:border-[#1B4D2E]"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-white/15 bg-[#0D1117] text-white placeholder-slate-500 focus:outline-none focus:border-[#CCFF00] focus:ring-1 focus:ring-[#CCFF00]"
                 />
               </div>
 
               {/* Date Filter */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs w-full">
+                <div className="flex items-center gap-1.5 bg-[#0D1117] px-2.5 py-1.5 rounded-lg border border-white/15 text-xs w-full">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <input
                     type="date"
                     value={directoryDateFilter}
                     onChange={(e) => setDirectoryDateFilter(e.target.value)}
-                    className="font-semibold text-slate-800 focus:outline-none bg-transparent w-full"
+                    className="font-semibold text-white focus:outline-none bg-transparent w-full"
                   />
                 </div>
                 {directoryDateFilter && (
                   <button
                     type="button"
                     onClick={() => setDirectoryDateFilter('')}
-                    className="text-[10px] text-slate-500 hover:text-slate-800 font-bold px-2 py-1 bg-slate-100 rounded"
+                    className="text-[10px] text-slate-400 hover:text-white font-bold px-2 py-1 bg-white/10 rounded"
                     title="Clear date to show all bookings"
                   >
                     All
@@ -476,7 +476,7 @@ export const StaffBookings = () => {
                 <button
                   type="button"
                   onClick={fetchDirectoryBookings}
-                  className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600"
+                  className="p-2 rounded-lg border border-white/10 hover:border-white/20 text-slate-300"
                   title="Refresh bookings"
                 >
                   <RefreshCw className={`w-4 h-4 ${directoryLoading ? 'animate-spin' : ''}`} />
@@ -486,15 +486,15 @@ export const StaffBookings = () => {
 
             {/* Quick Filter Court Dropdown */}
             {courtsList.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/10">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Court:</span>
                 <button
                   type="button"
                   onClick={() => setDirectoryCourtFilter('')}
-                  className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
                     !directoryCourtFilter
-                      ? 'bg-[#1B4D2E] text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      ? 'bg-[#CCFF00] text-black shadow-xs'
+                      : 'bg-white/5 text-slate-300 hover:text-white'
                   }`}
                 >
                   All Courts
@@ -504,10 +504,10 @@ export const StaffBookings = () => {
                     key={c.id}
                     type="button"
                     onClick={() => setDirectoryCourtFilter(c.id)}
-                    className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all ${
+                    className={`text-xs px-2.5 py-1 rounded-md font-bold transition-all ${
                       directoryCourtFilter === c.id
-                        ? 'bg-[#1B4D2E] text-white'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-[#CCFF00] text-black shadow-xs'
+                        : 'bg-white/5 text-slate-300 hover:text-white'
                     }`}
                   >
                     {c.name}
@@ -518,22 +518,22 @@ export const StaffBookings = () => {
           </div>
 
           {/* Bookings Directory Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-[#111418] rounded-xl border border-white/10 shadow-xs overflow-hidden">
             {directoryLoading ? (
               <div className="p-12 text-center text-slate-400">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#1B4D2E]" />
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#CCFF00]" />
                 <p className="text-xs font-semibold">Loading court reservations...</p>
               </div>
             ) : filteredBookings.length === 0 ? (
               <div className="p-12 text-center">
-                <Trophy className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <h4 className="font-bold text-slate-700">No reservations found</h4>
-                <p className="text-xs text-slate-500 mt-1">Try clearing your date or search filters.</p>
+                <Trophy className="w-10 h-10 text-slate-600 mx-auto mb-2" />
+                <h4 className="font-bold text-white">No reservations found</h4>
+                <p className="text-xs text-slate-400 mt-1">Try clearing your date or search filters.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  <thead className="bg-white/5 border-b border-white/10 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="py-3 px-4">Ref & Time</th>
                       <th className="py-3 px-4">Court</th>
@@ -543,7 +543,7 @@ export const StaffBookings = () => {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-white/5">
                     {filteredBookings.map((b) => {
                       const memberName = b.memberName || b.member?.fullName || b.member?.name || (b.guestName ? `${b.guestName} (Guest)` : 'Club Member')
                       const memberPhone = b.memberPhone || b.member?.phone || b.guestPhone || '—'
@@ -552,47 +552,47 @@ export const StaffBookings = () => {
                       const isGuest = !b.memberId && !b.member_id
 
                       return (
-                        <tr key={b.id} className="hover:bg-slate-50/70 transition-colors">
+                        <tr key={b.id} className="hover:bg-white/[0.03] transition-colors">
                           <td className="py-3.5 px-4 font-mono">
-                            <span className="font-bold text-slate-900">{b.bookingNo || b.booking_no || 'BK-—'}</span>
-                            <div className="text-[11px] text-slate-500 font-sans mt-0.5 flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-slate-400" />
+                            <span className="font-bold text-white">{b.bookingNo || b.booking_no || 'BK-—'}</span>
+                            <div className="text-[11px] text-slate-400 font-sans mt-0.5 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-500" />
                               <span>{formatDate(b.startAt || b.start_at)}</span>
                               <span>•</span>
-                              <span className="font-bold">{formatTime(b.startAt || b.start_at)}</span>
+                              <span className="font-bold text-slate-200">{formatTime(b.startAt || b.start_at)}</span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <div className="font-bold text-slate-800">{b.court?.name || b.court_name || 'Championship Court'}</div>
-                            <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+                            <div className="font-bold text-white">{b.court?.name || b.court_name || 'Championship Court'}</div>
+                            <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/10 text-slate-300 border border-white/10">
                               {b.court?.sport || b.court_sport || 'Tennis'}
                             </span>
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                              <div className="w-7 h-7 rounded-full bg-[#CCFF00] text-black flex items-center justify-center font-bold text-xs uppercase shrink-0">
                                 {memberName.charAt(0)}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-bold text-slate-900 truncate flex items-center gap-1.5">
+                                <div className="font-bold text-white truncate flex items-center gap-1.5">
                                   <span>{memberName}</span>
                                   {isGuest ? (
-                                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">
+                                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded">
                                       Guest
                                     </span>
                                   ) : planName ? (
-                                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-800 rounded">
+                                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30 rounded">
                                       {planName}
                                     </span>
                                   ) : null}
                                 </div>
-                                <div className="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                                <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
                                   {memberPhone !== '—' && (
                                     <a
                                       href={`tel:${memberPhone}`}
-                                      className="hover:text-[#1B4D2E] hover:underline flex items-center gap-1"
+                                      className="hover:text-[#CCFF00] hover:underline flex items-center gap-1"
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <Phone className="w-2.5 h-2.5" />
@@ -600,7 +600,7 @@ export const StaffBookings = () => {
                                     </a>
                                   )}
                                   {memberCode && (
-                                    <span className="font-mono text-slate-400">#{memberCode}</span>
+                                    <span className="font-mono text-slate-500">#{memberCode}</span>
                                   )}
                                 </div>
                               </div>
@@ -608,16 +608,16 @@ export const StaffBookings = () => {
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <div className="font-bold text-slate-900 tabular-nums">
+                            <div className="font-mono font-bold text-[#CCFF00] tabular-nums">
                               {b.price === 0 ? '₹0.00 (Waived)' : formatCurrency(b.price)}
                             </div>
                             <span
                               className={`inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                                 b.paymentStatus === 'paid'
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30'
                                   : b.paymentStatus === 'waived'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-amber-100 text-amber-800'
+                                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                               }`}
                             >
                               {b.paymentStatus || 'unpaid'}
@@ -628,14 +628,14 @@ export const StaffBookings = () => {
                             <span
                               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                 b.status === 'confirmed'
-                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40'
                                   : b.status === 'completed'
-                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                  : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                                  : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                               }`}
                             >
-                              {b.status === 'confirmed' && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
-                              {b.status === 'cancelled' && <XCircle className="w-3 h-3 text-rose-600" />}
+                              {b.status === 'confirmed' && <CheckCircle2 className="w-3 h-3 text-[#CCFF00]" />}
+                              {b.status === 'cancelled' && <XCircle className="w-3 h-3 text-rose-400" />}
                               <span>{b.status}</span>
                             </span>
                           </td>
@@ -644,7 +644,7 @@ export const StaffBookings = () => {
                             <button
                               type="button"
                               onClick={() => handleInspectBooking(b)}
-                              className="px-3 py-1.5 rounded-lg border border-slate-200 hover:border-[#1B4D2E] hover:bg-emerald-50 text-[#1B4D2E] font-bold text-xs inline-flex items-center gap-1.5 transition-all shadow-2xs"
+                              className="px-3 py-1.5 rounded-lg border border-white/15 hover:border-[#CCFF00] hover:text-[#CCFF00] text-slate-300 font-bold text-xs inline-flex items-center gap-1.5 transition-all shadow-2xs"
                             >
                               <Eye className="w-3.5 h-3.5" />
                               <span>View Details</span>
@@ -676,30 +676,30 @@ export const StaffBookings = () => {
         ) : (
           <div className="space-y-4 py-2 text-xs">
             {/* Status Header Badge Bar */}
-            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-700">Reservation Status:</span>
+                <span className="font-bold text-slate-300">Reservation Status:</span>
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                     selectedBooking.status === 'confirmed'
-                      ? 'bg-emerald-100 text-emerald-800'
+                      ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40'
                       : selectedBooking.status === 'completed'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-rose-100 text-rose-800'
+                      ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                      : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
                   }`}
                 >
                   {selectedBooking.status}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-500">Payment:</span>
+                <span className="font-bold text-slate-400">Payment:</span>
                 <span
                   className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                     selectedBooking.paymentStatus === 'paid'
-                      ? 'bg-emerald-100 text-emerald-800'
+                      ? 'bg-[#CCFF00]/20 text-[#CCFF00]'
                       : selectedBooking.paymentStatus === 'waived'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-amber-100 text-amber-800'
+                      ? 'bg-blue-500/20 text-blue-300'
+                      : 'bg-amber-500/20 text-amber-300'
                   }`}
                 >
                   {selectedBooking.paymentStatus}
@@ -708,38 +708,38 @@ export const StaffBookings = () => {
             </div>
 
             {/* Court & Session Detail */}
-            <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2">
+            <div className="p-3.5 bg-white/5 rounded-xl border border-white/10 space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Court & Session Schedule</span>
               <div className="grid grid-cols-2 gap-2 mt-1">
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Court Name:</span>
-                  <strong className="text-slate-900 text-sm">
+                  <span className="text-slate-400 block text-[11px]">Court Name:</span>
+                  <strong className="text-white text-sm">
                     {selectedBooking.court?.name || selectedBooking.court_name || 'Championship Court'}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[11px]">Sport:</span>
-                  <span className="font-bold uppercase tracking-wider text-[11px] text-[#1B4D2E]">
+                  <span className="text-slate-400 block text-[11px]">Sport:</span>
+                  <span className="font-black uppercase tracking-wider text-[11px] text-[#CCFF00]">
                     {selectedBooking.court?.sport || selectedBooking.court_sport || 'Tennis'}
                   </span>
                 </div>
-                <div className="col-span-2 pt-1 border-t border-slate-100 flex items-center gap-2">
+                <div className="col-span-2 pt-1 border-t border-white/10 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-200">
                     {formatDate(selectedBooking.startAt || selectedBooking.start_at)} •{' '}
                     {formatTime(selectedBooking.startAt || selectedBooking.start_at)} –{' '}
                     {formatTime(selectedBooking.endAt || selectedBooking.end_at)}
                   </span>
-                  <span className="text-slate-400 font-normal">(60 mins session)</span>
+                  <span className="text-slate-500 font-normal">(60 mins session)</span>
                 </div>
               </div>
             </div>
 
-            {/* Member Profile Details Card (THE MAIN REQUEST) */}
-            <div className="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 space-y-3">
+            {/* Member Profile Details Card */}
+            <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-emerald-700" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#CCFF00] flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#CCFF00]" />
                   <span>Booker & Member Profile</span>
                 </span>
                 {selectedBooking.memberId && (
@@ -749,7 +749,7 @@ export const StaffBookings = () => {
                       setIsDetailsModalOpen(false)
                       navigate(`/staff/members/${selectedBooking.memberId}`)
                     }}
-                    className="text-[11px] font-bold text-[#1B4D2E] hover:underline flex items-center gap-1"
+                    className="text-[11px] font-bold text-[#CCFF00] hover:underline flex items-center gap-1"
                   >
                     <span>View CRM Profile</span>
                     <ExternalLink className="w-3 h-3" />
@@ -758,40 +758,40 @@ export const StaffBookings = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#1B4D2E] text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+                <div className="w-11 h-11 rounded-full bg-[#CCFF00] text-black flex items-center justify-center font-bold text-base shadow-xs shrink-0">
                   {(selectedBooking.memberName || selectedBooking.member?.fullName || selectedBooking.guestName || 'M').charAt(0)}
                 </div>
 
                 <div className="flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-black text-slate-900 text-sm">
+                    <h3 className="font-black text-white text-sm">
                       {selectedBooking.memberName || selectedBooking.member?.fullName || selectedBooking.guestName || 'Club Member'}
                     </h3>
                     {selectedBooking.memberId ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200/80 text-emerald-900">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40">
                         {selectedBooking.planName || selectedBooking.member?.planName || 'Registered Member'}
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 text-amber-900">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                         Walk-in Guest
                       </span>
                     )}
                   </div>
 
                   {selectedBooking.memberCode && (
-                    <p className="text-[11px] text-slate-600 font-mono">
-                      Member Code: <strong>#{selectedBooking.memberCode}</strong>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      Member Code: <strong className="text-white">#{selectedBooking.memberCode}</strong>
                     </p>
                   )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-emerald-200/70 text-[11px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-[11px]">
                     {(selectedBooking.memberPhone || selectedBooking.member?.phone || selectedBooking.guestPhone) && (
                       <div className="flex items-center gap-1.5">
-                        <Phone className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span className="text-slate-500">Phone:</span>
+                        <Phone className="w-3.5 h-3.5 text-[#CCFF00] shrink-0" />
+                        <span className="text-slate-400">Phone:</span>
                         <a
                           href={`tel:${selectedBooking.memberPhone || selectedBooking.member?.phone || selectedBooking.guestPhone}`}
-                          className="font-bold text-emerald-900 hover:underline"
+                          className="font-bold text-[#CCFF00] hover:underline"
                         >
                           {selectedBooking.memberPhone || selectedBooking.member?.phone || selectedBooking.guestPhone}
                         </a>
@@ -800,11 +800,11 @@ export const StaffBookings = () => {
 
                     {(selectedBooking.memberEmail || selectedBooking.member?.email) && (
                       <div className="flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span className="text-slate-500">Email:</span>
+                        <Mail className="w-3.5 h-3.5 text-[#CCFF00] shrink-0" />
+                        <span className="text-slate-400">Email:</span>
                         <a
                           href={`mailto:${selectedBooking.memberEmail || selectedBooking.member?.email}`}
-                          className="font-bold text-emerald-900 hover:underline truncate"
+                          className="font-bold text-[#CCFF00] hover:underline truncate"
                         >
                           {selectedBooking.memberEmail || selectedBooking.member?.email}
                         </a>
@@ -816,22 +816,22 @@ export const StaffBookings = () => {
             </div>
 
             {/* Financial Ledger & Payment Action */}
-            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+            <div className="p-3.5 bg-white/5 rounded-xl border border-white/10 space-y-2.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Financial Summary</span>
               <div className="space-y-1.5">
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-400">
                   <span>Court Base Rate (1 hr):</span>
-                  <span className="tabular-nums font-semibold">{formatCurrency(selectedBooking.basePrice || selectedBooking.court?.ratePerHour || 600)}</span>
+                  <span className="tabular-nums font-mono font-semibold text-white">{formatCurrency(selectedBooking.basePrice || selectedBooking.court?.ratePerHour || 600)}</span>
                 </div>
                 {Number(selectedBooking.discountPct || 0) > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-semibold">
+                  <div className="flex justify-between text-[#CCFF00] font-semibold">
                     <span>Membership Discount ({selectedBooking.discountPct}%):</span>
-                    <span>- {formatCurrency(((selectedBooking.basePrice || 600) * selectedBooking.discountPct) / 100)}</span>
+                    <span className="font-mono">- {formatCurrency(((selectedBooking.basePrice || 600) * selectedBooking.discountPct) / 100)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-1.5">
+                <div className="flex justify-between text-white font-bold border-t border-white/10 pt-1.5">
                   <span>Net Price Payable:</span>
-                  <span className="tabular-nums text-sm text-[#1B4D2E]">
+                  <span className="tabular-nums text-sm font-mono font-black text-[#CCFF00]">
                     {selectedBooking.price === 0 ? '₹0.00 (Waived)' : formatCurrency(selectedBooking.price)}
                   </span>
                 </div>
@@ -839,23 +839,23 @@ export const StaffBookings = () => {
 
               {/* If Unpaid, offer immediate counter payment collection */}
               {selectedBooking.paymentStatus === 'unpaid' && selectedBooking.status === 'confirmed' && (
-                <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200 space-y-2">
-                  <div className="flex items-center gap-1.5 text-amber-900 font-bold">
-                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                <div className="mt-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/30 space-y-2">
+                  <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                    <AlertCircle className="w-4 h-4 text-amber-400" />
                     <span>Payment Pending at Counter</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Select
                       value={payMethodForBooking}
                       onChange={(e) => setPayMethodForBooking(e.target.value)}
-                      className="py-1 text-xs bg-white"
+                      className="py-1 text-xs"
                     >
                       <option value="cash">Cash Tender</option>
                       <option value="upi">UPI / QR Code</option>
                       <option value="card">Credit / Debit Card</option>
                     </Select>
                     <Button
-                      variant="lawn"
+                      variant="volt"
                       size="sm"
                       onClick={handleMarkAsPaid}
                       loading={actionLoading}
@@ -870,20 +870,20 @@ export const StaffBookings = () => {
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
               {selectedBooking.status !== 'cancelled' ? (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleCancelBooking}
                   loading={actionLoading}
-                  className="text-rose-600 border-rose-200 hover:bg-rose-50 font-bold"
+                  className="text-rose-400 border-rose-500/30 hover:bg-rose-500/10 font-bold"
                 >
                   <XCircle className="w-3.5 h-3.5 mr-1" />
                   Cancel Reservation
                 </Button>
               ) : (
-                <span className="text-[11px] text-rose-500 font-semibold italic">Reservation was cancelled</span>
+                <span className="text-[11px] text-rose-400 font-semibold italic">Reservation was cancelled</span>
               )}
 
               <Button
@@ -906,14 +906,14 @@ export const StaffBookings = () => {
         title="Front Desk Court Reservation"
         subtitle={`${selectedSlotInfo?.court?.courtName || selectedSlotInfo?.court?.name} • ${formatDate(selectedDate)} at ${formatTime(selectedSlotInfo?.slot?.startAt)}`}
       >
-        <form onSubmit={handleConfirmBooking} className="space-y-4 py-2">
+        <form onSubmit={handleConfirmBooking} className="space-y-4 py-2 font-sans">
           {/* Toggle Member vs Walk-in Guest */}
-          <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-lg">
+          <div className="grid grid-cols-2 gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
             <button
               type="button"
               onClick={() => setIsMemberMode(false)}
-              className={`py-1.5 text-xs font-bold rounded-md transition-all ${
-                !isMemberMode ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                !isMemberMode ? 'bg-[#CCFF00] text-black shadow-xs font-black' : 'text-slate-400 hover:text-white'
               }`}
             >
               Walk-in Guest
@@ -921,8 +921,8 @@ export const StaffBookings = () => {
             <button
               type="button"
               onClick={() => setIsMemberMode(true)}
-              className={`py-1.5 text-xs font-bold rounded-md transition-all ${
-                isMemberMode ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+              className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                isMemberMode ? 'bg-[#CCFF00] text-black shadow-xs font-black' : 'text-slate-400 hover:text-white'
               }`}
             >
               Registered Member
@@ -954,7 +954,7 @@ export const StaffBookings = () => {
                 onChange={(e) => handleMemberSearch(e.target.value)}
               />
               {matchedMembers.length > 0 && !selectedMember && (
-                <div className="border border-slate-200 rounded-lg max-h-36 overflow-y-auto divide-y divide-slate-100 text-xs bg-white">
+                <div className="border border-white/10 rounded-xl max-h-36 overflow-y-auto divide-y divide-white/5 text-xs bg-[#0D1117]">
                   {matchedMembers.map((m) => (
                     <button
                       type="button"
@@ -964,13 +964,13 @@ export const StaffBookings = () => {
                         setMatchedMembers([])
                         setMemberSearchQuery(m.fullName)
                       }}
-                      className="w-full p-2.5 text-left hover:bg-slate-50 flex items-center justify-between"
+                      className="w-full p-2.5 text-left hover:bg-white/5 flex items-center justify-between"
                     >
                       <div>
-                        <span className="font-bold text-slate-800">{m.fullName}</span>
-                        <span className="text-slate-400 text-[10px] ml-2 font-mono">{m.memberCode}</span>
+                        <span className="font-bold text-white">{m.fullName}</span>
+                        <span className="text-slate-400 text-[10px] ml-2 font-mono">#{m.memberCode}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold text-[#CCFF00] bg-[#CCFF00]/10 border border-[#CCFF00]/30 px-2 py-0.5 rounded">
                         {m.membership?.planCode || 'Member'}
                       </span>
                     </button>
@@ -979,10 +979,10 @@ export const StaffBookings = () => {
               )}
 
               {selectedMember && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between text-xs">
+                <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between text-xs">
                   <div>
-                    <span className="font-bold text-emerald-900">{selectedMember.fullName}</span>
-                    <span className="text-emerald-700 ml-2">({selectedMember.membership?.planName})</span>
+                    <span className="font-bold text-white">{selectedMember.fullName}</span>
+                    <span className="text-[#CCFF00] ml-2">({selectedMember.membership?.planName})</span>
                   </div>
                   <button
                     type="button"
@@ -990,7 +990,7 @@ export const StaffBookings = () => {
                       setSelectedMember(null)
                       setMemberSearchQuery('')
                     }}
-                    className="text-xs text-rose-600 font-semibold"
+                    className="text-xs text-rose-400 font-semibold"
                   >
                     Change
                   </button>
@@ -1000,10 +1000,10 @@ export const StaffBookings = () => {
           )}
 
           {/* Payment Method Selector */}
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <div className="p-3 bg-white/5 rounded-xl border border-white/10 space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-slate-500">Court Fee:</span>
-              <strong className="text-slate-900 tabular-nums">
+              <span className="text-slate-400">Court Fee:</span>
+              <strong className="text-white font-mono tabular-nums">
                 {isMemberMode && selectedMember?.membership?.planCode === 'GOLD'
                   ? '₹0.00 (Gold Member Waived)'
                   : formatCurrency(selectedSlotInfo?.court?.ratePerHour || 600)}
@@ -1034,7 +1034,7 @@ export const StaffBookings = () => {
             >
               Cancel
             </Button>
-            <Button variant="lawn" size="md" type="submit" loading={bookingLoading} className="font-bold">
+            <Button variant="volt" size="md" type="submit" loading={bookingLoading} className="font-black">
               Confirm & Book Court
             </Button>
           </div>

@@ -1,7 +1,6 @@
 import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 import { nextPaymentNo } from '../utils/numbering.js'
-import { toClubDate } from '../utils/clubTime.js'
 
 export const paymentRepository = {
   async insert(data) {

@@ -3,7 +3,6 @@ import membershipRepository from '../repositories/membershipRepository.js'
 import planRepository from '../repositories/planRepository.js'
 import membershipService from './membershipService.js'
 import userRepository from '../repositories/userRepository.js'
-import paymentRepository from '../repositories/paymentRepository.js'
 import memoryStore from '../utils/memoryStore.js'
 import ApiError from '../utils/ApiError.js'
 import { toClubDate } from '../utils/clubTime.js'
@@ -12,7 +11,7 @@ import { sendMail } from '../utils/mailer.js'
 import bcrypt from 'bcryptjs'
 
 export const memberService = {
-  async list({ page = 1, limit = 20, search, status, planId }) {
+  async list({ page = 1, limit = 20, search, planId }) {
     const { items, total } = await memberRepository.list({ page, limit, search, planId })
 
     const enriched = await Promise.all(
@@ -294,7 +293,7 @@ export const memberService = {
     if (member.user_id) {
       try {
         await userRepository.delete(member.user_id)
-      } catch (err) {
+      } catch {
         await userRepository.update(member.user_id, { is_active: false })
       }
     }

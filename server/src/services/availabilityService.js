@@ -67,7 +67,7 @@ export const availabilityService = {
            AND b.end_at > $1`,
         [startIso, endIso]
       )
-    } catch (err) {
+    } catch {
       // fallback
     }
 

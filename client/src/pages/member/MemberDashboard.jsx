@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import authService from '@/service/authService'
 import courtService from '@/service/courtService'
-import { formatCurrency, formatDate, formatTime } from '@/utils/format'
+import { formatDate, formatTime } from '@/utils/format'
 import {
   Trophy,
   Calendar,
@@ -28,7 +28,7 @@ export const MemberDashboard = () => {
   const [upcoming, setUpcoming] = useState([])
   const [loading, setLoading] = useState(true)
   const [membership, setMembership] = useState(null)
-  const [loadingMembership, setLoadingMembership] = useState(true)
+  const [, setLoadingMembership] = useState(true)
 
   useEffect(() => {
     authService
@@ -59,28 +59,28 @@ export const MemberDashboard = () => {
   const hasActiveMembership = Boolean(membership && membership.status === 'active')
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Welcome Hero Card (Dynamic Membership vs Guest) */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#1B4D2E] via-[#12351F] to-[#0A1F13] text-white p-6 sm:p-8 shadow-md relative overflow-hidden border border-[#1B4D2E]/40">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.2),transparent_70%)] pointer-events-none" />
+    <div className="space-y-6 font-sans text-white">
+      {/* Welcome Hero Card */}
+      <div className="rounded-3xl bg-[#111418] text-white p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-white/10">
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#CCFF00]/10 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6 z-10">
+          <div className="space-y-2.5">
             {hasActiveMembership ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] text-xs font-black uppercase tracking-wider border border-[#CCFF00]/30 shadow-sm">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Active {membership.plan_name || 'Gold'} Pass • {membership.court_discount_pct ?? 100}% Court Discount</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 text-amber-300 text-xs font-bold border border-amber-400/30 shadow-2xs">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 text-slate-300 text-xs font-bold border border-white/10">
+                <AlertCircle className="w-3.5 h-3.5 text-[#CCFF00]" />
                 <span>Standard Club Guest • No Active Membership Tier</span>
               </div>
             )}
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display uppercase">
               Welcome back, {user?.name || 'Champion'}
             </h1>
-            <p className="text-xs sm:text-sm text-emerald-100 max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
               {hasActiveMembership
                 ? `Your ${membership.plan_name || 'membership'} entitles you to priority booking, complimentary court access on clay & hard courts, and ${membership.shop_discount_pct ?? 15}% off at the Pro Shop & Café.`
                 : 'You currently do not have an active membership subscription. Subscribe to a tier to unlock complimentary court sessions, 15% discounts at the Pro Shop & Café, and priority reservations.'}
@@ -91,12 +91,12 @@ export const MemberDashboard = () => {
             {hasActiveMembership ? (
               <>
                 <Link to="/app/book">
-                  <Button variant="clay" size="lg" className="font-bold shadow-md">
-                    <Calendar className="w-4 h-4 mr-1.5" /> Book a Court
+                  <Button variant="volt" size="lg" className="font-black shadow-lg shadow-[#CCFF00]/25">
+                    <Calendar className="w-4 h-4 mr-1.5 stroke-[3]" /> Book a Court
                   </Button>
                 </Link>
                 <Link to="/app/pass">
-                  <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
+                  <Button variant="dark" size="lg" className="border-white/15 text-white">
                     <CreditCard className="w-4 h-4 mr-1.5" /> Digital Pass
                   </Button>
                 </Link>
@@ -104,12 +104,12 @@ export const MemberDashboard = () => {
             ) : (
               <>
                 <Link to="/plans">
-                  <Button variant="clay" size="lg" className="font-bold shadow-md">
-                    <Sparkles className="w-4 h-4 mr-1.5" /> Explore Plans
+                  <Button variant="volt" size="lg" className="font-black shadow-lg shadow-[#CCFF00]/25">
+                    <Sparkles className="w-4 h-4 mr-1.5 stroke-[3]" /> Explore Plans
                   </Button>
                 </Link>
                 <Link to="/app/book">
-                  <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
+                  <Button variant="dark" size="lg" className="border-white/15 text-white">
                     <Calendar className="w-4 h-4 mr-1.5" /> Book Court
                   </Button>
                 </Link>
@@ -123,58 +123,58 @@ export const MemberDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Next Upcoming Booking */}
         <div className="lg:col-span-2">
-          <Card className="border-slate-200">
+          <Card className="bg-[#111418] border-white/10 rounded-3xl h-full flex flex-col justify-between">
             <CardHeader
               title="Next Scheduled Session"
               subtitle="Your upcoming match or practice booking"
               action={
-                <Link to="/app/bookings" className="text-xs font-bold text-[#1B4D2E] hover:underline flex items-center gap-1">
-                  View All ({upcoming.length}) <ArrowRight className="w-3 h-3" />
+                <Link to="/app/bookings" className="text-xs font-black text-[#CCFF00] hover:underline flex items-center gap-1">
+                  View All ({upcoming.length}) <ArrowRight className="w-3 h-3 stroke-[3]" />
                 </Link>
               }
             />
             <CardContent>
               {loading ? (
-                <Skeleton className="h-28 rounded-xl" />
+                <Skeleton className="h-28 rounded-2xl bg-white/5" />
               ) : nextBooking ? (
-                <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 rounded-2xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#1B4D2E] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                      <Trophy className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 rounded-xl bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30 flex items-center justify-center font-bold text-sm shrink-0">
+                      <Trophy className="w-6 h-6 text-[#CCFF00]" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-black bg-[#CCFF00] px-2 py-0.5 rounded-full">
                         {nextBooking.court?.sport || nextBooking.court_sport || 'Court'}
                       </span>
-                      <h4 className="font-bold text-base text-slate-900 mt-0.5">
+                      <h4 className="font-bold text-base text-white mt-1">
                         {nextBooking.court?.name || nextBooking.court_name || 'Championship Court'}
                       </h4>
-                      <p className="text-xs text-slate-600 mt-0.5">
+                      <p className="text-xs text-slate-400 mt-0.5">
                         {formatDate(nextBooking.startAt || nextBooking.start_at)} • {formatTime(nextBooking.startAt || nextBooking.start_at)} – {formatTime(nextBooking.endAt || nextBooking.end_at)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 sm:self-center">
-                    <span className="text-xs font-bold text-emerald-800 bg-emerald-200/60 px-3 py-1.5 rounded-lg">
+                    <span className="text-xs font-black uppercase text-black bg-[#CCFF00] px-3 py-1.5 rounded-xl shadow-xs">
                       Confirmed
                     </span>
                     <Link to="/app/bookings">
-                      <Button variant="outline" size="sm" className="text-xs">
+                      <Button variant="dark" size="sm" className="text-xs border-white/15">
                         Details
                       </Button>
                     </Link>
                   </div>
                 </div>
               ) : (
-                <div className="py-8 text-center text-slate-500 space-y-3">
-                  <Clock className="w-10 h-10 text-slate-300 mx-auto" />
+                <div className="py-8 text-center text-slate-400 space-y-3">
+                  <Clock className="w-10 h-10 text-slate-600 mx-auto" />
                   <div>
-                    <p className="text-sm font-semibold text-slate-700">No upcoming court sessions</p>
+                    <p className="text-sm font-bold text-white">No upcoming court sessions</p>
                     <p className="text-xs text-slate-400 mt-0.5">Your courts are waiting. Reserve a session today.</p>
                   </div>
                   <Link to="/app/book">
-                    <Button variant="lawn" size="sm">
+                    <Button variant="volt" size="sm" className="font-black">
                       Reserve a Court
                     </Button>
                   </Link>
@@ -186,47 +186,47 @@ export const MemberDashboard = () => {
 
         {/* Quick Privileges Tile */}
         <div>
-          <Card className="border-slate-200 h-full flex flex-col justify-between">
+          <Card className="bg-[#111418] border-white/10 rounded-3xl h-full flex flex-col justify-between">
             <CardHeader
               title={hasActiveMembership ? `Your ${membership.plan_name || 'Member'} Entitlements` : 'Club Guest Status'}
               subtitle={hasActiveMembership ? `Tier: ${membership.plan_name || 'Active Member'}` : 'Tier: No Active Plan'}
             />
             <CardContent className="space-y-3 text-xs">
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Court Booking:</span>
-                <strong className={hasActiveMembership ? 'text-emerald-700 font-bold' : 'text-slate-800 font-bold'}>
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-slate-400 font-medium">Court Booking:</span>
+                <strong className={hasActiveMembership ? 'text-[#CCFF00] font-bold' : 'text-slate-300 font-bold'}>
                   {hasActiveMembership ? `${membership.court_discount_pct ?? 100}% Discount` : 'Standard Rates (0% Off)'}
                 </strong>
               </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Daily Limit:</span>
-                <strong className="text-slate-900 font-bold">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-slate-400 font-medium">Daily Limit:</span>
+                <strong className="text-white font-bold">
                   {hasActiveMembership ? `Up to ${membership.max_bookings_per_day || 2} Bookings / Day` : '2 Bookings / Day'}
                 </strong>
               </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Pro Shop Discount:</span>
-                <strong className="text-slate-900 font-bold">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-slate-400 font-medium">Pro Shop Discount:</span>
+                <strong className="text-[#CCFF00] font-bold">
                   {hasActiveMembership ? `${membership.shop_discount_pct ?? 15}% Off All Gear` : '0% Off (Standard)'}
                 </strong>
               </div>
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Club Cafe & Bar:</span>
-                <strong className="text-slate-900 font-bold">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-slate-400 font-medium">Club Cafe & Bar:</span>
+                <strong className="text-[#CCFF00] font-bold">
                   {hasActiveMembership ? `${membership.bar_discount_pct ?? 15}% Off Food & Drink` : '0% Off (Standard)'}
                 </strong>
               </div>
             </CardContent>
-            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+            <div className="p-4 border-t border-white/10 bg-white/[0.02]">
               {hasActiveMembership ? (
                 <Link to="/app/pass">
-                  <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Button variant="dark" size="sm" className="w-full text-xs border-white/15">
                     View Pass QR Code
                   </Button>
                 </Link>
               ) : (
                 <Link to="/plans">
-                  <Button variant="lawn" size="sm" className="w-full text-xs font-bold">
+                  <Button variant="volt" size="sm" className="w-full text-xs font-black">
                     Unlock Membership Perks
                   </Button>
                 </Link>
@@ -237,31 +237,31 @@ export const MemberDashboard = () => {
       </div>
 
       {/* Club Café & Athlete Fuel Banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-[#1B4D2E] text-white p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 border border-amber-600/30">
+      <div className="rounded-3xl bg-[#111418] text-white p-5 sm:p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/30 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30 flex items-center justify-center shrink-0">
             <Coffee className="w-6 h-6" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-[#CCFF00] text-black px-2.5 py-0.5 rounded-full">
                 {hasActiveMembership
                   ? `${membership.bar_discount_pct ?? 15}% Member Discount Applied`
                   : 'Standard Café Rates • Subscribe for 15% Off'}
               </span>
-              <span className="text-xs text-amber-200">Court-Side Delivery Available</span>
+              <span className="text-xs text-[#CCFF00]">Court-Side Delivery Available</span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-white mt-1">
               Fuel Up at The Club Café & Recovery Lounge
             </h3>
-            <p className="text-xs text-slate-300 max-w-xl mt-0.5">
+            <p className="text-xs text-slate-400 max-w-xl mt-0.5">
               Order fresh artisanal pour-overs, cold-pressed juices, protein superbowls, or recovery shakes from your phone. Pre-order for post-match pickup.
             </p>
           </div>
         </div>
         <Link to="/app/cafe" className="shrink-0 w-full md:w-auto">
-          <Button variant="clay" className="w-full md:w-auto font-bold shadow-md gap-2">
-            <Utensils className="w-4 h-4" /> Order from Café
+          <Button variant="volt" className="w-full md:w-auto font-black shadow-lg shadow-[#CCFF00]/20 gap-2">
+            <Utensils className="w-4 h-4 stroke-[3]" /> Order from Café
           </Button>
         </Link>
       </div>
@@ -269,56 +269,56 @@ export const MemberDashboard = () => {
       {/* Quick Action Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <Link to="/app/book" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-[#1B4D2E] h-full flex flex-col justify-between">
+          <Card hover className="p-4 bg-[#111418] border-white/10 group-hover:border-[#CCFF00]/50 rounded-2xl h-full flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#1B4D2E] flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] flex items-center justify-center mb-3">
                 <Calendar className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-sm text-slate-900">Book Court</h4>
-              <p className="text-xs text-slate-500 mt-1">Select court & time slot</p>
+              <h4 className="font-bold text-sm text-white">Book Court</h4>
+              <p className="text-xs text-slate-400 mt-1">Select court & time slot</p>
             </div>
           </Card>
         </Link>
 
         <Link to="/app/cafe" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-amber-500 h-full flex flex-col justify-between">
+          <Card hover className="p-4 bg-[#111418] border-white/10 group-hover:border-[#CCFF00]/50 rounded-2xl h-full flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] flex items-center justify-center mb-3">
                 <Coffee className="w-5 h-5" />
               </div>
               <div className="flex items-center gap-1.5">
-                <h4 className="font-bold text-sm text-slate-900">Club Café</h4>
+                <h4 className="font-bold text-sm text-white">Club Café</h4>
                 {hasActiveMembership && (
-                  <span className="text-[9px] font-extrabold uppercase bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">
+                  <span className="text-[9px] font-black uppercase bg-[#CCFF00] text-black px-1.5 py-0.2 rounded">
                     {membership.bar_discount_pct || 15}% Off
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-1">Order food & recovery fuel</p>
+              <p className="text-xs text-slate-400 mt-1">Order food & recovery fuel</p>
             </div>
           </Card>
         </Link>
 
         <Link to="/app/social" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-indigo-500 h-full flex flex-col justify-between">
+          <Card hover className="p-4 bg-[#111418] border-white/10 group-hover:border-[#CCFF00]/50 rounded-2xl h-full flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3">
                 <Users className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-sm text-slate-900">Friday Social</h4>
-              <p className="text-xs text-slate-500 mt-1">Join the weekly mixer</p>
+              <h4 className="font-bold text-sm text-white">Friday Social</h4>
+              <p className="text-xs text-slate-400 mt-1">Join the weekly mixer</p>
             </div>
           </Card>
         </Link>
 
         <Link to="/shop" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-[#C85A32] h-full flex flex-col justify-between">
+          <Card hover className="p-4 bg-[#111418] border-white/10 group-hover:border-[#CCFF00]/50 rounded-2xl h-full flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] flex items-center justify-center mb-3">
                 <ShoppingBag className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-sm text-slate-900">Pro Shop</h4>
-              <p className="text-xs text-slate-500 mt-1">
+              <h4 className="font-bold text-sm text-white">Pro Shop</h4>
+              <p className="text-xs text-slate-400 mt-1">
                 {hasActiveMembership ? `${membership.shop_discount_pct || 15}% member discount` : 'Official club equipment'}
               </p>
             </div>
@@ -326,13 +326,13 @@ export const MemberDashboard = () => {
         </Link>
 
         <Link to="/app/pass" className="group">
-          <Card hover className="p-4 border-slate-200 group-hover:border-amber-500 h-full flex flex-col justify-between">
+          <Card hover className="p-4 bg-[#111418] border-white/10 group-hover:border-[#CCFF00]/50 rounded-2xl h-full flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
                 <CreditCard className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-sm text-slate-900">Digital Pass</h4>
-              <p className="text-xs text-slate-500 mt-1">Check-in at clubhouse</p>
+              <h4 className="font-bold text-sm text-white">Digital Pass</h4>
+              <p className="text-xs text-slate-400 mt-1">Check-in at clubhouse</p>
             </div>
           </Card>
         </Link>

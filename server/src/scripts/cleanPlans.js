@@ -37,9 +37,67 @@ async function clean() {
     [juniorId, silverId, goldId]
   )
 
+  // Update canonical pricing and perks to reflect real club value
   await query(
-    `update public.plans set is_active = true where id in ($1, $2, $3)`,
-    [juniorId, silverId, goldId]
+    `update public.plans 
+     set price = 59999,
+         description = 'The ultimate VIP all-access pass with 100% complimentary courts, 14-day priority window, and luxury clubhouse perks.',
+         perks = $1,
+         is_active = true
+     where id = $2`,
+    [
+      JSON.stringify([
+        '100% Free Court Bookings (Zero Court Fees)',
+        '14-Day Advance Priority Window',
+        '4 Daily Session Bookings Allowance',
+        '15% Off Pro-Shop Equipment & Stringing',
+        '15% Off Club Café & Energy Bar',
+        'VIP Locker & Recovery Lounge Access',
+        'Save ₹1,50,000+/year on Court Fees',
+      ]),
+      goldId,
+    ]
+  )
+
+  await query(
+    `update public.plans 
+     set price = 29999,
+         description = 'The active competitive athlete tier with 30% court discounts, priority bookings, and clubhouse privileges.',
+         perks = $1,
+         is_active = true
+     where id = $2`,
+    [
+      JSON.stringify([
+        '30% Off All Court Bookings',
+        '7-Day Advance Priority Booking Window',
+        '2 Daily Session Bookings Allowance',
+        '10% Off Pro-Shop Gear & Apparel',
+        '10% Off Club Café & Nutrition Bar',
+        'Club Tournament & League Access',
+        'Save ₹45,000+/year on Sports Bookings',
+      ]),
+      silverId,
+    ]
+  )
+
+  await query(
+    `update public.plans 
+     set price = 14999,
+         description = 'For aspiring young athletes under 18 years. Includes 50% court discount, coaching priority & pro gear savings.',
+         perks = $1,
+         is_active = true
+     where id = $2`,
+    [
+      JSON.stringify([
+        '50% Off Junior & Training Courts',
+        'Junior Academy Coaching Priority',
+        '2 Daily Session Bookings Allowance',
+        '10% Off Junior Equipment & Restringing',
+        '10% Off Healthy Café Smoothies & Fuel',
+        'Save ₹30,000+/year on Youth Training',
+      ]),
+      juniorId,
+    ]
   )
 
   const activePlans = await query(

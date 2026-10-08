@@ -19,7 +19,7 @@ export const seedCommerce = async () => {
 
   // 2. Products (~20 SKUs, some at or below low stock threshold)
   const products = [
-    { id: 'prd-01', name: 'Wilson Pro Staff 97 v14', sku: 'WIL-PS97-01', category_id: 'cat-01', price: 21990, stock_qty: 6, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1617083934555-563d762e8316?auto=format&fit=crop&w=600&q=80', is_active: true },
+    { id: 'prd-01', name: 'Wilson Pro Staff 97 v14', sku: 'WIL-PS97-01', category_id: 'cat-01', price: 21990, stock_qty: 6, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=600&q=80', is_active: true },
     { id: 'prd-02', name: 'Babolat Pure Aero 2023', sku: 'BAB-PA23-01', category_id: 'cat-01', price: 19990, stock_qty: 3, low_stock_threshold: 5, image_url: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
     { id: 'prd-03', name: 'Head Speed MP 2024', sku: 'HED-SMP24-01', category_id: 'cat-01', price: 18500, stock_qty: 8, low_stock_threshold: 4, image_url: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80', is_active: true },
     { id: 'prd-04', name: 'Yonex Astrox 88D Pro', sku: 'YNX-AX88D-01', category_id: 'cat-01', price: 15490, stock_qty: 2, low_stock_threshold: 4, image_url: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=600&q=80', is_active: true }, // LOW STOCK
@@ -57,7 +57,7 @@ export const seedCommerce = async () => {
     { id: 'mnu-07', name: 'Cold Brew Coffee', category: 'drink', price: 190, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=600&q=80', is_available: true },
     { id: 'mnu-08', name: 'Fresh Watermelon Juice', category: 'drink', price: 150, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80', is_available: true },
     { id: 'mnu-09', name: 'Tender Coconut Water', category: 'drink', price: 120, tax_rate_pct: 18, station: 'bar', image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80', is_available: true },
-    { id: 'mnu-10', name: 'Masala French Fries', category: 'snack', price: 180, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=600&q=80', is_available: true },
+    { id: 'mnu-10', name: 'Masala French Fries', category: 'snack', price: 180, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80', is_available: true },
     { id: 'mnu-11', name: 'Crispy Veg Spring Rolls', category: 'snack', price: 220, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80', is_available: true },
     { id: 'mnu-12', name: 'Peri Peri Chicken Wings', category: 'snack', price: 280, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=600&q=80', is_available: true },
     { id: 'mnu-13', name: 'Nachos with Cheese & Salsa', category: 'snack', price: 210, tax_rate_pct: 5, station: 'kitchen', image_url: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600&q=80', is_available: true },
@@ -196,7 +196,6 @@ export const seedCommerce = async () => {
 
   // 8. 30 Days of Payments across categories & methods (BR-13 Single Revenue Ledger)
   const payments = []
-  const sources = ['court', 'shop', 'bar', 'membership', 'corporate']
   const methods = ['cash', 'card', 'upi', 'online']
 
   let paySeq = 1000

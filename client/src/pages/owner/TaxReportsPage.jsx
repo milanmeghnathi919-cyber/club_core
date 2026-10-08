@@ -3,11 +3,9 @@ import financeService from '@/service/financeService'
 import { formatCurrency } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
-import Card, { CardContent, CardHeader } from '@/components/ui/Card'
-import { Skeleton } from '@/components/ui/Skeleton'
-import { FileSpreadsheet, Download, Printer, ShieldCheck } from 'lucide-react'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { FileSpreadsheet, Download, Printer, ShieldCheck, Zap } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 export const TaxReportsPage = () => {
   const toast = useToast()
@@ -29,56 +27,61 @@ export const TaxReportsPage = () => {
 
   const handleDownloadPdf = () => {
     if (!taxData) return
-    const doc = new jsPDF()
+    try {
+      const doc = new jsPDF()
 
-    doc.setFontSize(18)
-    doc.text('THE CHAMPIONS CLUB', 105, 18, { align: 'center' })
-    doc.setFontSize(10)
-    doc.text('GST Tax Audit & Liability Statement (BR-16 Tax-Inclusive)', 105, 24, { align: 'center' })
+      doc.setFontSize(18)
+      doc.text('THE CHAMPIONS CLUB', 105, 18, { align: 'center' })
+      doc.setFontSize(10)
+      doc.text('GST Tax Audit & Liability Statement (BR-16 Tax-Inclusive)', 105, 24, { align: 'center' })
 
-    const outputRows = (taxData.outputTax || []).map((t) => [
-      `${t.ratePct}% GST`,
-      formatCurrency(t.taxableValue),
-      formatCurrency(t.tax),
-    ])
+      const outputRows = (taxData.outputTax || []).map((t) => [
+        `${t.ratePct}% GST`,
+        formatCurrency(t.taxableValue),
+        formatCurrency(t.tax),
+      ])
 
-    doc.autoTable({
-      startY: 36,
-      head: [['Tax Slab Rate', 'Taxable Turnover Base', 'Output GST Collected']],
-      body: outputRows,
-      theme: 'grid',
-    })
+      autoTable(doc, {
+        startY: 36,
+        head: [['Tax Slab Rate', 'Taxable Turnover Base', 'Output GST Collected']],
+        body: outputRows,
+        theme: 'grid',
+      })
 
-    const finalY = doc.lastAutoTable.finalY + 10
-    doc.text(`Total Output GST Collected: ${formatCurrency(taxData.outputTax?.reduce((a, b) => a + b.tax, 0) || 54000)}`, 14, finalY)
-    doc.text(`Input Tax Credit Claimed: ${formatCurrency(taxData.inputTax || 3500)}`, 14, finalY + 6)
-    doc.setFontSize(12)
-    doc.text(`NET GST PAYABLE: ${formatCurrency(taxData.netPayable || 50500)}`, 14, finalY + 14)
+      const finalY = (doc.lastAutoTable?.finalY ?? 36) + 10
+      doc.text(`Total Output GST Collected: ${formatCurrency(taxData.outputTax?.reduce((a, b) => a + b.tax, 0) || 54000)}`, 14, finalY)
+      doc.text(`Input Tax Credit Claimed: ${formatCurrency(taxData.inputTax || 3500)}`, 14, finalY + 6)
+      doc.setFontSize(12)
+      doc.text(`NET GST PAYABLE: ${formatCurrency(taxData.netPayable || 50500)}`, 14, finalY + 14)
 
-    doc.save('GST-Audit-Report.pdf')
-    toast.success('Tax Audit PDF downloaded')
+      doc.save('GST-Audit-Report.pdf')
+      toast.success('Tax Audit PDF downloaded')
+    } catch (err) {
+      console.error('Tax PDF error:', err)
+      toast.error('Failed to generate Tax Audit PDF')
+    }
   }
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-            Statutory Compliance
+          <span className="text-xs font-black uppercase tracking-widest text-[#CCFF00] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5" /> Statutory Compliance
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mt-1">
             GST & Tax Statements
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Reconcile tax inclusive gross receipts (BR-16 formula) against input tax credits.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" icon={Download} onClick={handleDownloadCsv} className="font-bold">
+          <Button variant="outline" size="sm" icon={Download} onClick={handleDownloadCsv} className="font-bold text-xs uppercase">
             Export CSV
           </Button>
-          <Button variant="lawn" size="sm" icon={Printer} onClick={handleDownloadPdf} className="font-bold">
+          <Button variant="volt" size="sm" icon={Printer} onClick={handleDownloadPdf} className="font-black uppercase text-xs">
             Download Tax PDF
           </Button>
         </div>
@@ -86,76 +89,79 @@ export const TaxReportsPage = () => {
 
       {loading ? (
         <div className="space-y-4">
-          <Skeleton className="h-28 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
+          <div className="h-28 bg-white/5 rounded-3xl animate-pulse" />
+          <div className="h-64 bg-white/5 rounded-3xl animate-pulse" />
         </div>
       ) : taxData ? (
         <div className="space-y-6">
           {/* Summary Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="border-slate-200 p-4">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 Total Output GST Collected
               </span>
-              <p className="text-2xl font-extrabold text-slate-900 mt-1 tabular-nums">
+              <p className="text-2xl font-black font-mono text-white mt-1.5 tabular-nums">
                 {formatCurrency(taxData.outputTax?.reduce((a, b) => a + b.tax, 0) || 54000)}
               </p>
-              <span className="text-[10px] text-slate-500 mt-0.5 block">
+              <span className="text-[10px] text-slate-500 mt-1 block">
                 Derived from gross client receipts
               </span>
-            </Card>
+            </div>
 
-            <Card className="border-slate-200 p-4">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
                 Input Tax Credit (ITC)
               </span>
-              <p className="text-2xl font-extrabold text-blue-600 mt-1 tabular-nums">
+              <p className="text-2xl font-black font-mono text-blue-400 mt-1.5 tabular-nums">
                 {formatCurrency(taxData.inputTax || 3500)}
               </p>
-              <span className="text-[10px] text-slate-500 mt-0.5 block">
+              <span className="text-[10px] text-slate-500 mt-1 block">
                 Vendor expenses and supplies
               </span>
-            </Card>
+            </div>
 
-            <Card className="border-emerald-200 bg-emerald-50/50 p-4">
-              <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">
+            <div className="rounded-3xl bg-[#111418] border border-[#CCFF00]/40 p-5 shadow-2xl shadow-[#CCFF00]/5">
+              <span className="text-[10px] text-[#CCFF00] font-black uppercase tracking-wider block">
                 Net Tax Remittance Due
               </span>
-              <p className="text-2xl font-extrabold text-[#1B4D2E] mt-1 tabular-nums">
+              <p className="text-2xl font-black font-mono text-[#CCFF00] mt-1.5 tabular-nums">
                 {formatCurrency(taxData.netPayable || 50500)}
               </p>
-              <span className="text-[10px] text-emerald-700 mt-0.5 block">
+              <span className="text-[10px] text-slate-400 mt-1 block">
                 Output Tax minus ITC
               </span>
-            </Card>
+            </div>
           </div>
 
           {/* Slabs Table */}
-          <Card className="border-slate-200 overflow-hidden">
-            <CardHeader title="Tax Output Slabs Breakdown" subtitle="Computed strictly via tax = gross * rate / (100 + rate)" />
+          <div className="rounded-3xl bg-[#111418] border border-white/10 overflow-hidden shadow-2xl">
+            <div className="p-5 border-b border-white/10">
+              <h3 className="text-base font-black uppercase tracking-tight text-white">Tax Output Slabs Breakdown</h3>
+              <p className="text-xs text-slate-400">Computed strictly via tax = gross * rate / (100 + rate)</p>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                    <th className="py-3 px-4">Tax Category & Slab</th>
-                    <th className="py-3 px-4">Taxable Value Base</th>
-                    <th className="py-3 px-4">Tax Rate</th>
-                    <th className="py-3 px-4 text-right">Output GST Collected</th>
+                  <tr className="bg-white/5 border-b border-white/10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                    <th className="py-3.5 px-5">Tax Category & Slab</th>
+                    <th className="py-3.5 px-5">Taxable Value Base</th>
+                    <th className="py-3.5 px-5">Tax Rate</th>
+                    <th className="py-3.5 px-5 text-right">Output GST Collected</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-white/5 font-medium">
                   {(taxData.outputTax || []).map((t, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/80">
-                      <td className="py-3 px-4 font-bold text-slate-900">
+                    <tr key={idx} className="hover:bg-white/5 transition-colors">
+                      <td className="py-3.5 px-5 font-bold text-white">
                         {t.ratePct === 5 ? 'Food & Concession Items' : 'Sports Courts, Pro Shop & Beverages'}
                       </td>
-                      <td className="py-3 px-4 text-slate-600 tabular-nums">
+                      <td className="py-3.5 px-5 font-mono text-slate-300 tabular-nums">
                         {formatCurrency(t.taxableValue)}
                       </td>
-                      <td className="py-3 px-4 font-bold text-slate-800 font-mono">
+                      <td className="py-3.5 px-5 font-bold text-[#CCFF00] font-mono">
                         {t.ratePct}%
                       </td>
-                      <td className="py-3 px-4 font-extrabold text-[#1B4D2E] tabular-nums text-right">
+                      <td className="py-3.5 px-5 font-black font-mono text-[#CCFF00] tabular-nums text-right">
                         {formatCurrency(t.tax)}
                       </td>
                     </tr>
@@ -163,7 +169,7 @@ export const TaxReportsPage = () => {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </div>
         </div>
       ) : null}
     </div>

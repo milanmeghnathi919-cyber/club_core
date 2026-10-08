@@ -5,9 +5,7 @@ import { formatCurrency } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import Card, { CardContent, CardHeader } from '@/components/ui/Card'
-import { UserPlus, Trophy, CheckCircle2, ShieldCheck, ArrowRight, Key } from 'lucide-react'
+import { UserPlus, Trophy, CheckCircle2, ShieldCheck, ArrowRight, Key, Sparkles } from 'lucide-react'
 
 export const MemberNew = () => {
   const navigate = useNavigate()
@@ -87,46 +85,48 @@ export const MemberNew = () => {
     return (
       <div className="max-w-lg mx-auto py-12 px-4 space-y-6 font-sans">
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+          <div className="w-16 h-16 rounded-2xl bg-[#CCFF00]/15 text-[#CCFF00] flex items-center justify-center mx-auto shadow-xl border border-[#CCFF00]/40">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Member Successfully Enrolled!</h1>
-          <p className="text-xs text-slate-500">
+          <h1 className="text-2xl font-black uppercase tracking-tight text-white">Member Successfully Enrolled!</h1>
+          <p className="text-xs text-slate-400">
             Official profile created and single ledger membership payment recorded.
           </p>
         </div>
 
         {/* Member Pass Preview */}
-        <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-black text-white p-6 shadow-xl border border-slate-700 space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="rounded-3xl bg-[#111418] text-white p-6 sm:p-8 shadow-2xl border-2 border-[#CCFF00]/40 space-y-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#CCFF00]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" />
-              <span className="font-bold text-xs uppercase tracking-wider text-slate-300">
+              <Trophy className="w-5 h-5 text-[#CCFF00]" />
+              <span className="font-black text-xs uppercase tracking-wider text-slate-300">
                 The Champions Club Pass
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold uppercase">
+            <span className="px-3 py-1 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] text-[10px] font-black uppercase border border-[#CCFF00]/30">
               Active Member
             </span>
           </div>
 
-          <div>
-            <h3 className="text-xl font-bold">{m.fullName}</h3>
-            <p className="font-mono text-sm text-amber-400 mt-0.5">{m.memberCode}</p>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-black uppercase tracking-tight text-white">{m.fullName}</h3>
+            <p className="font-mono text-base font-bold text-[#CCFF00] mt-1">{m.memberCode}</p>
           </div>
 
-          <div className="pt-2 border-t border-white/10 flex justify-between text-xs text-slate-400">
+          <div className="pt-3 border-t border-white/10 flex justify-between text-xs text-slate-400 relative z-10">
             <span>Phone: {m.phone}</span>
             {m.email && <span>Email: {m.email}</span>}
           </div>
 
           {createdResult.tempPassword && (
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs text-amber-200">
-              <div className="flex items-center gap-2">
-                <Key className="w-4 h-4 text-amber-400" />
+            <div className="p-3.5 bg-[#CCFF00]/10 border border-[#CCFF00]/30 rounded-2xl flex items-center justify-between text-xs text-[#CCFF00] relative z-10">
+              <div className="flex items-center gap-2 font-bold">
+                <Key className="w-4 h-4 text-[#CCFF00]" />
                 <span>Temporary Portal Password:</span>
               </div>
-              <strong className="font-mono text-white text-sm bg-black/40 px-2 py-0.5 rounded">
+              <strong className="font-mono text-black text-sm bg-[#CCFF00] px-2.5 py-0.5 rounded-lg">
                 {createdResult.tempPassword}
               </strong>
             </div>
@@ -135,13 +135,13 @@ export const MemberNew = () => {
 
         <div className="flex items-center gap-3">
           <Link to={`/staff/members/${m.id}`} className="flex-1">
-            <Button variant="lawn" className="w-full font-bold">
+            <Button variant="volt" className="w-full font-black uppercase text-xs">
               View Profile
             </Button>
           </Link>
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 font-bold uppercase text-xs"
             onClick={() => {
               setCreatedResult(null)
               setForm({
@@ -164,104 +164,116 @@ export const MemberNew = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 font-sans">
-      <div className="border-b border-slate-200 pb-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-          Front Desk Concierge
+      <div className="border-b border-white/10 pb-4">
+        <span className="text-xs font-black uppercase tracking-widest text-[#CCFF00] flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5" /> Front Desk Concierge
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mt-1">
           New Member Quick Registration
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
           Complete intake and initialize membership plan in under 60 seconds.
         </p>
       </div>
 
-      <Card className="border-slate-200">
-        <CardHeader title="Applicant Profile" subtitle="Personal and contact information" />
-        <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Full Name *"
-                placeholder="e.g. Ananya Sen"
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                required
-              />
-              <Input
-                label="Mobile Phone *"
-                placeholder="e.g. +91 98765 00000"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                required
-              />
-            </div>
+      <div className="rounded-3xl bg-[#111418] border border-white/10 p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="pb-4 border-b border-white/10">
+          <h2 className="text-lg font-black uppercase tracking-tight text-white">Applicant Profile</h2>
+          <p className="text-xs text-slate-400">Personal and contact information</p>
+        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="e.g. ananya@gmail.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-              <Input
-                label="Date of Birth"
-                type="date"
-                value={form.dob}
-                onChange={(e) => setForm({ ...form, dob: e.target.value })}
-                helperText="Required if enrolling under the Junior (<18) tier"
-              />
-            </div>
+        <form onSubmit={handleRegister} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Full Name *"
+              placeholder="e.g. Ananya Sen"
+              value={form.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              required
+            />
+            <Input
+              label="Mobile Phone *"
+              placeholder="e.g. +91 98765 00000"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              required
+            />
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
-              <Select
-                label="Membership Plan Tier *"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="e.g. ananya@gmail.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <Input
+              label="Date of Birth"
+              type="date"
+              value={form.dob}
+              onChange={(e) => setForm({ ...form, dob: e.target.value })}
+              helperText="Required if enrolling under the Junior (<18) tier"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Membership Plan Tier *
+              </label>
+              <select
                 value={form.planId}
                 onChange={(e) => setForm({ ...form, planId: e.target.value })}
                 required
+                className="w-full py-2.5 px-3.5 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
               >
-                <option value="">Select Plan...</option>
+                <option value="" className="bg-[#111418] text-white">Select Plan...</option>
                 {plans.map((p) => (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={p.id} className="bg-[#111418] text-white">
                     {p.name} ({formatCurrency(p.price)}/yr)
                   </option>
                 ))}
-              </Select>
+              </select>
+            </div>
 
-              <Select
-                label="Payment Tender Method *"
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Payment Tender Method *
+              </label>
+              <select
                 value={form.paymentMethod}
                 onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}
+                className="w-full py-2.5 px-3.5 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
               >
-                <option value="cash">Cash Tender</option>
-                <option value="upi">UPI / QR Code</option>
-                <option value="card">Credit / Debit Card</option>
-                <option value="later">Invoice Later</option>
-              </Select>
+                <option value="cash" className="bg-[#111418] text-white">Cash Tender</option>
+                <option value="upi" className="bg-[#111418] text-white">UPI / QR Code</option>
+                <option value="card" className="bg-[#111418] text-white">Credit / Debit Card</option>
+                <option value="later" className="bg-[#111418] text-white">Invoice Later</option>
+              </select>
             </div>
+          </div>
 
-            <label className="flex items-center gap-2.5 text-xs text-slate-700 font-medium cursor-pointer pt-2">
-              <input
-                type="checkbox"
-                checked={form.createLogin}
-                onChange={(e) => setForm({ ...form, createLogin: e.target.checked })}
-                className="rounded border-slate-300 text-[#1B4D2E] focus:ring-[#1B4D2E]"
-              />
-              <span>Generate portal credentials & issue temporary password</span>
-            </label>
+          <label className="flex items-center gap-2.5 text-xs text-slate-300 font-medium cursor-pointer pt-2">
+            <input
+              type="checkbox"
+              checked={form.createLogin}
+              onChange={(e) => setForm({ ...form, createLogin: e.target.checked })}
+              className="rounded border-white/20 text-[#CCFF00] focus:ring-[#CCFF00]"
+            />
+            <span>Generate portal credentials & issue temporary password</span>
+          </label>
 
-            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-              <Button variant="outline" type="button" onClick={() => navigate('/staff/members')}>
-                Cancel
-              </Button>
-              <Button variant="lawn" type="submit" loading={loading} className="font-bold">
-                Complete Registration
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
+            <Button variant="ghost" type="button" onClick={() => navigate('/staff/members')}>
+              Cancel
+            </Button>
+            <Button variant="volt" type="submit" loading={loading} className="font-black uppercase text-xs">
+              Complete Registration
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

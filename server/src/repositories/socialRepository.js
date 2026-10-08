@@ -1,4 +1,3 @@
-import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 
 export const socialRepository = {

@@ -158,34 +158,38 @@ export const Register = () => {
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 font-sans">
-      <div className="w-full max-w-lg space-y-6">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 font-sans relative bg-[#090B0E] text-white">
+      {/* Background radial glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#CCFF00]/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute inset-0 bg-court-mesh-dark opacity-30 pointer-events-none" />
+
+      <div className="w-full max-w-lg space-y-6 relative z-10">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#1B4D2E] text-white flex items-center justify-center mx-auto shadow-md">
-            <Trophy className="w-6 h-6 text-amber-400" />
+        <div className="text-center space-y-2.5">
+          <div className="w-14 h-14 rounded-2xl bg-[#CCFF00]/15 text-[#CCFF00] flex items-center justify-center mx-auto shadow-lg shadow-[#CCFF00]/20 border border-[#CCFF00]/30 animate-float">
+            <Trophy className="w-7 h-7 text-[#CCFF00]" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display uppercase">
             Join The Champions Club
           </h1>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
             Create your member account to reserve courts, enter social sessions, and access club privileges.
           </p>
         </div>
 
         {/* Card */}
-        <Card className="border-slate-200/90 shadow-lg">
-          <CardContent className="p-6 sm:p-8 space-y-5">
+        <Card className="bg-[#111418] border border-white/10 shadow-2xl rounded-3xl">
+          <CardContent className="p-6 sm:p-8 space-y-5 text-white">
             {/* Quick Demo Fill Banner for Evaluators */}
-            <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs text-amber-900">
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="font-semibold">Hackathon Evaluator Quick-Test:</span>
+                <Sparkles className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                <span className="font-bold">Hackathon Quick-Fill:</span>
               </div>
               <button
                 type="button"
                 onClick={fillQuickDemo}
-                className="px-2.5 py-1 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-lg shadow-2xs transition-colors shrink-0"
+                className="px-3 py-1.5 text-xs font-extrabold bg-[#CCFF00] hover:bg-[#B4E600] text-black rounded-xl shadow-xs transition-transform hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
               >
                 Auto-Fill New Member
               </button>
@@ -193,8 +197,8 @@ export const Register = () => {
 
             {/* Error Banner */}
             {errorMessage && (
-              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-300">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                 <div className="flex-1 font-medium leading-relaxed">{errorMessage}</div>
               </div>
             )}
@@ -249,7 +253,7 @@ export const Register = () => {
 
               {/* Password */}
               <div className="space-y-1.5 text-left">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Password
                 </label>
                 <div className="relative flex items-center">
@@ -262,13 +266,13 @@ export const Register = () => {
                     placeholder="At least 8 characters"
                     value={form.password}
                     onChange={handleChange}
-                    className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1B4D2E] focus:ring-3 focus:ring-[#1B4D2E]/15 shadow-2xs transition-all"
+                    className="w-full rounded-xl border border-white/15 bg-[#12161D] pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-[#CCFF00] focus:ring-2 focus:ring-[#CCFF00]/25 transition-all"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 text-slate-400 hover:text-white focus:outline-none cursor-pointer"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -279,25 +283,25 @@ export const Register = () => {
                 {form.password && (
                   <div className="pt-1.5 space-y-1">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500">Strength:</span>
+                      <span className="text-slate-400">Strength:</span>
                       <span className={`font-bold ${passwordStrength.text}`}>
                         {passwordStrength.label}
                       </span>
                     </div>
-                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex gap-1">
+                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden flex gap-1">
                       <div
                         className={`h-full rounded-full transition-all ${
-                          passwordStrength.score >= 1 ? passwordStrength.color : 'bg-slate-200'
+                          passwordStrength.score >= 1 ? passwordStrength.color : 'bg-white/10'
                         } flex-1`}
                       />
                       <div
                         className={`h-full rounded-full transition-all ${
-                          passwordStrength.score >= 2 ? passwordStrength.color : 'bg-slate-200'
+                          passwordStrength.score >= 2 ? passwordStrength.color : 'bg-white/10'
                         } flex-1`}
                       />
                       <div
                         className={`h-full rounded-full transition-all ${
-                          passwordStrength.score >= 3 ? passwordStrength.color : 'bg-slate-200'
+                          passwordStrength.score >= 3 ? passwordStrength.color : 'bg-white/10'
                         } flex-1`}
                       />
                     </div>
@@ -307,7 +311,7 @@ export const Register = () => {
 
               {/* Confirm Password */}
               <div className="space-y-1.5 text-left">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Confirm Password
                 </label>
                 <div className="relative flex items-center">
@@ -320,19 +324,19 @@ export const Register = () => {
                     placeholder="Re-enter password"
                     value={form.confirmPassword}
                     onChange={handleChange}
-                    className={`w-full rounded-xl border bg-white pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-3 shadow-2xs transition-all ${
+                    className={`w-full rounded-xl border bg-[#12161D] pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 transition-all ${
                       form.confirmPassword && !passwordsMatch
-                        ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-200'
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
                         : form.confirmPassword && passwordsMatch
-                        ? 'border-emerald-500 focus:border-emerald-600 focus:ring-emerald-200'
-                        : 'border-slate-300 focus:border-[#1B4D2E] focus:ring-[#1B4D2E]/15'
+                        ? 'border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500/20'
+                        : 'border-white/15 focus:border-[#CCFF00] focus:ring-[#CCFF00]/25'
                     }`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 text-slate-400 hover:text-white focus:outline-none cursor-pointer"
                     tabIndex={-1}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -341,11 +345,11 @@ export const Register = () => {
                 {form.confirmPassword && (
                   <p className="text-[11px] font-medium flex items-center gap-1">
                     {passwordsMatch ? (
-                      <span className="text-emerald-600 flex items-center gap-1">
+                      <span className="text-emerald-400 flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Passwords match
                       </span>
                     ) : (
-                      <span className="text-rose-600 flex items-center gap-1">
+                      <span className="text-rose-400 flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5" /> Passwords do not match
                       </span>
                     )}
@@ -354,13 +358,13 @@ export const Register = () => {
               </div>
 
               {/* Terms Checkbox */}
-              <label className="flex items-start gap-2.5 pt-1 text-xs text-slate-600 cursor-pointer select-none">
+              <label className="flex items-start gap-2.5 pt-1 text-xs text-slate-300 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   name="agreeTerms"
                   checked={form.agreeTerms}
                   onChange={handleChange}
-                  className="mt-0.5 rounded border-slate-300 text-[#1B4D2E] focus:ring-[#1B4D2E]"
+                  className="mt-0.5 rounded border-white/20 bg-[#12161D] text-[#CCFF00] focus:ring-[#CCFF00] cursor-pointer"
                 />
                 <span>
                   I accept The Champions Club court etiquette, rules, and privacy policy.
@@ -370,19 +374,19 @@ export const Register = () => {
               {/* Submit CTA */}
               <Button
                 type="submit"
-                variant="lawn"
+                variant="volt"
                 size="lg"
                 loading={loading}
-                className="w-full font-bold shadow-sm flex items-center justify-center gap-2"
+                className="w-full font-extrabold shadow-lg shadow-[#CCFF00]/25 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Join The Champions Club</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 stroke-[3]" />
               </Button>
             </form>
 
-            <div className="pt-2 text-center text-xs text-slate-500">
+            <div className="pt-2 text-center text-xs text-slate-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-[#1B4D2E] font-bold hover:underline">
+              <Link to="/login" className="text-[#CCFF00] font-extrabold hover:underline">
                 Sign In
               </Link>
             </div>
@@ -391,7 +395,7 @@ export const Register = () => {
 
         {/* Security badge */}
         <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <ShieldCheck className="w-4 h-4 text-[#CCFF00]" />
           <span>Bank-grade 256-bit encrypted authentication & cookie tokens</span>
         </div>
       </div>

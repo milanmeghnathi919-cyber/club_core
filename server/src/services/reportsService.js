@@ -1,12 +1,6 @@
 import paymentRepository from '../repositories/paymentRepository.js'
 import paymentsService from './paymentsService.js'
 import courtRepository from '../repositories/courtRepository.js'
-import memberRepository from '../repositories/memberRepository.js'
-import { expenseRepository, invoiceRepository } from '../repositories/financeRepository.js'
-import productRepository from '../repositories/productRepository.js'
-import leadRepository from '../repositories/leadRepository.js'
-import hrRepository from '../repositories/hrRepository.js'
-import settingsService from './settingsService.js'
 import memoryStore from '../utils/memoryStore.js'
 import { toClubDate, localDayRange } from '../utils/clubTime.js'
 import { round2 } from '../utils/money.js'
@@ -105,7 +99,6 @@ export const reportsService = {
     const allMembers = memoryStore.find('members')
     const newMembersInRange = allMembers.filter((m) => m.created_at >= startIso && m.created_at <= endIso).length
 
-    const todayDate = new Date(todayStr)
     const in7DaysDate = new Date(todayStr)
     in7DaysDate.setDate(in7DaysDate.getDate() + 7)
     const in7DaysStr = toClubDate(in7DaysDate)

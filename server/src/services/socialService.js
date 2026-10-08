@@ -2,7 +2,6 @@ import socialRepository from '../repositories/socialRepository.js'
 import bookingRepository from '../repositories/bookingRepository.js'
 import courtRepository from '../repositories/courtRepository.js'
 import membershipService from './membershipService.js'
-import settingsService from './settingsService.js'
 import paymentsService from './paymentsService.js'
 import ApiError from '../utils/ApiError.js'
 import { toClubDate, parseClubDateTime, localDayRange } from '../utils/clubTime.js'
@@ -186,7 +185,7 @@ export const socialService = {
     return participant
   },
 
-  async cancel(sessionId, actorId) {
+  async cancel(sessionId, _actorId) {
     const session = await socialRepository.findSessionById(sessionId)
     if (!session) throw new ApiError(404, 'Session not found', null, 'NOT_FOUND')
 

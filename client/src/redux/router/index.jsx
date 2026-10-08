@@ -60,7 +60,9 @@ const UniversalProfileRedirect = () => {
   try {
     const raw = localStorage.getItem('cc_user')
     if (raw) role = JSON.parse(raw)?.role || 'member'
-  } catch {}
+  } catch {
+    // corrupted stored user falls back to the member role
+  }
   if (role === 'owner') return <Navigate to="/owner/profile" replace />
   if (role === 'member' || role === 'user') return <Navigate to="/app/profile" replace />
   return <Navigate to="/staff/profile" replace />

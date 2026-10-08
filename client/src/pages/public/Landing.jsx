@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import publicService from '@/service/publicService'
-import cafeService from '@/service/cafeService'
 import { formatCurrency } from '@/utils/format'
+import useToast from '@/components/ui/Toast'
 import {
   Trophy,
   Calendar,
@@ -18,467 +17,827 @@ import {
   Utensils,
   Zap,
   ShoppingBag,
+  Store,
+  Flame,
+  Check,
+  Phone,
+  Mail,
+  UserCheck,
+  Activity,
+  Layers,
+  ChevronRight,
+  TrendingUp,
+  Globe,
+  Play,
+  Award,
+  DollarSign,
+  ChevronDown,
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Card, { CardContent } from '@/components/ui/Card'
+import Modal from '@/components/ui/Modal'
+import CyberCourtBackground from '@/components/common/CyberCourtBackground'
 
 export const Landing = () => {
-  const user = useSelector((state) => state.auth.user)
-  const [club, setClub] = useState(null)
+  const toast = useToast()
+  const [, setClub] = useState(null)
   const [plans, setPlans] = useState([])
   const [courts, setCourts] = useState([])
-  const [cafeItems, setCafeItems] = useState([])
-  const [activeCafeCategory, setActiveCafeCategory] = useState('All')
+  const [billingCycle, setBillingCycle] = useState('annual')
+
+  // Trial booking modal
+  const [isTrialModalOpen, setIsTrialModalOpen] = useState(false)
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
+  const [trialForm, setTrialForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    sport: 'tennis',
+    experience: 'intermediate',
+    preferredTime: '18:00',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+  })
+  const [submittingTrial, setSubmittingTrial] = useState(false)
+  const [trialConfirmed, setTrialConfirmed] = useState(null)
 
   useEffect(() => {
     publicService.getClubInfo().then(setClub).catch(console.error)
     publicService.getPlans().then(setPlans).catch(console.error)
     publicService.getCourts().then(setCourts).catch(console.error)
-    cafeService.getMenu().then((items) => {
-      if (Array.isArray(items)) setCafeItems(items)
-    }).catch(console.error)
   }, [])
 
-  useEffect(() => {
-    if (window.location.hash === '#cafe') {
-      setTimeout(() => {
-        const el = document.getElementById('cafe')
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
+  const handleTrialSubmit = async (e) => {
+    e.preventDefault()
+    if (!trialForm.name || (!trialForm.phone && !trialForm.email)) {
+      toast.error('Please enter your name and contact details')
+      return
     }
-  }, [cafeItems])
+
+    setSubmittingTrial(true)
+    try {
+      const payload = {
+        name: trialForm.name,
+        email: trialForm.email || undefined,
+        phone: trialForm.phone || undefined,
+        sport: trialForm.sport,
+        interest: 'trial',
+        message: `Trial session request for ${trialForm.sport.toUpperCase()} at ${trialForm.preferredTime} on ${trialForm.date}. Skill: ${trialForm.experience}.`,
+      }
+      const res = await publicService.submitEnquiry(payload)
+      setTrialConfirmed(res)
+      toast.success('Trial booking request submitted! Concierge will confirm your slot.')
+    } catch {
+      toast.error('Unable to submit trial request. Please try again.')
+    } finally {
+      setSubmittingTrial(false)
+    }
+  }
 
   return (
-    <div className="space-y-24 pb-24 font-sans">
-      {/* Hero Section with Signature Court Line Architecture */}
-      <section className="relative bg-[#070B12] text-white overflow-hidden py-24 sm:py-36 px-4 sm:px-8 border-b border-white/10">
-        {/* Subtle athletic grid backdrop */}
-        <div className="absolute inset-0 bg-court-mesh-dark opacity-15 pointer-events-none" />
-        
-        {/* Vector Tennis Court Lines (Pure SVG, zero layout shift) */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-          <svg className="w-full max-w-6xl h-full" viewBox="0 0 1000 600" fill="none" stroke="currentColor">
-            <rect x="50" y="50" width="900" height="500" strokeWidth="2" />
-            <line x1="50" y1="120" x2="950" y2="120" strokeWidth="1.5" />
-            <line x1="50" y1="480" x2="950" y2="480" strokeWidth="1.5" />
-            <line x1="500" y1="50" x2="500" y2="550" strokeWidth="3" strokeDasharray="6 6" />
-            <line x1="250" y1="120" x2="250" y2="480" strokeWidth="1.5" />
-            <line x1="750" y1="120" x2="750" y2="480" strokeWidth="1.5" />
-            <line x1="250" y1="300" x2="750" y2="300" strokeWidth="1.5" />
-          </svg>
-        </div>
+    <div className="bg-[#090B0E] text-white space-y-28 pb-28 font-sans selection:bg-[#CCFF00] selection:text-black overflow-x-hidden">
+      {/* 1. HERO SECTION: "DOMINATE THE COURT" (Cyber Volt Animated Hero) */}
+      <section className="relative pt-12 sm:pt-20 pb-16 px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
+        {/* Dynamic 60fps Cyber Court Perspective & Particle Background Animation */}
+        <CyberCourtBackground />
 
-        {/* Ambient Stadium Lighting Sheens */}
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[#1B4D2E]/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#C85A32]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+          {/* Left Column: Big Display Copy */}
+          <div className="lg:col-span-7 space-y-7 z-10">
+            {/* Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-xs font-bold text-slate-200">
+              <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-ping" />
+              <span className="text-[#CCFF00]">•</span>
+              <span>Next-Gen Sports Sanctuary</span>
+            </div>
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-7">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-300 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Welcome to Bengaluru&rsquo;s Premier Sports Sanctuary</span>
+            {/* Giant Title */}
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.98] font-display uppercase">
+              DOMINATE <br />
+              THE <br />
+              <span className="text-[#CCFF00] drop-shadow-[0_0_40px_rgba(204,255,0,0.4)]">
+                COURT
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg text-slate-400 font-normal leading-relaxed max-w-xl">
+              Smart 30-min booking, instant matchmaking, and live statistics. The digital operating backbone for padel, tennis, badminton, and cricket champions.
+            </p>
+
+            {/* CTAs: Neon Pill + Dark Translucent Button */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link to="/availability">
+                <button className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#CCFF00] hover:bg-[#B4E600] text-black font-extrabold text-sm shadow-xl shadow-[#CCFF00]/25 hover:shadow-[#CCFF00]/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer">
+                  <span>Book a Court</span>
+                  <ArrowRight className="w-4 h-4 font-bold stroke-[3]" />
+                </button>
+              </Link>
+              <button
+                onClick={() => setIsVideoModalOpen(true)}
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 text-white border border-white/15 backdrop-blur-md text-sm font-bold hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-white text-white" />
+                <span>Watch Demo</span>
+              </button>
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] font-display">
-            Where Champions <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-[#C85A32]">
-              Train, Play & Connect.
-            </span>
-          </h1>
+          {/* Right Column: Athlete Action Image with Floating Widgets */}
+          <div className="lg:col-span-5 relative z-10 flex justify-center">
+            <div className="relative w-full max-w-md lg:max-w-none rounded-3xl overflow-hidden border border-white/15 shadow-2xl bg-[#12161D] group">
+              {/* Main Action Photo (Athlete Smashing in Modern Arena) */}
+              <img
+                src="https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=1200&q=80"
+                alt="Padel / Tennis Champion in Motion"
+                className="w-full h-[480px] sm:h-[540px] object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#090B0E] via-transparent to-black/30" />
 
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 font-normal leading-relaxed">
-            World-class Roland Garros clay tennis courts, panoramic padel glass cages, BWF standard badminton, and artisanal club dining. Powered by real-time scheduling.
-          </p>
+              {/* Floating Widget 1: Top Right "Court Booked" (Exact Reference Element) */}
+              <div className="absolute top-6 right-6 p-3 rounded-2xl bg-[#0F1216]/85 backdrop-blur-md border border-white/15 shadow-2xl flex items-center gap-3 animate-float">
+                <div className="w-9 h-9 rounded-xl bg-[#CCFF00]/20 text-[#CCFF00] flex items-center justify-center font-bold">
+                  <Clock className="w-5 h-5 text-[#CCFF00]" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Court Booked</p>
+                  <p className="text-xs font-extrabold text-white">Today 6:00 PM</p>
+                </div>
+              </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
-            <Link to="/availability">
-              <Button variant="lawn" size="lg" className="gap-2.5 bg-[#1B4D2E] text-white shadow-md">
-                <Calendar className="w-4 h-4" /> Check Court Availability
-              </Button>
-            </Link>
-            <Link to="/plans">
-              <Button variant="outline" size="lg" className="border-white/25 text-white hover:bg-white/10 hover:border-white/40">
-                Explore Membership Tiers
-              </Button>
-            </Link>
-          </div>
-
-          {/* Quick Metrics Chronograph Bar */}
-          <div className="pt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto border-t border-white/10">
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums font-display">6</p>
-              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Championship Courts</p>
-            </div>
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums font-display">06:00</p>
-              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Morning First Serve</p>
-            </div>
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums font-display">100%</p>
-              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Gold Court Access</p>
-            </div>
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
-              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums font-display">0</p>
-              <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-0.5">Double-Booking Guarantee</p>
+              {/* Floating Widget 2: Bottom Left "Players Active" (Exact Reference Element) */}
+              <div className="absolute bottom-6 left-6 p-3 rounded-2xl bg-[#0F1216]/85 backdrop-blur-md border border-white/15 shadow-2xl flex items-center gap-3 animate-float-delayed">
+                <div className="w-9 h-9 rounded-xl bg-[#CCFF00] text-black flex items-center justify-center font-bold">
+                  <Users className="w-5 h-5 text-black" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Players Online</p>
+                  <p className="text-sm font-extrabold text-white tabular-nums">2,847</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Championship Facilities Strip */}
+      {/* 2. SECTION 2: "MANAGE YOUR CLUB LIKE A PRO" (Exact Reference Section) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-            Athletic Excellence
-          </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 mt-1 font-display">Tournament-Grade Facilities</h2>
-          <p className="text-sm text-slate-500 mt-2">
-            Every arena is maintained to strict international federation tolerances.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left: Monochrome Athletic Photo with Floating Stat Badges */}
+          <div className="lg:col-span-6 relative">
+            <div className="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl bg-[#111418]">
+              <img
+                src="https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&w=800&q=80"
+                alt="Padel & Tennis Match Gear"
+                className="w-full h-[420px] sm:h-[480px] object-cover filter grayscale contrast-125"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#090B0E] via-transparent to-transparent" />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {courts.slice(0, 3).map((court) => (
-            <Card key={court.id} hover className="border-slate-200/90 overflow-hidden">
-              <div className="h-48 bg-slate-100 overflow-hidden relative">
-                {court.imageUrl ? (
-                  <img
-                    src={court.imageUrl}
-                    alt={court.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-[#1B4D2E]/10 flex items-center justify-center text-[#1B4D2E]">
-                    <Trophy className="w-12 h-12" />
-                  </div>
-                )}
-                <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-slate-900/85 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider border border-white/10 shadow-xs">
-                  {court.sport}
-                </span>
-              </div>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-base text-slate-900 font-display">{court.name}</h3>
-                  <span className="text-xs font-extrabold text-[#1B4D2E] tabular-nums">
-                    {formatCurrency(court.ratePerHour)}/hr
-                  </span>
+              {/* Floating Metric Badges Overlay (As in Reference) */}
+              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between gap-3 p-3 rounded-2xl bg-[#0F1216]/90 backdrop-blur-md border border-white/15">
+                <div className="text-center px-2">
+                  <p className="text-lg sm:text-xl font-black text-[#CCFF00] tabular-nums">98%</p>
+                  <p className="text-[9px] uppercase font-bold text-slate-400">Court Utilization</p>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Competition floodlighting, high-traction athletic surfacing, and court-side hydration coolers.
+                <div className="h-8 w-px bg-white/15" />
+                <div className="text-center px-2">
+                  <p className="text-lg sm:text-xl font-black text-white tabular-nums">+45%</p>
+                  <p className="text-[9px] uppercase font-bold text-slate-400">Revenue Growth</p>
+                </div>
+                <div className="h-8 w-px bg-white/15" />
+                <div className="text-center px-2">
+                  <p className="text-lg sm:text-xl font-black text-[#CCFF00] tabular-nums">4.9★</p>
+                  <p className="text-[9px] uppercase font-bold text-slate-400">Member Rating</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Feature Content & 4 Cards Grid */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] text-xs font-bold uppercase tracking-wider">
+              <span>• FOR CLUBS & PLAYERS</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-display leading-[1.05]">
+              MANAGE YOUR <br />
+              <span className="text-[#CCFF00]">CLUB LIKE A PRO</span>
+            </h2>
+
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Comprehensive management tools for clubs, coaches, and players. Streamline operations, eliminate WhatsApp booking chaos, and scale without friction.
+            </p>
+
+            {/* 4 Feature Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="p-4 rounded-2xl bg-[#111418] border border-white/10 hover:border-[#CCFF00]/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-[#CCFF00] flex items-center justify-center mb-3">
+                  <Calendar className="w-4 h-4 text-[#CCFF00]" />
+                </div>
+                <h4 className="font-bold text-sm text-white">Court Management</h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Optimize scheduling with 30-min start grid and zero double-booking invariant.
                 </p>
-                <Link to="/availability" className="block pt-2">
-                  <Button variant="outline" size="sm" className="w-full text-xs font-bold">
-                    View Schedule <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#111418] border border-white/10 hover:border-[#CCFF00]/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-[#CCFF00] flex items-center justify-center mb-3">
+                  <TrendingUp className="w-4 h-4 text-[#CCFF00]" />
+                </div>
+                <h4 className="font-bold text-sm text-white">Revenue Analytics</h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Single financial ledger across courts, pro shop, and bar in real time.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#111418] border border-white/10 hover:border-[#CCFF00]/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-[#CCFF00] flex items-center justify-center mb-3">
+                  <Trophy className="w-4 h-4 text-[#CCFF00]" />
+                </div>
+                <h4 className="font-bold text-sm text-white">Coach & Player Profiles</h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Showcase certified coaches, match ratings, and digital scannable passes.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#111418] border border-white/10 hover:border-[#CCFF00]/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-[#CCFF00] flex items-center justify-center mb-3">
+                  <Users className="w-4 h-4 text-[#CCFF00]" />
+                </div>
+                <h4 className="font-bold text-sm text-white">Member Insights</h4>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Understand athlete frequency with automated expiry and renewal workflows.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link to="/plans">
+                <button className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#CCFF00] hover:underline cursor-pointer">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[3]" />
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Club Café & Recovery Lounge Showcase */}
-      <section id="cafe" className="max-w-7xl mx-auto px-4 sm:px-8 scroll-mt-24">
-        {/* Header Strip */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-200">
-              <Coffee className="w-3.5 h-3.5 text-amber-700" />
-              <span>Nutrition & Recovery Lounge</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
-              The Club Café & Recovery Bar
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl leading-relaxed">
-              Artisan single-origin brews, nutrient-dense protein bowls, fresh superfood smoothies, and court-side hydration coolers.
-            </p>
+      {/* 3. SECTION 3: "JOIN THE GLOBAL SPORTS REVOLUTION" & Live Community Pulse (Exact Reference) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <span>• COMMUNITY</span>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            {user ? (
-              <Link to="/app/cafe">
-                <Button variant="lawn" className="gap-2 bg-[#1B4D2E] text-white">
-                  <Utensils className="w-4 h-4" /> Order from Café (15% Off)
-                </Button>
-              </Link>
-            ) : (
-              <Link to="/login">
-                <Button variant="lawn" className="gap-2 bg-[#1B4D2E] text-white">
-                  <Coffee className="w-4 h-4" /> Member Café Ordering
-                </Button>
-              </Link>
-            )}
-          </div>
+          <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-display">
+            JOIN THE GLOBAL <br />
+            <span className="text-[#CCFF00]">SPORTS REVOLUTION</span>
+          </h2>
+
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Connect with players worldwide. Compete, learn, and grow together in Bengaluru&rsquo;s most vibrant athletics community.
+          </p>
         </div>
 
-        {/* Feature Highlights Strip */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 shadow-2xs">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Coffee className="w-5 h-5" />
+        {/* 2-Column Dashboard Cards: Community Pulse + Facility Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Card 1: COMMUNITY PULSE (Live Activity Feed) */}
+          <div className="lg:col-span-8 p-6 sm:p-8 rounded-3xl bg-[#111418] border border-white/10 shadow-xl space-y-6">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">
+                  LIVE RIGHT NOW
+                </span>
+                <h3 className="text-xl font-black text-white font-display">COMMUNITY PULSE</h3>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#CCFF00]/15 border border-[#CCFF00]/30 text-[#CCFF00] text-[10px] font-extrabold uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
+                <span>LIVE</span>
+              </div>
             </div>
-            <div>
-              <h4 className="text-xs font-bold text-slate-900">Single-Origin Roasts</h4>
-              <p className="text-[11px] text-slate-600">Fresh Arabica, pour-overs & Nitro Cold Brew</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 shadow-2xs">
-            <div className="w-10 h-10 rounded-xl bg-[#1B4D2E] text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Zap className="w-5 h-5 text-amber-400" />
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-slate-900">Athlete Recovery Macros</h4>
-              <p className="text-[11px] text-slate-600">Clean proteins, electrolyte elixirs & fresh bowls</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3.5 p-4.5 rounded-2xl bg-blue-50/70 border border-blue-200/80 shadow-2xs">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-xs font-bold text-slate-900">15% Member Discount</h4>
-              <p className="text-[11px] text-slate-600">Gold & Silver members save on all F&B orders</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Category Filter Tabs */}
-        {(() => {
-          const rawItems = cafeItems.length > 0 ? cafeItems : [
-            { id: 'f-1', name: 'Nitro Cold Brew Espresso', category: 'Coffee & Brews', price: 220, calories: 15, description: 'Slow-steeped 18 hours, infused with nitrogen for a velvety, creamy cascade finish.', image_url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=800&q=80' },
-            { id: 'f-2', name: 'Avocado & Poached Egg Sourdough', category: 'Artisan Toasts', price: 320, calories: 380, description: 'Hass avocado mash, two free-range poached eggs, microgreens, and chili flakes on artisan sourdough.', image_url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80' },
-            { id: 'f-3', name: 'Grilled Salmon & Quinoa Superbowl', category: 'Protein Bowls', price: 480, calories: 520, description: 'Pan-seared Atlantic salmon fillet, rainbow quinoa, edamame, roasted sweet potatoes, and lemon tahini.', image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80' },
-            { id: 'f-4', name: 'Wild Berry Recovery Smoothie', category: 'Recovery Smoothies', price: 260, calories: 290, description: 'Blueberries, strawberries, acai, organic whey isolate, coconut water and chia seeds for rapid muscle reload.', image_url: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=800&q=80' },
-          ]
-          const categories = ['All', ...new Set(rawItems.map((i) => i.category).filter(Boolean))]
-          const filtered = activeCafeCategory === 'All' ? rawItems : rawItems.filter((i) => i.category === activeCafeCategory)
-          const displayed = filtered.slice(0, 8)
+            {/* Top 3 Counters (Reference Image Chips) */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center">
+                <p className="text-xl sm:text-2xl font-black text-[#CCFF00] tabular-nums font-display">4,282</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold mt-0.5">Players Online</p>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center">
+                <p className="text-xl sm:text-2xl font-black text-white tabular-nums font-display">184</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold mt-0.5">Matches This Week</p>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center">
+                <p className="text-xl sm:text-2xl font-black text-amber-400 tabular-nums font-display">24</p>
+                <p className="text-[10px] text-slate-400 uppercase font-bold mt-0.5">Active Social Teams</p>
+              </div>
+            </div>
 
-          return (
-            <>
-              {/* Category Filter Buttons */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCafeCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-150 cursor-pointer ${
-                      activeCafeCategory === cat
-                        ? 'bg-[#1B4D2E] text-white shadow-xs'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+            {/* Recent Live Activity Stream */}
+            <div className="space-y-3">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
+                RECENT ACTIVITY
+              </span>
+              {[
+                { name: 'Arun Kumar (Gold Member)', action: 'Booked Clay Tennis Court 1 for 18:00', time: '2m ago' },
+                { name: 'Maria Sharapova', action: 'Settled Clubhouse Café bill via UPI', time: '5m ago' },
+                { name: 'Alex Kostov', action: 'Registered for Friday Night Social Mixer', time: '8m ago' },
+                { name: 'Sofia Rodriguez', action: 'Purchased Wilson Pro Staff Racket (Click & Collect)', time: '12m ago' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 text-xs hover:border-white/15 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-full bg-[#CCFF00]/20 text-[#CCFF00] flex items-center justify-center font-bold text-[10px]">
+                      {item.name.charAt(0)}
+                    </div>
+                    <div>
+                      <span className="font-bold text-white">{item.name}</span>
+                      <span className="text-slate-400 ml-2">{item.action}</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-mono shrink-0">{item.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Card 2: Facility & Court Reach */}
+          <div className="lg:col-span-4 p-6 sm:p-8 rounded-3xl bg-[#111418] border border-white/10 shadow-xl space-y-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">
+                    6 CHAMPIONSHIP COURTS
+                  </span>
+                  <h3 className="text-xl font-black text-white font-display">COURT STATUS</h3>
+                </div>
+                <Globe className="w-5 h-5 text-[#CCFF00]" />
               </div>
 
-              {/* Menu Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {displayed.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] overflow-hidden flex flex-col justify-between hover:shadow-[0_10px_25px_-5px_rgba(27,77,46,0.12)] hover:-translate-y-0.5 transition-all duration-200 group"
-                  >
-                    {/* Image / Thumbnail */}
-                    <div className="h-40 bg-slate-100 overflow-hidden relative">
-                      {item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-amber-50 text-amber-700">
-                          <Coffee className="w-8 h-8" />
-                        </div>
-                      )}
-                      {item.calories && (
-                        <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-bold tabular-nums border border-white/10">
-                          {item.calories} kcal
-                        </span>
-                      )}
-                      <span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold uppercase tracking-wider">
-                        {item.category}
+              <div className="space-y-3.5 mt-5">
+                {(courts && courts.length > 0
+                  ? courts.slice(0, 6).map((c) => ({
+                      name: c.name,
+                      rate: `${formatCurrency(c.hourlyRate || 800)}/hr`,
+                      status: c.isActive !== false ? 'Available' : 'Booked',
+                    }))
+                  : [
+                      { name: 'Tennis Clay 1', rate: '₹800/hr', status: 'Booked' },
+                      { name: 'Tennis Hard 2', rate: '₹800/hr', status: 'Available' },
+                      { name: 'Padel Glass 1', rate: '₹1200/hr', status: 'Available' },
+                      { name: 'Badminton Court 1', rate: '₹400/hr', status: 'Booked' },
+                      { name: 'Badminton Court 2', rate: '₹400/hr', status: 'Available' },
+                      { name: 'Box Cricket Net', rate: '₹1500/hr', status: 'Available' },
+                    ]
+                ).map((c, i) => (
+                  <div key={i} className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-white">{c.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-400 font-mono text-[11px]">{c.rate}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                          c.status === 'Available'
+                            ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/40'
+                            : 'bg-white/10 text-slate-400'
+                        }`}
+                      >
+                        {c.status}
                       </span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-bold text-slate-900 text-sm leading-snug group-hover:text-[#1B4D2E] transition-colors">
-                            {item.name}
-                          </h4>
-                        </div>
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                        <div>
-                          <span className="text-sm font-extrabold text-slate-900 tabular-nums">
-                            {formatCurrency(item.price)}
-                          </span>
-                          <span className="text-[10px] text-emerald-700 font-bold ml-1.5">
-                            (₹{Math.round(item.price * 0.85)} Gold)
-                          </span>
-                        </div>
-                        {user ? (
-                          <Link to="/app/cafe">
-                            <span className="text-[11px] font-bold text-[#1B4D2E] hover:underline flex items-center gap-0.5">
-                              Order <ArrowRight className="w-3 h-3" />
-                            </span>
-                          </Link>
-                        ) : (
-                          <Link to="/login">
-                            <span className="text-[11px] font-bold text-slate-400 hover:text-slate-700 flex items-center gap-0.5">
-                              Sign in <ArrowRight className="w-3 h-3" />
-                            </span>
-                          </Link>
-                        )}
-                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </>
-          )
-        })()}
+            </div>
 
-        {/* Member Pre-order Court Delivery Banner */}
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-[#C85A32] text-white p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md relative overflow-hidden">
-          <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
-          <div className="space-y-1.5 max-w-xl relative z-10">
-            <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-wider">
-              Exclusive Member Perk
-            </span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-white font-display">
-              Court-Side Delivery & Locker Pickup
+            <Link to="/availability" className="block pt-4">
+              <button className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer border border-white/10">
+                View Live 7-Day Grid
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Action Banner: "READY TO JOIN 50,000+ PLAYERS?" (Reference Bar) */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#12161D] via-[#1A202C] to-[#0F141C] border border-white/15 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div className="space-y-1 text-center md:text-left">
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-white font-display">
+              READY TO PLAY WITH <span className="text-[#CCFF00]">4,000+ ATHLETES</span>?
             </h3>
-            <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
-              Match running into a third set? Order hydration drinks or post-match protein shakes from your phone and our café team delivers directly to your court bench.
+            <p className="text-xs text-slate-400">
+              Start connecting, reserving courts, and improving your game today.
             </p>
           </div>
-          <div className="shrink-0 flex items-center gap-3 relative z-10">
-            <Link to={user ? '/app/cafe' : '/register'}>
-              <Button size="lg" className="bg-slate-950 hover:bg-slate-900 text-white font-bold border-0 shadow-lg">
-                {user ? 'Open Café Menu' : 'Join & Get 15% Off'}
-              </Button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsTrialModalOpen(true)}
+              className="px-6 py-3 rounded-full bg-[#CCFF00] hover:bg-[#B4E600] text-black font-extrabold text-xs shadow-lg shadow-[#CCFF00]/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              Book Complimentary Trial
+            </button>
+            <Link to="/plans">
+              <button className="px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-colors cursor-pointer">
+                Explore Plans
+              </button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Membership Tiers Teaser */}
-      <section className="bg-[#070B12] text-white py-24 px-4 sm:px-8 border-y border-white/10 relative overflow-hidden">
-        <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
-              Club Privileges
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mt-1 text-white font-display">
-              Designed For High Performers
-            </h2>
-            <p className="text-sm text-slate-400 mt-2">
-              Unlock prioritized booking windows, 100% complimentary court access, and pro shop privileges.
-            </p>
+      {/* 4. SECTION 4: "YOUR COMMAND CENTER ALL IN ONE PLACE" (Reference Section) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/30 text-[#CCFF00] text-xs font-bold uppercase tracking-wider">
+            <span>• DASHBOARD PREVIEW</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.slice(0, 3).map((p) => {
-              const isGold = p.code?.toLowerCase().includes('gold')
-              return (
-                <div
-                  key={p.id}
-                  className={`rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all ${
-                    isGold
-                      ? 'bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-2 border-amber-500/80 shadow-2xl relative scale-102'
-                      : 'bg-white/5 border border-white/10 hover:border-white/25'
-                  }`}
-                >
-                  {isGold && (
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-extrabold uppercase tracking-widest shadow-md">
-                      Flagship Tier
-                    </span>
-                  )}
+          <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-display">
+            YOUR COMMAND CENTER <br />
+            <span className="text-[#CCFF00]">ALL IN ONE PLACE</span>
+          </h2>
 
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-white font-display">{p.name}</h3>
-                      <p className="text-xs text-slate-400 mt-1">Full 365-day athletic access</p>
-                    </div>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Control everything from our intuitive operating portals. View match statistics, manage bookings, order post-match dining, and track club financials.
+          </p>
+        </div>
 
-                    <div className="py-2 border-y border-white/10">
-                      <span className="text-3xl font-extrabold text-white tabular-nums font-display">
-                        {formatCurrency(p.price)}
+        {/* Interactive Command Center Portal Mock */}
+        <div className="rounded-3xl bg-[#0D1015] border border-white/15 p-6 sm:p-8 shadow-2xl space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-rose-500" />
+              <div className="w-3 h-3 rounded-full bg-amber-500" />
+              <div className="w-3 h-3 rounded-full bg-[#CCFF00]" />
+              <span className="text-xs font-mono text-slate-400 ml-2">app.championsclub.in</span>
+            </div>
+
+            {/* Quick Portal Tabs */}
+            <div className="flex items-center gap-2">
+              <Link to="/app">
+                <button className="px-3 py-1 rounded-lg bg-[#CCFF00] text-black text-xs font-extrabold hover:scale-105 transition-transform cursor-pointer">
+                  Athlete Portal (/app)
+                </button>
+              </Link>
+              <Link to="/staff/bookings">
+                <button className="px-3 py-1 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer">
+                  Staff Console (/staff)
+                </button>
+              </Link>
+              <Link to="/bar">
+                <button className="px-3 py-1 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer">
+                  Bar & KDS (/bar)
+                </button>
+              </Link>
+              <Link to="/owner">
+                <button className="px-3 py-1 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer">
+                  Owner Executive (/owner)
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-2xl bg-[#14181F] border border-white/10 space-y-2">
+              <span className="text-[10px] font-bold uppercase text-slate-400">Athlete Invariant</span>
+              <h4 className="text-base font-extrabold text-white">Zero Double-Booking Guarantee</h4>
+              <p className="text-xs text-slate-400">
+                PostgreSQL btree_gist database exclusion constraint strictly guarantees two players can never reserve the same court.
+              </p>
+            </div>
+            <div className="p-5 rounded-2xl bg-[#14181F] border border-white/10 space-y-2">
+              <span className="text-[10px] font-bold uppercase text-[#CCFF00]">Retail Invariant</span>
+              <h4 className="text-base font-extrabold text-white">Single-Shelf Unified Stock</h4>
+              <p className="text-xs text-slate-400">
+                What a member buys at the front counter and what they order from home draw from the exact same inventory ledger.
+              </p>
+            </div>
+            <div className="p-5 rounded-2xl bg-[#14181F] border border-white/10 space-y-2">
+              <span className="text-[10px] font-bold uppercase text-amber-400">Executive Invariant</span>
+              <h4 className="text-base font-extrabold text-white">Single Revenue Ledger</h4>
+              <p className="text-xs text-slate-400">
+                100% of money arrives across courts, pro shop, and bar directly into a unified P&L reporting engine.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. MEMBERSHIP TIERS MATRIX (Gold VIP Highlight in Cyber-Volt) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <span>• MEMBERSHIP PRIVILEGES</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-display">
+            TIERED PASSES FOR <br />
+            <span className="text-[#CCFF00]">ELITE PERFORMANCE</span>
+          </h2>
+
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Choose your athletic tier. Unlock 100% complimentary court access, pro shop discounts, and priority booking windows.
+          </p>
+
+          {/* Billing Switch */}
+          <div className="inline-flex items-center gap-2 mt-4 p-1 rounded-full bg-white/10 border border-white/15">
+            <button
+              onClick={() => setBillingCycle('annual')}
+              className={`px-4 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+                billingCycle === 'annual'
+                  ? 'bg-[#CCFF00] text-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              Annual Pass (Save 20%)
+            </button>
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-4 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+                billingCycle === 'monthly'
+                  ? 'bg-[#CCFF00] text-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              Quarterly Flex
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {plans.slice(0, 3).map((p) => {
+            const isGold = p.code?.toLowerCase().includes('gold')
+            const price = billingCycle === 'annual' ? p.price : Math.round(p.price * 0.3)
+
+            return (
+              <div
+                key={p.id}
+                className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 relative ${
+                  isGold
+                    ? 'bg-[#12161D] border-2 border-[#CCFF00] shadow-2xl scale-102 glow-volt z-10'
+                    : 'bg-[#0E1116] border border-white/10 hover:border-white/20'
+                }`}
+              >
+                {isGold && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#CCFF00] text-black text-[10px] font-black uppercase tracking-widest shadow-lg">
+                    ★ FLAGSHIP GOLD TIER
+                  </span>
+                )}
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-white font-display uppercase">{p.name}</h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {isGold ? '100% Free Court Access & Maximum Privileges' : 'Competitive athlete membership'}
+                    </p>
+                  </div>
+
+                  <div className="py-4 border-y border-white/10 space-y-1">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl sm:text-4xl font-black text-white tabular-nums font-display">
+                        {formatCurrency(price)}
                       </span>
-                      <span className="text-xs text-slate-400 ml-1">/ year</span>
+                      <span className="text-xs text-slate-400 ml-1.5">
+                        / {billingCycle === 'annual' ? 'year' : 'quarter'}
+                      </span>
                     </div>
-
-                    <ul className="space-y-2.5 text-xs text-slate-300">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>
-                          <strong className="text-white">{p.court_discount_pct}% Court Discount</strong>{' '}
-                          {p.court_discount_pct === 100 ? '(Free Play)' : ''}
-                        </span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>{p.shop_discount_pct}% Off Pro Shop Equipment</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>{p.bar_discount_pct}% Off F&B and Energy Bar</span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Max {p.max_bookings_per_day} Bookings / Day</span>
-                      </li>
-                    </ul>
+                    <div className="flex items-center justify-between text-[11px] pt-0.5">
+                      <span className="text-slate-400 font-medium">
+                        Equivalent to <strong className="text-white font-bold">{formatCurrency(Math.round(billingCycle === 'annual' ? p.price / 12 : price / 3))}</strong> / mo
+                      </span>
+                      <span className="text-[#CCFF00] font-bold">GST Inclusive</span>
+                    </div>
+                    <div className="mt-2 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400">Est. Facility Value:</span>
+                      <span className="font-extrabold text-[#CCFF00]">
+                        {isGold ? '₹1,80,000+/yr' : p.code?.toLowerCase().includes('silver') ? '₹75,000+/yr' : '₹45,000+/yr'}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="pt-8">
-                    <Link to="/contact">
-                      <Button
-                        variant={isGold ? 'clay' : 'outline'}
-                        className={`w-full font-bold ${!isGold ? 'border-white/20 text-white hover:bg-white/10' : ''}`}
-                      >
-                        Enquire for Membership
-                      </Button>
-                    </Link>
-                  </div>
+                  <ul className="space-y-3 text-xs text-slate-300">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                      <span>
+                        <strong className="text-white">{p.court_discount_pct}% Court Discount</strong>{' '}
+                        {p.court_discount_pct === 100 ? '(Free Unlimited Play)' : ''}
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                      <span>{p.shop_discount_pct}% Off Pro Shop Gear & Restringing</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                      <span>{p.bar_discount_pct}% Off Clubhouse Café & Energy Bar</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                      <span>Max {p.max_bookings_per_day} Sessions Per Day Allowance</span>
+                    </li>
+                  </ul>
                 </div>
-              )
-            })}
-          </div>
+
+                <div className="pt-8">
+                  <Link to={`/register?plan=${p.code?.toLowerCase() || 'gold'}`}>
+                    <button
+                      className={`w-full py-3.5 rounded-full font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                        isGold
+                          ? 'bg-[#CCFF00] hover:bg-[#B4E600] text-black shadow-lg shadow-[#CCFF00]/25'
+                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
+                      }`}
+                    >
+                      Join as {p.name.split(' ')[0]}
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
-      {/* Friday Social Play Invitation */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-[#1B4D2E] to-[#12351F] text-white p-8 sm:p-12 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden border border-[#143B23]/50">
-          <div className="absolute inset-0 bg-court-mesh-dark opacity-10 pointer-events-none" />
-          <div className="space-y-3 max-w-xl relative z-10">
-            <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider">
-              Every Friday Evening
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
-              Friday Social Doubles & Padel Mixer
-            </h3>
-            <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
-              Shared court rotations, dynamic partner matching, and post-match drinks at the Club Lounge. Open to all skill levels.
+      {/* 6. TRIAL MODAL */}
+      <Modal
+        isOpen={isTrialModalOpen}
+        onClose={() => {
+          setIsTrialModalOpen(false)
+          setTrialConfirmed(null)
+        }}
+        title="Book a Complimentary Trial Session"
+        subtitle="Experience Bengaluru's premier sports sanctuary with a free trial match."
+      >
+        {trialConfirmed ? (
+          <div className="space-y-4 py-4 text-center">
+            <div className="w-14 h-14 rounded-full bg-[#CCFF00]/20 text-[#CCFF00] flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Trial Request Logged!</h3>
+            <p className="text-xs text-slate-300 max-w-sm mx-auto">
+              Our front-desk concierge has received your booking and logged it into our CRM. A staff member will confirm your court slot shortly.
             </p>
-          </div>
-          <Link to="/contact" className="relative z-10">
-            <Button variant="clay" size="lg" className="whitespace-nowrap font-bold shadow-lg">
-              Book a Trial Session
+            <div className="p-3 bg-white/5 border border-white/10 rounded-xl text-xs font-mono text-[#CCFF00]">
+              Ref ID: {trialConfirmed.id || trialConfirmed.leadId || 'CHAMP-TRIAL-OK'}
+            </div>
+            <Button
+              variant="volt"
+              onClick={() => {
+                setIsTrialModalOpen(false)
+                setTrialConfirmed(null)
+              }}
+              className="mt-2 w-full"
+            >
+              Done
             </Button>
-          </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleTrialSubmit} className="space-y-4 py-2">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Your Full Name *</label>
+              <input
+                type="text"
+                required
+                value={trialForm.name}
+                onChange={(e) => setTrialForm({ ...trialForm, name: e.target.value })}
+                placeholder="e.g. Arun Kumar"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={trialForm.phone}
+                  onChange={(e) => setTrialForm({ ...trialForm, phone: e.target.value })}
+                  placeholder="+91 98765 00000"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={trialForm.email}
+                  onChange={(e) => setTrialForm({ ...trialForm, email: e.target.value })}
+                  placeholder="name@example.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Preferred Sport</label>
+                <select
+                  value={trialForm.sport}
+                  onChange={(e) => setTrialForm({ ...trialForm, sport: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                >
+                  <option value="tennis">Tennis (Clay / Hard)</option>
+                  <option value="padel">Padel Arena</option>
+                  <option value="badminton">Badminton (BWF Court)</option>
+                  <option value="cricket">Box Cricket</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Skill Level</label>
+                <select
+                  value={trialForm.experience}
+                  onChange={(e) => setTrialForm({ ...trialForm, experience: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                >
+                  <option value="beginner">Beginner (First Time)</option>
+                  <option value="intermediate">Intermediate (Club Player)</option>
+                  <option value="advanced">Advanced / Tournament</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Preferred Date</label>
+                <input
+                  type="date"
+                  value={trialForm.date}
+                  onChange={(e) => setTrialForm({ ...trialForm, date: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Time Slot</label>
+                <select
+                  value={trialForm.preferredTime}
+                  onChange={(e) => setTrialForm({ ...trialForm, preferredTime: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#090B0E] text-white text-xs font-medium focus:ring-2 focus:ring-[#CCFF00]"
+                >
+                  <option value="07:00" className="bg-[#111418] text-white">07:00 AM (Morning)</option>
+                  <option value="09:00" className="bg-[#111418] text-white">09:00 AM (Morning)</option>
+                  <option value="17:00" className="bg-[#111418] text-white">05:00 PM (Evening)</option>
+                  <option value="18:00" className="bg-[#111418] text-white">06:00 PM (Prime Evening)</option>
+                  <option value="19:30" className="bg-[#111418] text-white">07:30 PM (Night Lights)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="pt-3 flex items-center justify-end gap-2 border-t border-white/10">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsTrialModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="volt"
+                size="sm"
+                loading={submittingTrial}
+                className="font-bold uppercase text-xs"
+              >
+                Submit Trial Request
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* 7. WATCH DEMO MODAL */}
+      <Modal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        title="Experience The Champions Club"
+        subtitle="A quick overview of our world-class digital athletics operating system."
+      >
+        <div className="space-y-4 py-2">
+          <div className="rounded-2xl overflow-hidden bg-black aspect-video relative flex items-center justify-center border border-white/10">
+            <img
+              src="https://images.unsplash.com/photo-1622163642998-1ea32b0bbc67?auto=format&fit=crop&w=800&q=80"
+              alt="Club Arena Overview"
+              className="w-full h-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-[#CCFF00] text-black flex items-center justify-center shadow-2xl animate-pulse">
+                <Play className="w-6 h-6 fill-black ml-1" />
+              </div>
+            </div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-slate-300 space-y-1.5">
+            <h4 className="font-bold text-white uppercase tracking-wider text-[11px]">What makes The Champions Club unique:</h4>
+            <p>• Zero double-booking guarantee backed by strict SQLite/PostgreSQL database locking.</p>
+            <p>• 1-hour sessions starting every 30 minutes (:00 & :30 grid).</p>
+            <p>• Single-shelf pro shop inventory shared between front counter and web orders.</p>
+            <p>• Live Kitchen Display System (KDS) & running tabs for post-match dining.</p>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="volt" size="sm" onClick={() => setIsVideoModalOpen(false)}>
+              Got It
+            </Button>
+          </div>
         </div>
-      </section>
+      </Modal>
     </div>
   )
 }

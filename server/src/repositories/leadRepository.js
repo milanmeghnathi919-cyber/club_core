@@ -1,4 +1,3 @@
-import { query, queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 
 export const leadRepository = {
@@ -46,7 +45,6 @@ export const leadRepository = {
   },
 
   async getFollowUps() {
-    const today = new Date().toISOString().slice(0, 10)
     return memoryStore.find('leads', (l) => l.follow_up_at && l.status !== 'won' && l.status !== 'lost')
   },
 

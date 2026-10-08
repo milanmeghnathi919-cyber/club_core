@@ -42,7 +42,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 })
 
 export const listLowStock = asyncHandler(async (req, res) => {
-  const { items, total } = await productService.list({
+  const { items } = await productService.list({
     isStaff: true,
     isLowStock: true,
     page: 1,

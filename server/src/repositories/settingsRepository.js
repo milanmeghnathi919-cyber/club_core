@@ -1,4 +1,4 @@
-import { query, queryOne } from '../utils/db.js'
+import { queryOne } from '../utils/db.js'
 import memoryStore from '../utils/memoryStore.js'
 
 const DEFAULT_SETTINGS = {

@@ -2,7 +2,7 @@ import ApiError from '../utils/ApiError.js'
 import paymentRepository from '../repositories/paymentRepository.js'
 import memoryStore from '../utils/memoryStore.js'
 import { round2 } from '../utils/money.js'
-import { toClubDate, localDayRange } from '../utils/clubTime.js'
+import { toClubDate } from '../utils/clubTime.js'
 import { verifyPaymentSignature } from '../utils/razorpay.js'
 
 /**
@@ -64,7 +64,7 @@ export const paymentsService = {
   /**
    * Refund a payment: status -> refunded, updates source payment_status -> refunded.
    */
-  async refund(paymentId, actorId) {
+  async refund(paymentId, _actorId) {
     const payment = await paymentRepository.findById(paymentId)
     if (!payment) {
       throw new ApiError(404, 'Payment not found', null, 'NOT_FOUND')

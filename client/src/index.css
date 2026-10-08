@@ -28,11 +28,16 @@
   --color-night: #070B12;
   --color-midnight: #0F172A;
   --color-court-dark: #0B1321;
+  
+  --color-volt: #CCFF00;
+  --color-volt-hover: #B4E600;
+  --color-volt-dark: #8FB800;
+  --color-volt-light: #F4FFCC;
 }
 
 :root {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 h1, h2, h3, h4, .font-display {
@@ -44,8 +49,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #F8FAF6;
-  color: #0F172A;
+  background-color: #090B0E;
+  color: #F8FAFC;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -55,20 +60,20 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Athletic subtle scrollbar */
+/* Athletic subtle neon scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #090B0E;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.3);
+  background: rgba(204, 255, 0, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(27, 77, 46, 0.5);
+  background: #CCFF00;
 }
 
 /* Athletic Visual Patterns (Pure Vector SVG inlined, zero external network dependency) */
@@ -113,6 +118,76 @@ body {
 
 .athletic-shadow-clay {
   box-shadow: 0 10px 25px -5px rgba(200, 90, 50, 0.25), 0 4px 10px -4px rgba(200, 90, 50, 0.15);
+}
+
+.athletic-shadow-gold {
+  box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.25), 0 4px 10px -4px rgba(217, 119, 6, 0.15);
+}
+
+/* Glass & Glow utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 30px -4px rgba(27, 77, 46, 0.35);
+}
+
+.glow-clay {
+  box-shadow: 0 0 30px -4px rgba(200, 90, 50, 0.35);
+}
+
+.glow-gold {
+  box-shadow: 0 0 30px -4px rgba(245, 158, 11, 0.4);
+}
+
+.glow-volt {
+  box-shadow: 0 0 30px -4px rgba(204, 255, 0, 0.45);
+}
+
+.glow-volt-sm {
+  box-shadow: 0 0 15px -2px rgba(204, 255, 0, 0.35);
+}
+
+.glow-volt-lg {
+  box-shadow: 0 0 55px -6px rgba(204, 255, 0, 0.65);
+}
+
+/* Float Animations (Reference style) */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-float {
+  animation: floatSlow 3.8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatReverse 4.6s ease-in-out infinite;
 }
 
 /* Tactile Athletic Micro-interactions */

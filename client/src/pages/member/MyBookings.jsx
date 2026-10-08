@@ -4,11 +4,13 @@ import courtService from '@/service/courtService'
 import { formatCurrency, formatDate, formatTime } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
-import Card, { CardContent, CardHeader } from '@/components/ui/Card'
+import Card, { CardContent } from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { Calendar, Clock, Trophy, XCircle, AlertCircle, Plus } from 'lucide-react'
+import { Calendar, Trophy, Plus, Download } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import FakePaymentModal from '@/components/common/FakePaymentModal'
 
 export const MyBookings = () => {
@@ -25,7 +27,7 @@ export const MyBookings = () => {
       const data = await courtService.getMyBookings()
       const list = Array.isArray(data) ? data : data?.items || data?.data || []
       setBookings(list)
-    } catch (err) {
+    } catch {
       toast.error('Failed to load your bookings')
     } finally {
       setLoading(false)
@@ -55,21 +57,65 @@ export const MyBookings = () => {
     }
   }
 
+  const handleDownloadBookingPdf = (b) => {
+    if (!b) return
+    try {
+      const doc = new jsPDF()
+      doc.setFontSize(18)
+      doc.text('THE CHAMPIONS CLUB', 105, 18, { align: 'center' })
+      doc.setFontSize(10)
+      doc.text('Official Court Access Pass & Reservation Voucher', 105, 24, { align: 'center' })
+      doc.text(`Booking Ref: ${b.bookingNo || b.booking_no || b.id?.slice(0, 8)}`, 14, 34)
+      doc.text(`Court Arena: ${b.court?.name || b.court_name || 'Champions Court'}`, 14, 40)
+      doc.text(`Sport: ${(b.court?.sport || b.sport || 'Racquet').toUpperCase()}`, 14, 46)
+      doc.text(`Scheduled Date: ${formatDate(b.startAt || b.start_at)}`, 14, 52)
+      doc.text(`Time Slot: ${formatTime(b.startAt || b.start_at)} - ${formatTime(b.endAt || b.end_at)}`, 14, 58)
+      doc.text(`Reservation Status: ${(b.status || 'Confirmed').toUpperCase()}`, 14, 64)
+      doc.text(`Payment: ${(b.payment_status || 'Paid').toUpperCase()}`, 14, 70)
+
+      autoTable(doc, {
+        startY: 76,
+        head: [['Arena Item', 'Duration', 'Rate / Fee', 'Amount']],
+        body: [[
+          b.court?.name || 'Exclusive Club Court Reservation',
+          '60 Minutes',
+          formatCurrency(b.price || 0),
+          formatCurrency(b.price || 0),
+        ]],
+        theme: 'grid',
+      })
+
+      const finalY = (doc.lastAutoTable?.finalY ?? 76) + 12
+      doc.setFontSize(12)
+      doc.text(`TOTAL TENDER: ${formatCurrency(b.price || 0)}`, 14, finalY)
+      doc.setFontSize(9)
+      doc.text('Please present this digital pass or QR voucher at the club reception kiosk upon arrival.', 14, finalY + 8)
+
+      doc.save(`CourtPass-${b.bookingNo || 'Reservation'}.pdf`)
+      toast.success('Court Pass PDF downloaded')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to generate Court Pass PDF')
+    }
+  }
+
   return (
     <div className="space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
+          <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#CCFF00] text-black">
             Schedule History
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">My Court Bookings</h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mt-3">
+            My Court Bookings
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Review upcoming court reservations and match history.
           </p>
         </div>
 
         <Link to="/app/book">
-          <Button variant="lawn" size="sm" icon={Plus} className="font-bold">
+          <Button variant="volt" size="sm" icon={Plus} className="font-extrabold">
             Book Another Court
           </Button>
         </Link>
@@ -78,18 +124,18 @@ export const MyBookings = () => {
       {loading ? (
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
+            <Skeleton key={i} className="h-24 rounded-2xl bg-white/5" />
           ))}
         </div>
       ) : bookings.length === 0 ? (
-        <div className="p-16 text-center bg-white rounded-2xl border border-slate-200 space-y-4">
-          <Calendar className="w-12 h-12 text-slate-300 mx-auto" />
+        <div className="p-16 text-center bg-[#111418] rounded-2xl border border-white/10 space-y-4">
+          <Calendar className="w-12 h-12 text-slate-600 mx-auto" />
           <div>
-            <h3 className="font-bold text-slate-800 text-base">No court bookings found</h3>
+            <h3 className="font-bold text-white text-base">No court bookings found</h3>
             <p className="text-xs text-slate-400 mt-1">You haven&rsquo;t booked any courts yet.</p>
           </div>
           <Link to="/app/book">
-            <Button variant="lawn" size="md">
+            <Button variant="volt" size="md">
               Reserve First Court
             </Button>
           </Link>
@@ -106,39 +152,39 @@ export const MyBookings = () => {
             const bookingRef = b.bookingNo || b.booking_no || (b.id ? b.id.slice(0, 8) : 'CONFIRMED')
 
             return (
-              <Card key={b.id} className="border-slate-200 hover:border-slate-300 transition-colors">
+              <Card key={b.id} className="border-white/10 bg-[#111418] hover:border-[#CCFF00]/40 transition-colors">
                 <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-start sm:items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#1B4D2E]/10 text-[#1B4D2E] flex items-center justify-center font-bold text-sm shrink-0">
-                      <Trophy className="w-6 h-6 text-[#1B4D2E]" />
+                    <div className="w-12 h-12 rounded-xl bg-[#CCFF00]/10 text-[#CCFF00] border border-[#CCFF00]/20 flex items-center justify-center font-bold text-sm shrink-0">
+                      <Trophy className="w-6 h-6 text-[#CCFF00]" />
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-base text-slate-900">
+                        <h4 className="font-bold text-base text-white">
                           {courtName}
                         </h4>
                         {courtSport && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-slate-300 border border-white/10">
                             {courtSport}
                           </span>
                         )}
                         <Badge status={b.status}>{b.status}</Badge>
                       </div>
 
-                      <p className="text-xs font-semibold text-slate-700">
+                      <p className="text-xs font-semibold text-slate-300">
                         {formatDate(start)} • {formatTime(start)} – {formatTime(end)}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 font-mono">
-                        <span>Ref: {bookingRef}</span>
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 font-mono">
+                        <span>Ref: <strong className="text-white">{bookingRef}</strong></span>
                         <span>•</span>
-                        <span>Amount: {formatCurrency(b.price || 0)}</span>
+                        <span>Amount: <strong className="text-[#CCFF00]">{formatCurrency(b.price || 0)}</strong></span>
                         <span>•</span>
                         <span
                           className={`capitalize font-semibold px-2 py-0.5 rounded-full text-[10px] ${
                             b.payment_status === 'paid' || b.payment_status === 'waived'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-amber-100 text-amber-800'
+                              ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30'
+                              : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                           }`}
                         >
                           Payment: {b.payment_status || 'Unpaid'}
@@ -148,9 +194,20 @@ export const MyBookings = () => {
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDownloadBookingPdf(b)}
+                      className="text-xs font-bold gap-1.5 cursor-pointer text-[#CCFF00] border-[#CCFF00]/30 hover:bg-[#CCFF00]/10"
+                      title="Download Official Court Pass PDF"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Pass PDF</span>
+                    </Button>
+
                     {b.payment_status === 'unpaid' && Number(b.price) > 0 && (
                       <Button
-                        variant="lawn"
+                        variant="volt"
                         size="sm"
                         onClick={() => setPaymentTargetBooking(b)}
                         className="text-xs font-bold cursor-pointer"
@@ -164,7 +221,7 @@ export const MyBookings = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setCancelModalBooking(b)}
-                        className="text-xs text-rose-600 hover:bg-rose-50 border-rose-200 hover:border-rose-300"
+                        className="text-xs text-rose-400 hover:bg-rose-500/10 border-rose-500/30"
                       >
                         Cancel Booking
                       </Button>
@@ -205,11 +262,11 @@ export const MyBookings = () => {
           </div>
         }
       >
-        <div className="space-y-3 py-2 text-xs text-slate-600">
+        <div className="space-y-3 py-2 text-xs text-slate-300">
           <p>
             Are you sure you want to cancel this booking? The slot will immediately become available for other club members to book.
           </p>
-          <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px]">
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px]">
             Please note that cancellations are subject to our 2-hour advance cutoff policy.
           </div>
         </div>

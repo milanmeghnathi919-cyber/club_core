@@ -4,7 +4,7 @@ import memberRepository from '../repositories/memberRepository.js'
 import notificationService from '../services/notificationService.js'
 import { sendMail } from '../utils/mailer.js'
 import { toClubDate } from '../utils/clubTime.js'
-import { addDays, differenceInCalendarDays, parseISO } from 'date-fns'
+import { differenceInCalendarDays, parseISO } from 'date-fns'
 
 export const remindExpiry = async () => {
   const today = toClubDate()

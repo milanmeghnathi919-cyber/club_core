@@ -191,7 +191,7 @@ export const bookingService = {
     return booking
   },
 
-  async cancel(id, { actorId, isStaff = false, reason = null } = {}) {
+  async cancel(id, { actorId: _actorId, isStaff = false, reason = null } = {}) {
     const booking = await bookingRepository.findById(id)
     if (!booking) throw new ApiError(404, 'Booking not found', null, 'NOT_FOUND')
     if (booking.status === 'cancelled') return booking

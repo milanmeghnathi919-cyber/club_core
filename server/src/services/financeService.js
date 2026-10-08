@@ -169,7 +169,7 @@ export const financeService = {
     })
   },
 
-  async payExpense(id, { method = 'cash', actorId }) {
+  async payExpense(id, { method = 'cash', actorId: _actorId }) {
     const exp = await expenseRepository.findById(id)
     if (!exp) throw new ApiError(404, 'Expense not found', null, 'NOT_FOUND')
 

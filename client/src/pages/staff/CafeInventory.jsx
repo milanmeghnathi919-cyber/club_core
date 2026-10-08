@@ -4,10 +4,7 @@ import { formatCurrency } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import Card, { CardContent, CardHeader } from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
-import { Skeleton } from '@/components/ui/Skeleton'
 import {
   Coffee,
   Utensils,
@@ -23,6 +20,7 @@ import {
   Sparkles,
   ArrowUpDown,
   RefreshCw,
+  Zap,
 } from 'lucide-react'
 
 const CAFE_CATEGORIES = [
@@ -117,7 +115,6 @@ export const CafeInventory = () => {
     e.preventDefault()
     if (!formData.name.trim() || !formData.price) {
       toast.error('Please enter name and price')
-      return
     }
 
     setSaving(true)
@@ -218,15 +215,15 @@ export const CafeInventory = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E] flex items-center gap-1.5">
+          <span className="text-xs font-black uppercase tracking-widest text-[#CCFF00] flex items-center gap-1.5">
             <Coffee className="w-3.5 h-3.5" /> Café Management & Dining
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mt-1">
             Café Menu & Stock Inventory
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Real-time food & beverage inventory, barista station routing, and kitchen stock status.
           </p>
         </div>
@@ -237,16 +234,16 @@ export const CafeInventory = () => {
             size="sm"
             icon={RefreshCw}
             onClick={fetchMenu}
-            className="text-slate-600 hover:text-slate-900"
+            className="text-xs font-bold uppercase"
           >
             Refresh
           </Button>
           <Button
-            variant="lawn"
+            variant="volt"
             size="sm"
             icon={Plus}
             onClick={handleOpenAddModal}
-            className="font-bold shadow-xs"
+            className="font-black uppercase text-xs"
           >
             Add Café Item
           </Button>
@@ -255,98 +252,90 @@ export const CafeInventory = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-slate-200/90 shadow-2xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-slate-500">Total Café Items</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5 tabular-nums">
-                {totalItems}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
-              <Layers className="w-5 h-5 text-slate-600" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Items</p>
+            <h3 className="text-2xl font-black font-mono text-white mt-1 tabular-nums">
+              {totalItems}
+            </h3>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#CCFF00]">
+            <Layers className="w-5 h-5" />
+          </div>
+        </div>
 
-        <Card className="border-slate-200/90 shadow-2xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-emerald-700">In Stock (Available)</p>
-              <h3 className="text-2xl font-black text-emerald-800 mt-0.5 tabular-nums">
-                {inStockCount}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 border border-emerald-200/60">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#CCFF00]">In Stock</p>
+            <h3 className="text-2xl font-black font-mono text-[#CCFF00] mt-1 tabular-nums">
+              {inStockCount}
+            </h3>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center text-[#CCFF00]">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+        </div>
 
-        <Card className="border-slate-200/90 shadow-2xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-rose-700">Stock Depleted</p>
-              <h3 className="text-2xl font-black text-rose-800 mt-0.5 tabular-nums">
-                {outOfStockCount}
-              </h3>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-700 border border-rose-200/60">
-              <XCircle className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-rose-400">Out of Stock</p>
+            <h3 className="text-2xl font-black font-mono text-rose-400 mt-1 tabular-nums">
+              {outOfStockCount}
+            </h3>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+            <XCircle className="w-5 h-5" />
+          </div>
+        </div>
 
-        <Card className="border-slate-200/90 shadow-2xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-amber-700">Routing Stations</p>
-              <h3 className="text-xs font-bold text-slate-800 mt-1 space-x-1">
-                <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">{baristaCount} Barista</span>
-                <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-900">{kitchenCount} Kitchen</span>
-              </h3>
+        <div className="rounded-3xl bg-[#111418] border border-white/10 p-5 shadow-2xl flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Routing Stations</p>
+            <div className="mt-1 flex items-center gap-1.5 text-xs font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] font-mono">{baristaCount} Bar</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 font-mono">{kitchenCount} Kitchen</span>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 border border-amber-200/60">
-              <Flame className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#CCFF00]">
+            <Flame className="w-5 h-5" />
+          </div>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="space-y-3 bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
+      <div className="space-y-3 bg-[#111418] p-4 sm:p-5 rounded-3xl border border-white/10 shadow-2xl">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search dishes, coffee, smoothies..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/20 focus:border-[#1B4D2E]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#090B0E] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Select
+            <select
               value={stationFilter}
               onChange={(e) => setStationFilter(e.target.value)}
-              className="text-xs py-1.5"
+              className="text-xs py-2 px-3 bg-[#090B0E] rounded-xl border border-white/10 text-white focus:outline-none"
             >
               <option value="all">All Stations</option>
               <option value="bar">Barista Bar</option>
               <option value="kitchen">Kitchen Line</option>
-            </Select>
+            </select>
 
-            <Select
+            <select
               value={availabilityFilter}
               onChange={(e) => setAvailabilityFilter(e.target.value)}
-              className="text-xs py-1.5"
+              className="text-xs py-2 px-3 bg-[#090B0E] rounded-xl border border-white/10 text-white focus:outline-none"
             >
               <option value="all">All Availability</option>
               <option value="in_stock">In Stock Only</option>
               <option value="out_of_stock">Out of Stock Only</option>
-            </Select>
+            </select>
           </div>
         </div>
 
@@ -356,10 +345,10 @@ export const CafeInventory = () => {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
                 selectedCategory === cat
-                  ? 'bg-[#1B4D2E] text-white shadow-2xs font-bold'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
+                  ? 'bg-[#CCFF00] text-black shadow-md'
+                  : 'bg-white/5 text-slate-400 hover:text-white border border-white/10 hover:bg-white/10'
               }`}
             >
               {cat}
@@ -372,13 +361,13 @@ export const CafeInventory = () => {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <Skeleton key={i} className="h-64 rounded-xl" />
+            <div key={i} className="h-64 rounded-3xl bg-white/5 animate-pulse" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="p-16 text-center bg-white rounded-2xl border border-slate-200 space-y-3">
-          <Coffee className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="font-bold text-slate-800 text-base">No café items matched your filter</h3>
+        <div className="p-16 text-center bg-[#111418] rounded-3xl border border-white/10 space-y-3 shadow-2xl">
+          <Coffee className="w-12 h-12 text-slate-600 mx-auto" />
+          <h3 className="font-black uppercase tracking-tight text-white text-base">No café items matched your filter</h3>
           <p className="text-xs text-slate-400">Try adjusting your search keywords or category filters.</p>
           <Button variant="outline" size="sm" onClick={() => { setSearch(''); setSelectedCategory('All'); setStationFilter('all'); setAvailabilityFilter('all') }}>
             Reset Filters
@@ -393,13 +382,13 @@ export const CafeInventory = () => {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-xl border transition-all overflow-hidden flex flex-col justify-between group hover:shadow-md ${
-                  isAvailable ? 'border-slate-200' : 'border-rose-200 bg-rose-50/20 opacity-90'
+                className={`bg-[#111418] rounded-3xl border transition-all overflow-hidden flex flex-col justify-between group hover:border-[#CCFF00]/50 hover:shadow-[0_0_20px_rgba(204,255,0,0.15)] duration-300 ${
+                  isAvailable ? 'border-white/10' : 'border-rose-500/30 opacity-80'
                 }`}
               >
                 <div>
                   {/* Image */}
-                  <div className="h-36 w-full bg-slate-100 relative overflow-hidden">
+                  <div className="h-40 w-full bg-[#161a22] relative overflow-hidden">
                     <img
                       src={item.image_url || item.imageUrl || DEFAULT_IMAGE}
                       alt={item.name}
@@ -409,27 +398,27 @@ export const CafeInventory = () => {
                       }}
                     />
                     {/* Badge */}
-                    <div className="absolute top-2 left-2 flex items-center gap-1">
+                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
                       <span
-                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-md shadow-xs ${
+                        className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full backdrop-blur-md shadow-md ${
                           isDrink
-                            ? 'bg-amber-900/80 text-amber-200'
-                            : 'bg-emerald-900/80 text-emerald-200'
+                            ? 'bg-[#111418]/90 text-[#CCFF00] border border-[#CCFF00]/40'
+                            : 'bg-[#111418]/90 text-blue-400 border border-blue-400/40'
                         }`}
                       >
                         {isDrink ? 'Barista' : 'Kitchen'}
                       </span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-900/70 text-white backdrop-blur-md">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/80 text-white backdrop-blur-md border border-white/10">
                         GST {item.tax_rate_pct ?? item.taxRatePct ?? 5}%
                       </span>
                     </div>
 
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2.5 right-2.5">
                       <span
-                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-md flex items-center gap-1 shadow-xs ${
+                        className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full backdrop-blur-md flex items-center gap-1 shadow-md ${
                           isAvailable
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-rose-600 text-white'
+                            ? 'bg-[#CCFF00] text-black'
+                            : 'bg-rose-500 text-white'
                         }`}
                       >
                         {isAvailable ? 'In Stock' : 'Out of Stock'}
@@ -442,36 +431,36 @@ export const CafeInventory = () => {
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                       {item.category}
                     </span>
-                    <h4 className="font-bold text-sm text-slate-900 line-clamp-1" title={item.name}>
+                    <h4 className="font-black uppercase tracking-tight text-sm text-white line-clamp-1 group-hover:text-[#CCFF00] transition-colors" title={item.name}>
                       {item.name}
                     </h4>
-                    <p className="text-base font-extrabold text-[#1B4D2E] tabular-nums">
+                    <p className="text-base font-black font-mono text-[#CCFF00] tabular-nums">
                       {formatCurrency(item.price)}
                     </p>
                   </div>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-2">
+                <div className="p-3 border-t border-white/10 bg-white/5 flex items-center justify-between gap-2">
                   {/* Stock Toggle Switch */}
                   <button
                     onClick={() => handleToggleAvailability(item)}
-                    className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg border transition-all ${
+                    className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-xl border transition-all ${
                       isAvailable
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                        : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100'
+                        ? 'bg-[#CCFF00]/15 text-[#CCFF00] border-[#CCFF00]/40 hover:bg-[#CCFF00] hover:text-black'
+                        : 'bg-rose-500/20 text-rose-400 border-rose-500/40 hover:bg-rose-500 hover:text-white'
                     }`}
                     title="Click to toggle availability"
                   >
                     {isAvailable ? (
                       <>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>In Stock</span>
                       </>
                     ) : (
                       <>
-                        <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                        <span>Unavailable</span>
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Out of Stock</span>
                       </>
                     )}
                   </button>
@@ -479,14 +468,14 @@ export const CafeInventory = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenEditModal(item)}
-                      className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-md transition-colors"
+                      className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                       title="Edit Item"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleteItemTarget(item)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+                      className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
                       title="Delete Item"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -516,26 +505,36 @@ export const CafeInventory = () => {
           />
 
           <div className="grid grid-cols-2 gap-3">
-            <Select
-              label="Menu Category *"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              {CAFE_CATEGORIES.filter((c) => c !== 'All').map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Menu Category *
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full py-2.5 px-3 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none"
+              >
+                {CAFE_CATEGORIES.filter((c) => c !== 'All').map((c) => (
+                  <option key={c} value={c} className="bg-[#111418] text-white">
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <Select
-              label="Station Routing *"
-              value={formData.station}
-              onChange={(e) => setFormData({ ...formData, station: e.target.value })}
-            >
-              <option value="bar">Barista Bar Station</option>
-              <option value="kitchen">Kitchen Prep Line</option>
-            </Select>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Station Routing *
+              </label>
+              <select
+                value={formData.station}
+                onChange={(e) => setFormData({ ...formData, station: e.target.value })}
+                className="w-full py-2.5 px-3 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none"
+              >
+                <option value="bar" className="bg-[#111418] text-white">Barista Bar Station</option>
+                <option value="kitchen" className="bg-[#111418] text-white">Kitchen Prep Line</option>
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -548,14 +547,19 @@ export const CafeInventory = () => {
               required
             />
 
-            <Select
-              label="GST Tax Rate *"
-              value={formData.taxRatePct}
-              onChange={(e) => setFormData({ ...formData, taxRatePct: e.target.value })}
-            >
-              <option value={5}>5% (F&B / Prepared Food)</option>
-              <option value={18}>18% (Packaged Beverages / Mocktails)</option>
-            </Select>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                GST Tax Rate *
+              </label>
+              <select
+                value={formData.taxRatePct}
+                onChange={(e) => setFormData({ ...formData, taxRatePct: e.target.value })}
+                className="w-full py-2.5 px-3 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none"
+              >
+                <option value={5} className="bg-[#111418] text-white">5% (F&B / Prepared Food)</option>
+                <option value={18} className="bg-[#111418] text-white">18% (Packaged Beverages / Mocktails)</option>
+              </select>
+            </div>
           </div>
 
           <Input
@@ -571,18 +575,18 @@ export const CafeInventory = () => {
               id="isAvailableCheckbox"
               checked={formData.isAvailable}
               onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-              className="w-4 h-4 rounded text-[#1B4D2E] focus:ring-[#1B4D2E]"
+              className="w-4 h-4 rounded text-[#CCFF00] focus:ring-[#CCFF00]"
             />
-            <label htmlFor="isAvailableCheckbox" className="text-xs font-semibold text-slate-700">
+            <label htmlFor="isAvailableCheckbox" className="text-xs font-bold text-slate-300">
               Immediately Available on POS & Kitchen Display
             </label>
           </div>
 
-          <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
-            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
+          <div className="pt-3 flex items-center justify-end gap-3 border-t border-white/10">
+            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-            <Button variant="lawn" type="submit" loading={saving} className="font-bold">
+            <Button variant="volt" type="submit" loading={saving} className="font-black uppercase text-xs">
               {editingItem ? 'Save Changes' : 'Add to Menu'}
             </Button>
           </div>
@@ -597,18 +601,18 @@ export const CafeInventory = () => {
         subtitle={`Are you sure you want to remove "${deleteItemTarget?.name}" from the active café catalog?`}
       >
         <div className="py-2 space-y-4">
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-slate-400">
             This will permanently remove this item from the Café POS and Kitchen Queue. Past orders and sales history will remain unaffected.
           </p>
           <div className="flex items-center justify-end gap-3">
-            <Button variant="outline" onClick={() => setDeleteItemTarget(null)}>
+            <Button variant="ghost" onClick={() => setDeleteItemTarget(null)}>
               Cancel
             </Button>
             <Button
-              variant="outline"
+              variant="danger"
               onClick={handleDeleteItem}
               loading={deleting}
-              className="text-rose-600 hover:bg-rose-50 border-rose-200 hover:border-rose-300 font-bold"
+              className="font-bold uppercase text-xs"
             >
               Confirm Delete
             </Button>

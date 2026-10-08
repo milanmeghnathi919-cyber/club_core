@@ -4,11 +4,8 @@ import { formatCurrency } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import Card, { CardContent } from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
-import { Skeleton } from '@/components/ui/Skeleton'
-import { Package, AlertTriangle, Plus, Search, Edit3, ArrowUpDown, CheckCircle2 } from 'lucide-react'
+import { Package, AlertTriangle, Plus, Search, ArrowUpDown, CheckCircle2, Zap } from 'lucide-react'
 
 export const ProductsAdmin = () => {
   const toast = useToast()
@@ -69,121 +66,118 @@ export const ProductsAdmin = () => {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-            Inventory Management
+          <span className="text-xs font-black uppercase tracking-widest text-[#CCFF00] flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5" /> Inventory Management
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mt-1">
             Shop Products & Stock
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             Atomic shared stock across counter sales and online member orders.
           </p>
         </div>
 
         <button
           onClick={() => setLowStockOnly(!lowStockOnly)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all border ${
             lowStockOnly
-              ? 'bg-amber-100 text-amber-900 border-amber-300 ring-2 ring-amber-400/20'
-              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+              ? 'bg-[#CCFF00] text-black border-[#CCFF00] shadow-md shadow-[#CCFF00]/10'
+              : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
           }`}
         >
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-          <span>Low Stock Filter Only</span>
+          <AlertTriangle className={`w-3.5 h-3.5 ${lowStockOnly ? 'text-black' : 'text-[#CCFF00]'}`} />
+          <span>Low Stock Filter</span>
         </button>
       </div>
 
       {/* Search */}
       <div className="max-w-md relative">
-        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Filter by SKU or product name..."
-          className="w-full pl-9 pr-3 py-1.5 bg-white rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/20"
+          className="w-full pl-10 pr-3.5 py-2.5 bg-[#111418] rounded-xl border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
         />
       </div>
 
       {/* Inventory Table */}
-      <Card className="border-slate-200 overflow-hidden">
+      <div className="rounded-3xl bg-[#111418] border border-white/10 overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-6 space-y-3">
             {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-14 rounded-lg" />
+              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-4">Product & SKU</th>
-                  <th className="py-3 px-4">Price</th>
-                  <th className="py-3 px-4">Current Stock</th>
-                  <th className="py-3 px-4">Threshold</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                <tr className="bg-white/5 border-b border-white/10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                  <th className="py-3.5 px-5">Product & SKU</th>
+                  <th className="py-3.5 px-5">Price</th>
+                  <th className="py-3.5 px-5">Current Stock</th>
+                  <th className="py-3.5 px-5">Threshold</th>
+                  <th className="py-3.5 px-5">Status</th>
+                  <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-white/5 font-medium">
                 {products.map((p) => {
                   const stock = p.stockQty ?? p.stock_qty ?? 0
                   const threshold = p.lowStockThreshold ?? p.low_stock_threshold ?? 5
                   const isLow = stock <= threshold
 
                   return (
-                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4">
-                        <span className="font-bold text-slate-900 block">{p.name}</span>
-                        <span className="font-mono text-[10px] text-slate-400">{p.sku}</span>
+                    <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                      <td className="py-3.5 px-5">
+                        <span className="font-bold text-white block">{p.name}</span>
+                        <span className="font-mono text-[10px] text-[#CCFF00] font-bold">{p.sku}</span>
                       </td>
 
-                      <td className="py-3 px-4 font-bold text-slate-900 tabular-nums">
+                      <td className="py-3.5 px-5 font-mono font-bold text-white tabular-nums">
                         {formatCurrency(p.price)}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-5">
                         <span
-                          className={`font-mono font-extrabold text-sm px-2.5 py-0.5 rounded-md ${
-                            isLow ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-900'
+                          className={`font-mono font-bold text-xs px-2.5 py-1 rounded-lg ${
+                            isLow ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-white/10 text-white'
                           }`}
                         >
                           {stock} units
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-500 font-mono">
+                      <td className="py-3.5 px-5 text-slate-400 font-mono">
                         ≤ {threshold}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-5">
                         {isLow ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/30 uppercase">
                             <AlertTriangle className="w-3 h-3" /> Low Stock
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#CCFF00] bg-[#CCFF00]/10 px-2.5 py-0.5 rounded-full border border-[#CCFF00]/30 uppercase">
                             In Stock
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3 px-4 text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          icon={ArrowUpDown}
+                      <td className="py-3.5 px-5 text-right">
+                        <button
                           onClick={() => {
                             setAdjustProduct(p)
                             setAdjustDelta(5)
                           }}
-                          className="text-xs"
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-white/5 hover:bg-[#CCFF00] hover:text-black transition-colors inline-flex items-center gap-1 border border-white/10 hover:border-[#CCFF00]"
                         >
-                          Adjust Stock
-                        </Button>
+                          <ArrowUpDown className="w-3 h-3" /> Adjust Stock
+                        </button>
                       </td>
                     </tr>
                   )
@@ -192,7 +186,7 @@ export const ProductsAdmin = () => {
             </table>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Adjust Stock Modal */}
       <Modal
@@ -202,9 +196,9 @@ export const ProductsAdmin = () => {
         subtitle={`${adjustProduct?.name} (${adjustProduct?.sku})`}
       >
         <form onSubmit={handleAdjustStock} className="space-y-4 py-2">
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between text-xs">
-            <span className="text-slate-500">Current On-Hand Quantity:</span>
-            <strong className="font-mono text-slate-900 text-sm">
+          <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10 flex justify-between text-xs">
+            <span className="text-slate-400">Current On-Hand Quantity:</span>
+            <strong className="font-mono text-[#CCFF00] text-sm">
               {adjustProduct?.stockQty ?? adjustProduct?.stock_qty ?? 0} units
             </strong>
           </div>
@@ -218,16 +212,21 @@ export const ProductsAdmin = () => {
             helperText="e.g. +10 for fresh supplier shipment, -1 for floor damage"
           />
 
-          <Select
-            label="Reason for Adjustment *"
-            value={adjustReason}
-            onChange={(e) => setAdjustReason(e.target.value)}
-          >
-            <option value="restock">Restock from Supplier</option>
-            <option value="adjustment">Stock Count Audit Correction</option>
-            <option value="damage">Damaged or Expired Item</option>
-            <option value="return">Customer Return</option>
-          </Select>
+          <div>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+              Reason for Adjustment *
+            </label>
+            <select
+              value={adjustReason}
+              onChange={(e) => setAdjustReason(e.target.value)}
+              className="w-full py-2.5 px-3.5 bg-[#111418] rounded-xl border border-white/10 text-white text-xs focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
+            >
+              <option value="restock" className="bg-[#111418] text-white">Restock from Supplier</option>
+              <option value="adjustment" className="bg-[#111418] text-white">Stock Count Audit Correction</option>
+              <option value="damage" className="bg-[#111418] text-white">Damaged or Expired Item</option>
+              <option value="return" className="bg-[#111418] text-white">Customer Return</option>
+            </select>
+          </div>
 
           <Input
             label="Optional Audit Note"
@@ -236,11 +235,11 @@ export const ProductsAdmin = () => {
             onChange={(e) => setAdjustNote(e.target.value)}
           />
 
-          <div className="pt-2 flex items-center justify-end gap-3">
-            <Button variant="outline" type="button" onClick={() => setAdjustProduct(null)}>
+          <div className="pt-3 flex items-center justify-end gap-3 border-t border-white/10">
+            <Button variant="ghost" type="button" onClick={() => setAdjustProduct(null)}>
               Cancel
             </Button>
-            <Button variant="lawn" type="submit" loading={adjusting} className="font-bold">
+            <Button variant="volt" type="submit" loading={adjusting} className="font-black uppercase text-xs">
               Commit Stock Adjustment
             </Button>
           </div>

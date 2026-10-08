@@ -5,6 +5,7 @@ import { toggleCartDrawer } from '@/feature/shop/cartSlice'
 import CartDrawer from '@/components/common/CartDrawer'
 import { Trophy, ShoppingBag, User, Calendar, MapPin, Phone, Mail, Clock } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import RoleSwitcher from '@/components/common/RoleSwitcher'
 
 export const PublicLayout = () => {
   const location = useLocation()
@@ -23,20 +24,21 @@ export const PublicLayout = () => {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAF6] text-slate-900 font-sans selection:bg-[#1B4D2E] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#090B0E] text-slate-100 font-sans selection:bg-[#CCFF00] selection:text-black">
       {/* Top Athletic Utility Bar */}
-      <div className="bg-[#070B12] text-slate-300 text-xs py-2 px-4 sm:px-8 flex items-center justify-between border-b border-white/10 relative z-30">
+      <div className="bg-[#050709] text-slate-400 text-xs py-2 px-4 sm:px-8 flex items-center justify-between border-b border-white/5 relative z-30">
         <div className="flex items-center gap-6">
-          <span className="flex items-center gap-1.5 font-medium">
-            <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Indiranagar, Bengaluru
+          <span className="flex items-center gap-1.5 font-medium text-slate-300">
+            <MapPin className="w-3.5 h-3.5 text-[#CCFF00] shrink-0" /> Indiranagar, Bengaluru
           </span>
           <span className="hidden sm:flex items-center gap-1.5 text-slate-400">
-            <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Open 06:00 – 22:00 Daily
+            <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-pulse" />
+            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Open 06:00 – 22:00 Daily
           </span>
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden md:flex items-center gap-1.5 text-slate-400">
-            <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" /> +91 98765 43210
+            <Phone className="w-3.5 h-3.5 text-[#CCFF00] shrink-0" /> +91 98765 43210
           </span>
           {user ? (
             <Link
@@ -51,17 +53,17 @@ export const PublicLayout = () => {
                   ? '/staff/cafe/inventory'
                   : '/staff/bookings'
               }
-              className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 transition-colors"
+              className="text-[#CCFF00] font-bold hover:underline flex items-center gap-1.5 transition-colors"
             >
               <User className="w-3.5 h-3.5" /> Portal ({user.name?.split(' ')[0] || 'User'})
             </Link>
           ) : (
             <div className="flex items-center gap-3">
-              <Link to="/login" className="text-white hover:text-amber-300 font-semibold transition-colors">
+              <Link to="/login" className="text-slate-300 hover:text-white font-semibold transition-colors">
                 Sign In
               </Link>
               <span className="text-white/20 select-none">•</span>
-              <Link to="/register" className="text-amber-400 hover:text-amber-300 font-bold transition-colors">
+              <Link to="/register" className="text-[#CCFF00] hover:text-[#B4E600] font-bold transition-colors">
                 Join Club
               </Link>
             </div>
@@ -69,20 +71,20 @@ export const PublicLayout = () => {
         </div>
       </div>
 
-      {/* Main Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.06)]">
+      {/* Main Navigation Header (Reference Style: Dark + Neon Volt Pill CTA) */}
+      <header className="sticky top-0 z-40 bg-[#0B0D11]/90 backdrop-blur-md border-b border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1B4D2E] to-[#123821] flex items-center justify-center text-white shadow-md group-hover:shadow-[#1B4D2E]/25 transition-all duration-200 group-hover:scale-105 border border-[#143B23]/40">
-              <Trophy className="w-5 h-5 text-amber-400" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#12161D] to-[#1E2530] flex items-center justify-center text-white shadow-md border border-white/10 group-hover:border-[#CCFF00]/60 transition-all duration-200 group-hover:scale-105">
+              <Trophy className="w-5 h-5 text-[#CCFF00]" />
             </div>
             <div>
-              <span className="font-extrabold text-slate-950 tracking-tight text-lg sm:text-xl block leading-tight font-display">
-                THE CHAMPIONS CLUB
+              <span className="font-extrabold text-white tracking-tight text-lg sm:text-xl block leading-tight font-display">
+                THE CHAMPIONS CLUB<span className="text-[#CCFF00]">.</span>
               </span>
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">
-                Sports & Racquets Sanctuary
+                Next-Gen Sports Sanctuary
               </span>
             </div>
           </Link>
@@ -97,8 +99,8 @@ export const PublicLayout = () => {
                   to={item.path}
                   className={`px-3.5 py-2 rounded-xl transition-all duration-150 ${
                     active
-                      ? 'text-[#1B4D2E] bg-[#1B4D2E]/10 font-bold shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
+                      ? 'text-[#CCFF00] bg-white/10 font-bold shadow-2xs border border-white/10'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {item.label}
@@ -112,12 +114,12 @@ export const PublicLayout = () => {
             {/* Cart Trigger */}
             <button
               onClick={() => dispatch(toggleCartDrawer(true))}
-              className="relative p-2.5 rounded-xl border border-slate-200/90 hover:bg-slate-50 text-slate-700 transition-all duration-150 active:scale-95 cursor-pointer hover:border-slate-300 shadow-2xs"
+              className="relative p-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 transition-all duration-150 active:scale-95 cursor-pointer shadow-2xs"
               title="Open Pro Shop Bag"
             >
               <ShoppingBag className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C85A32] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#CCFF00] text-black text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                   {cartCount}
                 </span>
               )}
@@ -125,7 +127,7 @@ export const PublicLayout = () => {
 
             {user ? (
               <Button
-                variant="lawn"
+                variant="volt"
                 size="sm"
                 onClick={() =>
                   window.location.assign(
@@ -146,13 +148,13 @@ export const PublicLayout = () => {
             ) : (
               <div className="flex items-center gap-2">
                 <Link to="/login">
-                  <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                  <Button variant="dark" size="sm" className="hidden sm:inline-flex">
                     Sign In
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="clay" size="sm">
-                    Join Club
+                  <Button variant="volt" size="sm" className="rounded-full">
+                    Get Started
                   </Button>
                 </Link>
               </div>
@@ -168,6 +170,7 @@ export const PublicLayout = () => {
 
       {/* Global Presenter & Cart Overlays */}
       <CartDrawer />
+      <RoleSwitcher />
 
       {/* Footer */}
       <footer className="bg-[#070B12] text-white pt-16 pb-12 border-t border-white/10 relative overflow-hidden">

@@ -3,16 +3,15 @@ import barService from '@/service/barService'
 import { formatTime } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
-import Badge from '@/components/ui/Badge'
-import Card, { CardContent } from '@/components/ui/Card'
+import Card from '@/components/ui/Card'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { Utensils, RefreshCw, Clock, CheckCircle2, Flame, BellRing } from 'lucide-react'
+import { Clock, CheckCircle2 } from 'lucide-react'
 
 export const KitchenDisplay = () => {
   const toast = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
+  const [, setRefreshing] = useState(false)
   const [stationFilter, setStationFilter] = useState('')
 
   const fetchKitchenQueue = useCallback(async (isBg = false) => {
@@ -34,7 +33,7 @@ export const KitchenDisplay = () => {
 
   useEffect(() => {
     fetchKitchenQueue()
-    // 5-second live polling (Requirement D-F6)
+    // 5-second live polling
     const interval = setInterval(() => {
       fetchKitchenQueue(true)
     }, 5000)
@@ -57,21 +56,21 @@ export const KitchenDisplay = () => {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-              Café Kitchen & Barista Production
+            <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#CCFF00] text-black">
+              Production KDS
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live 5s Polling
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] text-[10px] font-black border border-[#CCFF00]/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" /> Live 5s Polling
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
-            Café Kitchen & Barista KDS
+          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mt-3">
+            Kitchen & Barista Display (KDS)
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Real-time ticket queue for chefs and baristas. Oldest tickets prioritized first.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Real-time ticket queue for chefs and baristas. Oldest orders prioritized first.
           </p>
         </div>
 
@@ -79,24 +78,30 @@ export const KitchenDisplay = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setStationFilter('')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              !stationFilter ? 'bg-slate-900 text-white' : 'bg-white border text-slate-700'
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+              !stationFilter
+                ? 'bg-[#CCFF00] text-black shadow-xs'
+                : 'bg-white/5 border border-white/10 text-slate-300 hover:text-white'
             }`}
           >
             All Stations ({items.length})
           </button>
           <button
             onClick={() => setStationFilter('kitchen')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              stationFilter === 'kitchen' ? 'bg-[#C85A32] text-white' : 'bg-white border text-slate-700'
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+              stationFilter === 'kitchen'
+                ? 'bg-[#CCFF00] text-black shadow-xs'
+                : 'bg-white/5 border border-white/10 text-slate-300 hover:text-white'
             }`}
           >
             Hot Kitchen Line
           </button>
           <button
             onClick={() => setStationFilter('bar')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              stationFilter === 'bar' ? 'bg-[#1B4D2E] text-white' : 'bg-white border text-slate-700'
+            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+              stationFilter === 'bar'
+                ? 'bg-[#CCFF00] text-black shadow-xs'
+                : 'bg-white/5 border border-white/10 text-slate-300 hover:text-white'
             }`}
           >
             Barista Coffee Bar
@@ -107,13 +112,13 @@ export const KitchenDisplay = () => {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-44 rounded-2xl" />
+            <Skeleton key={i} className="h-44 rounded-2xl bg-white/5" />
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <Card className="p-16 text-center border-slate-200">
-          <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-800 text-base">All orders have been prepared & served</h3>
+        <Card className="p-16 text-center border-white/10 bg-[#111418]">
+          <CheckCircle2 className="w-12 h-12 text-[#CCFF00] mx-auto mb-3" />
+          <h3 className="font-bold text-white text-base">All orders have been prepared & served</h3>
           <p className="text-xs text-slate-400 mt-1">New items sent from the POS table map will appear here live.</p>
         </Card>
       ) : (
@@ -126,21 +131,21 @@ export const KitchenDisplay = () => {
             return (
               <div
                 key={item.itemId || item.id}
-                className={`rounded-2xl border p-4 flex flex-col justify-between transition-all shadow-xs ${
+                className={`rounded-2xl border p-4 flex flex-col justify-between transition-all ${
                   isNew
-                    ? 'border-amber-400 bg-amber-50/40 ring-1 ring-amber-400/30'
+                    ? 'border-amber-400/80 bg-amber-500/10 ring-1 ring-amber-400/40 text-white'
                     : isPreparing
-                      ? 'border-blue-300 bg-blue-50/30'
-                      : 'border-emerald-300 bg-emerald-50/30'
+                      ? 'border-cyan-400/80 bg-cyan-500/10 text-white'
+                      : 'border-[#CCFF00] bg-[#CCFF00]/10 ring-1 ring-[#CCFF00]/40 text-white shadow-[0_0_20px_rgba(204,255,0,0.15)]'
                 }`}
               >
                 <div className="space-y-3">
                   {/* Ticket Header */}
-                  <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
-                    <span className="font-extrabold text-xs uppercase tracking-wider text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span className="font-mono font-black text-xs uppercase tracking-wider text-[#CCFF00] bg-black/60 px-2 py-0.5 rounded border border-white/10">
                       {item.tableLabel || 'Table'}
                     </span>
-                    <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1">
+                    <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {formatTime(item.placedAt || item.created_at)}
                     </span>
                   </div>
@@ -148,16 +153,16 @@ export const KitchenDisplay = () => {
                   {/* Item Description */}
                   <div>
                     <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-extrabold text-sm text-slate-900 leading-tight">
+                      <h4 className="font-extrabold text-sm text-white leading-tight">
                         {item.name || item.name_snapshot}
                       </h4>
-                      <span className="font-mono font-extrabold text-sm px-2 py-0.5 rounded bg-slate-900 text-white shrink-0">
+                      <span className="font-mono font-black text-sm px-2 py-0.5 rounded bg-[#CCFF00] text-black shrink-0">
                         ×{item.qty}
                       </span>
                     </div>
 
                     {item.notes && (
-                      <div className="mt-2 p-2 rounded-lg bg-white border border-amber-300/80 text-amber-900 text-[11px] font-semibold italic">
+                      <div className="mt-2 p-2 rounded-lg bg-black/40 border border-amber-400/40 text-amber-300 text-[11px] font-semibold italic">
                         &ldquo;{item.notes}&rdquo;
                       </div>
                     )}
@@ -165,33 +170,33 @@ export const KitchenDisplay = () => {
                 </div>
 
                 {/* Status Advancement Buttons */}
-                <div className="pt-4 mt-3 border-t border-slate-200/80 flex items-center gap-2">
+                <div className="pt-4 mt-3 border-t border-white/10 flex items-center gap-2">
                   {isNew && (
                     <Button
-                      variant="clay"
+                      variant="volt"
                       size="sm"
                       onClick={() => handleUpdateStatus(item.itemId || item.id, 'preparing')}
-                      className="w-full text-xs font-bold bg-amber-600 hover:bg-amber-700"
+                      className="w-full text-xs font-black"
                     >
                       Start Prep
                     </Button>
                   )}
                   {isPreparing && (
                     <Button
-                      variant="lawn"
+                      variant="volt"
                       size="sm"
                       onClick={() => handleUpdateStatus(item.itemId || item.id, 'ready')}
-                      className="w-full text-xs font-bold bg-blue-600 hover:bg-blue-700"
+                      className="w-full text-xs font-black"
                     >
                       Mark Ready
                     </Button>
                   )}
                   {isReady && (
                     <Button
-                      variant="lawn"
+                      variant="volt"
                       size="sm"
                       onClick={() => handleUpdateStatus(item.itemId || item.id, 'served')}
-                      className="w-full text-xs font-bold bg-emerald-700 hover:bg-emerald-800"
+                      className="w-full text-xs font-black"
                     >
                       Mark Served
                     </Button>

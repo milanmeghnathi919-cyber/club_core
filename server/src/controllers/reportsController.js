@@ -44,8 +44,8 @@ export const exportReport = asyncHandler(async (req, res) => {
 })
 
 export const emailReport = asyncHandler(async (req, res) => {
-  const { type, toEmail } = req.body
-  const { content, filename } = await reportsService.exportCsv(type || 'revenue')
+  const { type } = req.body
+  await reportsService.exportCsv(type || 'revenue')
   // nodemailer wrapper doesn't block
   return ok(res, { emailed: true })
 })

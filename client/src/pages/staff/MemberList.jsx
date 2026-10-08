@@ -5,13 +5,9 @@ import memberService from '@/service/memberService'
 import { formatDate } from '@/utils/format'
 import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
-import Select from '@/components/ui/Select'
-import Badge from '@/components/ui/Badge'
-import Card, { CardContent } from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { UserPlus, Search, Phone, Mail, ChevronRight, Users, ShieldCheck, Trash2, AlertTriangle } from 'lucide-react'
+import { UserPlus, Search, Phone, Mail, ChevronRight, Users, ShieldCheck, Trash2, AlertTriangle, Sparkles } from 'lucide-react'
 
 export const MemberList = () => {
   const toast = useToast()
@@ -53,7 +49,7 @@ export const MemberList = () => {
 
       const res = await memberService.getMembers(params)
       setMembers(res.items || [])
-    } catch (err) {
+    } catch {
       toast.error('Failed to load member records')
     } finally {
       setLoading(false)
@@ -67,21 +63,22 @@ export const MemberList = () => {
 
   return (
     <div className="space-y-6 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
-            Member Directory
+          <span className="text-xs font-black uppercase tracking-widest text-[#CCFF00] flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> Member Directory
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white mt-1">
             Club Members & Passes
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Search, recognize members, and review active memberships.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Search, recognize members, and review active memberships in real-time.
           </p>
         </div>
 
         <Link to="/staff/members/new">
-          <Button variant="lawn" size="sm" icon={UserPlus} className="font-bold">
+          <Button variant="volt" size="sm" icon={UserPlus} className="font-black uppercase text-xs">
             Register Member
           </Button>
         </Link>
@@ -90,118 +87,118 @@ export const MemberList = () => {
       {/* Filter Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1 min-w-[200px] max-w-sm relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, phone or code..."
-            className="w-full pl-9 pr-3 py-1.5 bg-white rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4D2E]/20 focus:border-[#1B4D2E]"
+            className="w-full pl-10 pr-3.5 py-2.5 bg-[#111418] rounded-xl border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#CCFF00]/60 focus:ring-1 focus:ring-[#CCFF00]/40 transition-colors"
           />
         </div>
 
-        <Select
+        <select
           value={planCode}
           onChange={(e) => setPlanCode(e.target.value)}
-          placeholder="All Plans"
-          className="text-xs py-1.5"
+          className="text-xs py-2.5 px-3.5 bg-[#111418] rounded-xl border border-white/10 text-white focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
         >
-          <option value="GOLD">Gold</option>
-          <option value="SILVER">Silver</option>
-          <option value="JUNIOR">Junior</option>
-        </Select>
+          <option value="" className="bg-[#111418] text-white">All Plans</option>
+          <option value="GOLD" className="bg-[#111418] text-white">Gold</option>
+          <option value="SILVER" className="bg-[#111418] text-white">Silver</option>
+          <option value="JUNIOR" className="bg-[#111418] text-white">Junior</option>
+        </select>
 
-        <Select
+        <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          placeholder="All Statuses"
-          className="text-xs py-1.5"
+          className="text-xs py-2.5 px-3.5 bg-[#111418] rounded-xl border border-white/10 text-white focus:outline-none focus:border-[#CCFF00]/60 transition-colors"
         >
-          <option value="active">Active</option>
-          <option value="expired">Expired</option>
-        </Select>
+          <option value="" className="bg-[#111418] text-white">All Statuses</option>
+          <option value="active" className="bg-[#111418] text-white">Active</option>
+          <option value="expired" className="bg-[#111418] text-white">Expired</option>
+        </select>
       </div>
 
       {/* Members Table */}
-      <Card className="border-slate-200 overflow-hidden">
+      <div className="rounded-3xl bg-[#111418] border border-white/10 overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-6 space-y-3">
             {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-14 rounded-lg" />
+              <div key={i} className="h-14 bg-white/5 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : members.length === 0 ? (
           <div className="p-16 text-center space-y-3">
-            <Users className="w-12 h-12 text-slate-300 mx-auto" />
-            <h4 className="font-bold text-slate-700">No member records match your query</h4>
+            <Users className="w-12 h-12 text-slate-600 mx-auto" />
+            <h4 className="font-black uppercase tracking-tight text-white">No member records match your query</h4>
             <p className="text-xs text-slate-400">Try adjusting your filters or register a new member.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-4">Member</th>
-                  <th className="py-3 px-4">Member Code</th>
-                  <th className="py-3 px-4">Phone / Contact</th>
-                  <th className="py-3 px-4">Active Plan</th>
-                  <th className="py-3 px-4">Expiry Date</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                <tr className="bg-white/5 border-b border-white/10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                  <th className="py-3.5 px-5">Member</th>
+                  <th className="py-3.5 px-5">Member Code</th>
+                  <th className="py-3.5 px-5">Phone / Contact</th>
+                  <th className="py-3.5 px-5">Active Plan</th>
+                  <th className="py-3.5 px-5">Expiry Date</th>
+                  <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-white/5 font-medium">
                 {members.map((m) => {
                   const plan = m.membership || m.currentMembership
 
                   return (
-                    <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-4">
+                    <tr key={m.id} className="hover:bg-white/5 transition-colors">
+                      <td className="py-3.5 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#1B4D2E]/10 text-[#1B4D2E] font-bold text-xs flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-[#CCFF00]/15 text-[#CCFF00] font-black text-xs flex items-center justify-center shrink-0 border border-[#CCFF00]/30">
                             {m.fullName?.charAt(0) || 'M'}
                           </div>
                           <div>
-                            <span className="font-bold text-slate-900 block">{m.fullName}</span>
+                            <span className="font-bold text-white block">{m.fullName}</span>
                             <span className="text-[11px] text-slate-400">{m.email || 'No email'}</span>
                           </div>
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 font-mono font-semibold text-slate-700">
+                      <td className="py-3.5 px-5 font-mono font-bold text-[#CCFF00]">
                         {m.memberCode}
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="py-3.5 px-5 text-slate-300">
                         {m.phone || '-'}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-5">
                         {plan ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                            <ShieldCheck className="w-3 h-3 text-amber-600" />
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#CCFF00]/15 text-[#CCFF00] border border-[#CCFF00]/30">
+                            <ShieldCheck className="w-3 h-3 text-[#CCFF00]" />
                             {plan.planName || plan.planCode}
                           </span>
                         ) : (
-                          <span className="text-slate-400">No active plan</span>
+                          <span className="text-slate-500 font-semibold">No active plan</span>
                         )}
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="py-3.5 px-5 text-slate-300">
                         {plan?.endDate ? formatDate(plan.endDate) : '-'}
                       </td>
 
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="py-3.5 px-5 text-right">
+                        <div className="flex items-center justify-end gap-2">
                           <Link to={`/staff/members/${m.id}`}>
-                            <Button variant="outline" size="sm" className="text-xs">
+                            <button className="px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-white/5 hover:bg-[#CCFF00] hover:text-black transition-colors flex items-center gap-1 border border-white/10 hover:border-[#CCFF00]">
                               Profile <ChevronRight className="w-3 h-3 ml-0.5" />
-                            </Button>
+                            </button>
                           </Link>
                           {isOwner && (
                             <button
                               type="button"
                               onClick={() => setMemberToDelete(m)}
-                              className="inline-flex items-center justify-center p-1.5 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/60 hover:border-rose-300 transition-colors cursor-pointer shadow-2xs"
+                              className="inline-flex items-center justify-center p-2 rounded-xl text-rose-400 hover:text-white hover:bg-rose-600/30 border border-rose-500/20 hover:border-rose-500/50 transition-colors cursor-pointer"
                               title={`Delete ${m.fullName}`}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -216,7 +213,7 @@ export const MemberList = () => {
             </table>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Delete Member Confirmation Modal */}
       <Modal
@@ -227,37 +224,37 @@ export const MemberList = () => {
       >
         {memberToDelete && (
           <div className="space-y-4 py-2">
-            <div className="flex items-start gap-3 p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs leading-relaxed">
-              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs leading-relaxed">
+              <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold block text-rose-900 mb-0.5">Permanent Deletion Warning</span>
-                Are you sure you want to delete member <strong className="font-semibold text-rose-950">{memberToDelete.fullName}</strong> ({memberToDelete.memberCode})?
+                <span className="font-black uppercase tracking-wider block text-rose-200 mb-0.5">Permanent Deletion Warning</span>
+                Are you sure you want to delete member <strong className="font-bold text-white">{memberToDelete.fullName}</strong> ({memberToDelete.memberCode})?
                 This will delete their membership profile, linked member account, and associated entitlements.
               </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs space-y-2">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-xs space-y-2.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">Member:</span>
-                <span className="font-bold text-slate-800">{memberToDelete.fullName}</span>
+                <span className="text-slate-400">Member:</span>
+                <span className="font-bold text-white">{memberToDelete.fullName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Member Code:</span>
-                <span className="font-mono font-bold text-slate-700">{memberToDelete.memberCode}</span>
+                <span className="text-slate-400">Member Code:</span>
+                <span className="font-mono font-bold text-[#CCFF00]">{memberToDelete.memberCode}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Phone:</span>
-                <span className="text-slate-700">{memberToDelete.phone || 'None'}</span>
+                <span className="text-slate-400">Phone:</span>
+                <span className="text-slate-200">{memberToDelete.phone || 'None'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Email:</span>
-                <span className="font-mono text-slate-700">{memberToDelete.email || 'None'}</span>
+                <span className="text-slate-400">Email:</span>
+                <span className="font-mono text-slate-200">{memberToDelete.email || 'None'}</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setMemberToDelete(null)}
                 disabled={deleting}
@@ -270,7 +267,7 @@ export const MemberList = () => {
                 icon={Trash2}
                 loading={deleting}
                 onClick={handleDeleteMember}
-                className="font-bold"
+                className="font-bold uppercase text-xs"
               >
                 Confirm & Delete Member
               </Button>

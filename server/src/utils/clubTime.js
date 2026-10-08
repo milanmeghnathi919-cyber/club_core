@@ -29,7 +29,6 @@ export const toClubDate = (date = new Date()) => {
  * Day ends at 23:59:59.999 IST -> same day 18:29:59.999 UTC.
  */
 export const localDayRange = (dateStr) => {
-  const [year, month, day] = dateStr.split('-').map(Number)
   const startLocal = `${dateStr}T00:00:00.000`
   const endLocal = `${dateStr}T23:59:59.999`
   

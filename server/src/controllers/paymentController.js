@@ -54,7 +54,6 @@ export const processDummyPayment = asyncHandler(async (req, res) => {
     method = 'card',
     simulatedStatus = 'success',
     memberId = null,
-    notes = null,
   } = req.body
 
   if (simulatedStatus === 'failed') {

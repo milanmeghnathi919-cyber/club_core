@@ -7,8 +7,8 @@ export const Card = ({ children, className, hover = false, ...props }) => {
     <div
       className={twMerge(
         clsx(
-          'bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] overflow-hidden transition-all duration-200',
-          hover && 'hover:shadow-[0_12px_28px_-8px_rgba(27,77,46,0.12)] hover:border-slate-300 hover:-translate-y-0.5',
+          'bg-[#111418] rounded-2xl border border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-200 text-white',
+          hover && 'hover:shadow-[0_12px_28px_-8px_rgba(204,255,0,0.15)] hover:border-[#CCFF00]/40 hover:-translate-y-0.5',
           className,
         ),
       )}
@@ -24,14 +24,14 @@ export const CardHeader = ({ children, className, title, subtitle, action }) => 
     <div
       className={twMerge(
         clsx(
-          'px-6 py-4.5 border-b border-slate-100 flex items-center justify-between gap-4 bg-slate-50/40',
+          'px-6 py-4.5 border-b border-white/10 flex items-center justify-between gap-4 bg-white/[0.02]',
           className,
         ),
       )}
     >
       <div>
-        {title && <h3 className="font-bold text-slate-900 text-base leading-snug font-display tracking-tight">{title}</h3>}
-        {subtitle && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{subtitle}</p>}
+        {title && <h3 className="font-bold text-white text-base leading-snug font-display tracking-tight">{title}</h3>}
+        {subtitle && <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{subtitle}</p>}
         {children}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -40,7 +40,7 @@ export const CardHeader = ({ children, className, title, subtitle, action }) => 
 }
 
 export const CardContent = ({ children, className }) => {
-  return <div className={twMerge(clsx('p-6 text-slate-700', className))}>{children}</div>
+  return <div className={twMerge(clsx('p-6 text-slate-300', className))}>{children}</div>
 }
 
 export const CardFooter = ({ children, className }) => {
@@ -48,7 +48,7 @@ export const CardFooter = ({ children, className }) => {
     <div
       className={twMerge(
         clsx(
-          'px-6 py-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between',
+          'px-6 py-4 bg-white/[0.02] border-t border-white/10 flex items-center justify-between',
           className,
         ),
       )}

@@ -371,7 +371,7 @@ export const bookingRepository = {
           total,
         }
       }
-    } catch (err) {
+    } catch {
       // In case of any DB error or disconnect, fall back to memoryStore
     }
 

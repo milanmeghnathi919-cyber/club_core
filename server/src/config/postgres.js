@@ -51,11 +51,46 @@ if (process.env.DATABASE_URL) {
   poolConfig.password = config.db.password
 }
 
-export const pool = new Pool(poolConfig)
+/**
+ * Hermetic test mode.
+ *
+ * Jest runs (NODE_ENV=test or JEST_WORKER_ID set) get a stub pool that rejects
+ * instantly instead of opening sockets. Repositories already treat a failed
+ * query as "fall back to the in-memory store", and the test seeds populate
+ * that store, so every integration suite runs against the exact fixture state
+ * its own beforeAll created — no leftover rows from earlier runs, no rows from
+ * an unrelated dev database, and no keep-alive sockets leaking past teardown.
+ *
+ * Set DB_IN_TESTS=true to run the same suites against a real Postgres instead.
+ */
+const hermeticTests =
+  process.env.DB_IN_TESTS !== 'true' &&
+  (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined)
 
-// A pool-level error (e.g. the network drops) must not crash the process.
-pool.on('error', (err) => {
-  console.error('[postgres] idle client error:', err.message)
-})
+const disabledPool = () => {
+  const reject = () => {
+    const err = new Error(
+      'Postgres disabled in hermetic test mode (set DB_IN_TESTS=true to use a real database)',
+    )
+    err.code = 'PG_DISABLED'
+    return Promise.reject(err)
+  }
+  return {
+    query: reject,
+    connect: reject,
+    end: () => Promise.resolve(),
+    on: () => {},
+  }
+}
+
+export const dbEnabled = !hermeticTests
+export const pool = hermeticTests ? disabledPool() : new Pool(poolConfig)
+
+if (dbEnabled) {
+  // A pool-level error (e.g. the network drops) must not crash the process.
+  pool.on('error', (err) => {
+    console.error('[postgres] idle client error:', err.message)
+  })
+}
 
 export default pool

@@ -1,7 +1,6 @@
 import app from '../src/app.js'
 import seedCore from '../src/db/seeds/seed.core.js'
 import seedCommerce from '../src/db/seeds/seed.commerce.js'
-import { toClubDate } from '../src/utils/clubTime.js'
 import { addDays, format } from 'date-fns'
 
 const runSmokeTests = async () => {
@@ -40,7 +39,6 @@ const runSmokeTests = async () => {
     }
   }
 
-  let cookie = null
   let token = null
   let courtId = null
   let bookingId = null
@@ -64,8 +62,6 @@ const runSmokeTests = async () => {
       }),
     })
     if (!res.ok) throw new Error(`Status ${res.status}`)
-    const setCookie = res.headers.get('set-cookie')
-    if (setCookie) cookie = setCookie
     const json = await res.json()
     if (!json.success || !json.data?.token) throw new Error('Missing login token')
     token = json.data.token

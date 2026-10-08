@@ -1,6 +1,5 @@
 import memberService from '../services/memberService.js'
 import membershipService from '../services/membershipService.js'
-import membershipRepository from '../repositories/membershipRepository.js'
 import memberRepository from '../repositories/memberRepository.js'
 import planRepository from '../repositories/planRepository.js'
 import { createOrder, isRazorpayEnabled } from '../utils/razorpay.js'

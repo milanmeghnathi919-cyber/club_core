@@ -1,7 +1,6 @@
 import request from 'supertest'
 import app from '../../src/app.js'
 import seedCore from '../../src/db/seeds/seed.core.js'
-import { toClubDate } from '../../src/utils/clubTime.js'
 import { addDays, format } from 'date-fns'
 
 describe('Bookings Integration Tests (BE1-08)', () => {

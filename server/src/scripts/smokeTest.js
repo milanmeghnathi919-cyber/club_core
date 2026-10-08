@@ -61,7 +61,6 @@ async function main() {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
-    const loginBody = await loginRes.json()
     check(loginRes.status === 200, 'POST /api/auth/login', `HTTP ${loginRes.status}`)
 
     const setCookie = loginRes.headers.get('set-cookie') ?? ''

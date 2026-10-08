@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs'
 import memoryStore from '../../utils/memoryStore.js'
-import { toClubDate } from '../../utils/clubTime.js'
+import { query } from '../../utils/db.js'
+import { dbEnabled } from '../../config/postgres.js'
 import { addDays, format, subDays } from 'date-fns'
 
 export const seedCore = async () => {
   console.log('--- SEEDING CORE DATA ---')
-  const today = toClubDate()
   const nowIso = new Date().toISOString()
 
   // 1. Settings
@@ -54,7 +54,7 @@ export const seedCore = async () => {
       bar_discount_pct: 15,
       duration_days: 365,
       max_bookings_per_day: 4,
-      price: 15000,
+      price: 59999,
       is_active: true,
       created_at: nowIso,
     },
@@ -67,7 +67,7 @@ export const seedCore = async () => {
       bar_discount_pct: 10,
       duration_days: 365,
       max_bookings_per_day: 2,
-      price: 8000,
+      price: 29999,
       is_active: true,
       created_at: nowIso,
     },
@@ -80,7 +80,7 @@ export const seedCore = async () => {
       bar_discount_pct: 10,
       duration_days: 365,
       max_bookings_per_day: 2,
-      price: 5000,
+      price: 14999,
       is_active: true,
       created_at: nowIso,
     },
@@ -140,7 +140,7 @@ export const seedCore = async () => {
       sport: 'cricket',
       hourly_rate: 1500,
       is_active: true,
-      image_url: 'https://images.unsplash.com/photo-1531415074868-036b107e775a',
+      image_url: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=1200&q=80',
       created_at: nowIso,
     },
   ]
@@ -343,6 +343,61 @@ export const seedCore = async () => {
         payment_id: null,
         created_at: nowIso,
       })
+    }
+  }
+
+  // Sync the four demo accounts into Postgres when a real database is
+  // configured. Repositories prefer the database over the memory store, so
+  // without this `npm run seed` would leave demo logins broken against a real
+  // Postgres (the documented passwords would not match the stored hashes).
+  // Idempotent: keyed on the unique email, updates the stored credentials.
+  if (dbEnabled) {
+    try {
+      for (const u of users) {
+        await query(
+          `insert into public.users (email, name, phone, role, password_hash, is_active)
+           values ($1, $2, $3, $4, $5, $6)
+           on conflict (email) do update
+             set password_hash = excluded.password_hash,
+                 name          = excluded.name,
+                 phone         = excluded.phone,
+                 role          = excluded.role,
+                 is_active     = true`,
+          [u.email, u.name, u.phone, u.role, u.password_hash, u.is_active],
+        )
+      }
+      console.log(`- Demo accounts synced to Postgres: ${users.length}`)
+
+      // Sync the 3 core plans with realistic pricing to Postgres
+      await query(
+        `update public.plans 
+         set price = 59999, 
+             is_active = true,
+             description = 'The ultimate VIP all-access pass with 100% complimentary courts, 14-day priority window, and luxury clubhouse perks.'
+         where id = '023455d2-5e85-454b-83b2-afd73a874032' or lower(code) = 'gold'`
+      )
+      await query(
+        `update public.plans 
+         set price = 29999, 
+             is_active = true,
+             description = 'The active competitive athlete tier with 30% court discounts, priority bookings, and clubhouse privileges.'
+         where id = '82e0670b-ddbc-452b-8563-3f2a284294f5' or lower(code) = 'silver'`
+      )
+      await query(
+        `update public.plans 
+         set price = 14999, 
+             is_active = true,
+             description = 'For aspiring young athletes under 18 years. Includes 50% court discount, coaching priority & pro gear savings.'
+         where id = '31a48dbd-fb3a-4316-9d86-005ca87b9e0e' or lower(code) = 'junior'`
+      )
+      await query(
+        `update public.plans 
+         set is_active = false 
+         where id not in ('023455d2-5e85-454b-83b2-afd73a874032', '82e0670b-ddbc-452b-8563-3f2a284294f5', '31a48dbd-fb3a-4316-9d86-005ca87b9e0e')`
+      )
+      console.log(`- Core membership plan pricing synced to Postgres: ₹59,999 (Gold), ₹29,999 (Silver), ₹14,999 (Junior)`)
+    } catch (err) {
+      console.warn(`- Demo account / plan sync skipped: ${err.message}`)
     }
   }
 

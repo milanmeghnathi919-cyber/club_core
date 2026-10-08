@@ -7,7 +7,7 @@ import useToast from '@/components/ui/Toast'
 import courtService from '@/service/courtService'
 import authService from '@/service/authService'
 import { formatCurrency, formatTime, formatDate } from '@/utils/format'
-import { Calendar, Trophy, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react'
+import { Calendar, CheckCircle2 } from 'lucide-react'
 
 const SPORTS = [
   { label: 'All Sports', value: '' },
@@ -64,6 +64,7 @@ export const MemberBook = () => {
         toast.error('Daily booking limit reached for today (max active bookings reached).')
       } else if (err.code === 'SLOT_TAKEN') {
         toast.error('This slot was just booked by another player. Schedule updated.')
+        setRefreshKey((k) => k + 1)
       } else {
         toast.error(err.message || 'Failed to book slot')
       }
@@ -81,15 +82,15 @@ export const MemberBook = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Title & Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
+          <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#CCFF00] text-black">
             Court Reservations
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mt-3">
             Book Championship Court
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
             {hasActiveMembership
               ? `${membership?.plan_name || 'Member'}: ${courtDiscountPct}% complimentary access applied automatically across all courts.`
               : 'Standard Club Guest: Standard hourly rates apply. Upgrade to a Membership Plan for complimentary court sessions.'}
@@ -98,26 +99,26 @@ export const MemberBook = () => {
 
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-300 text-xs shadow-2xs">
-            <Calendar className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 bg-[#111418] px-3 py-1.5 rounded-xl border border-white/10 text-xs shadow-2xs">
+            <Calendar className="w-4 h-4 text-[#CCFF00]" />
             <input
               type="date"
               value={selectedDate}
               min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="font-bold text-slate-800 focus:outline-none"
+              className="font-bold text-white bg-transparent focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-1 bg-[#111418] p-1 rounded-xl border border-white/10">
             {SPORTS.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setSport(s.value)}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   sport === s.value
-                    ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#CCFF00] text-black shadow-xs font-black'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {s.label}
@@ -127,22 +128,22 @@ export const MemberBook = () => {
         </div>
       </div>
 
-      {/* Success Modal if just booked */}
+      {/* Success Banner if just booked */}
       {bookingSuccess && (
-        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in">
+        <div className="p-5 rounded-2xl bg-[#111418] border border-[#CCFF00] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_0_25px_rgba(204,255,0,0.15)] animate-in fade-in">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-8 h-8 text-[#CCFF00] shrink-0" />
             <div>
-              <h4 className="font-bold text-base">Booking Confirmed!</h4>
-              <p className="text-xs text-emerald-800 mt-0.5">
+              <h4 className="font-extrabold text-base text-white">Booking Confirmed!</h4>
+              <p className="text-xs text-slate-300 mt-0.5">
                 Booking Reference:{' '}
-                <strong className="font-mono">{bookingSuccess.bookingNo || bookingSuccess.booking_no || 'CONFIRMED'}</strong> •{' '}
+                <strong className="font-mono text-[#CCFF00]">{bookingSuccess.bookingNo || bookingSuccess.booking_no || 'CONFIRMED'}</strong> •{' '}
                 {bookingSuccess.court?.name || bookingSuccess.court_name || 'Court'} at {formatTime(bookingSuccess.startAt || bookingSuccess.start_at)}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button variant="lawn" size="sm" onClick={() => navigate('/app/bookings')}>
+            <Button variant="volt" size="sm" onClick={() => navigate('/app/bookings')}>
               View My Bookings
             </Button>
             <Button variant="outline" size="sm" onClick={() => setBookingSuccess(null)}>
@@ -178,67 +179,67 @@ export const MemberBook = () => {
               Cancel
             </Button>
             <Button
-              variant="lawn"
+              variant="volt"
               size="md"
               loading={loading}
               onClick={handleConfirmBooking}
-              className="font-bold"
+              className="font-black"
             >
               {payableAmount === 0 ? 'Confirm Reservation (Free)' : `Confirm Reservation (${formatCurrency(payableAmount)})`}
             </Button>
           </div>
         }
       >
-        <div className="space-y-4 py-2">
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+        <div className="space-y-4 py-2 font-sans">
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-3 text-xs">
             <div className="flex justify-between">
-              <span className="text-slate-500">Court Arena:</span>
-              <strong className="text-slate-900 font-bold">
+              <span className="text-slate-400">Court Arena:</span>
+              <strong className="text-white font-bold">
                 {selectedSlotInfo?.court?.courtName || selectedSlotInfo?.court?.name}
               </strong>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Time Slot:</span>
-              <strong className="text-slate-900 font-bold tabular-nums">
+              <span className="text-slate-400">Time Slot:</span>
+              <strong className="text-[#CCFF00] font-mono font-bold tabular-nums">
                 {formatTime(selectedSlotInfo?.slot?.startAt)} – {formatTime(selectedSlotInfo?.slot?.endAt)} (60 min)
               </strong>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Standard Walk-In Rate:</span>
-              <span className={`tabular-nums ${courtDiscountPct > 0 ? 'text-slate-400 line-through' : 'text-slate-900 font-semibold'}`}>
+              <span className="text-slate-400">Standard Walk-In Rate:</span>
+              <span className={`tabular-nums font-mono ${courtDiscountPct > 0 ? 'text-slate-500 line-through' : 'text-white font-semibold'}`}>
                 {formatCurrency(ratePerHour)}
               </span>
             </div>
             {courtDiscountPct > 0 ? (
-              <div className="flex justify-between text-emerald-700 font-semibold border-t border-slate-200 pt-2">
+              <div className="flex justify-between text-[#CCFF00] font-semibold border-t border-white/10 pt-2">
                 <span>Member {membership?.plan_name || 'Gold'} Discount:</span>
-                <span>{courtDiscountPct}% Off (-{formatCurrency(discountAmount)})</span>
+                <span className="font-mono">{courtDiscountPct}% Off (-{formatCurrency(discountAmount)})</span>
               </div>
             ) : (
-              <div className="flex justify-between text-slate-500 font-medium border-t border-slate-200 pt-2">
+              <div className="flex justify-between text-slate-400 font-medium border-t border-white/10 pt-2">
                 <span>Member Plan Discount:</span>
                 <span>₹0.00 (Standard Guest)</span>
               </div>
             )}
-            <div className="flex justify-between text-base font-extrabold text-slate-900 border-t border-slate-200 pt-2">
+            <div className="flex justify-between text-base font-extrabold text-white border-t border-white/10 pt-2">
               <span>Payable Amount:</span>
-              <span className={payableAmount === 0 ? 'text-emerald-700 tabular-nums' : 'text-slate-900 tabular-nums'}>
-                {payableAmount === 0 ? '₹0.00 (Waived)' : formatCurrency(payableAmount)}
+              <span className="text-[#CCFF00] font-mono font-black tabular-nums">
+                {payableAmount === 0 ? '₹0.00 (Complimentary)' : formatCurrency(payableAmount)}
               </span>
             </div>
           </div>
 
           {!hasActiveMembership && (
-            <div className="p-3 rounded-lg bg-emerald-50/80 border border-emerald-200 text-emerald-900 text-[11px] flex items-center justify-between gap-2">
-              <span>Want free court access? Subscribe to a membership tier.</span>
-              <Link to="/plans" className="font-bold underline text-[#1B4D2E] shrink-0">
+            <div className="p-3 rounded-lg bg-[#111418] border border-[#CCFF00]/30 text-white text-[11px] flex items-center justify-between gap-2">
+              <span className="text-slate-300">Want free court access? Subscribe to a membership tier.</span>
+              <Link to="/plans" className="font-bold underline text-[#CCFF00] shrink-0">
                 View Plans
               </Link>
             </div>
           )}
 
-          <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px] leading-relaxed">
-            <strong>Cancellation Policy:</strong> You may cancel up to 2 hours before the start time without penalty.
+          <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-slate-400 text-[11px] leading-relaxed">
+            <strong className="text-white">Cancellation Policy:</strong> You may cancel up to 2 hours before the start time without penalty.
           </div>
         </div>
       </Modal>

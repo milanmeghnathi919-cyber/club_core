@@ -30,6 +30,9 @@ export const Button = React.forwardRef(
     const variantClasses = {
       lawn: 'bg-[#1B4D2E] hover:bg-[#143B23] text-white shadow-xs hover:shadow-md hover:shadow-[#1B4D2E]/20 focus:ring-[#1B4D2E] border border-[#143B23]/40',
       clay: 'bg-[#C85A32] hover:bg-[#B54D27] text-white shadow-xs hover:shadow-md hover:shadow-[#C85A32]/20 focus:ring-[#C85A32] border border-[#B54D27]/40',
+      gold: 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold shadow-xs hover:shadow-md hover:shadow-amber-500/25 focus:ring-amber-500 border border-amber-600/40',
+      volt: 'bg-[#CCFF00] hover:bg-[#B4E600] text-black font-extrabold shadow-md shadow-[#CCFF00]/25 hover:shadow-lg hover:shadow-[#CCFF00]/40 focus:ring-[#CCFF00] border border-[#CCFF00]/60 hover:scale-[1.02]',
+      dark: 'bg-[#161B22] hover:bg-[#21262D] text-white border border-white/10 hover:border-white/20 shadow-xs focus:ring-slate-500',
       secondary: 'bg-slate-100 hover:bg-slate-200/90 text-slate-800 focus:ring-slate-400 border border-slate-200/80',
       outline: 'border border-slate-300/90 hover:bg-slate-50 text-slate-700 hover:text-slate-900 focus:ring-[#1B4D2E] hover:border-slate-400',
       ghost: 'hover:bg-slate-100 text-slate-700 hover:text-slate-900 focus:ring-slate-300',

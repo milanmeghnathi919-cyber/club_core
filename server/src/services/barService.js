@@ -41,16 +41,12 @@ export const barService = {
     if (!tab) return null
 
     let subtotal = 0
-    let totalTax = 0
 
     const activeItems = (tab.items || []).filter((i) => i.kitchen_status !== 'cancelled')
     for (const item of activeItems) {
       const lineTotal = round2(Number(item.unit_price) * Number(item.qty))
-      const taxRate = Number(item.tax_rate_pct || 18)
-      const lineTax = calcInclusiveTax(lineTotal, taxRate)
 
       subtotal += lineTotal
-      totalTax += lineTax
     }
 
     subtotal = round2(subtotal)
@@ -147,7 +143,7 @@ export const barService = {
     return this.recalculateTab(tabId)
   },
 
-  async cancelItem(tabId, itemId, actorId) {
+  async cancelItem(tabId, itemId, _actorId) {
     const tab = await barRepository.findTabById(tabId)
     if (!tab || tab.status !== 'open') throw new ApiError(409, 'Tab is closed', null, 'TAB_CLOSED')
 
@@ -224,7 +220,7 @@ export const barService = {
     return { ...tab, ...updated }
   },
 
-  async voidTab(tabId, { reason, actorId }) {
+  async voidTab(tabId, { reason, actorId: _actorId }) {
     if (!reason) throw new ApiError(422, 'Void reason is required', null, 'VALIDATION_ERROR')
     const tab = await barRepository.findTabById(tabId)
     if (!tab) throw new ApiError(404, 'Tab not found', null, 'NOT_FOUND')
@@ -341,7 +337,7 @@ export const barService = {
           payments: [{ method: paymentMethod, amount: updatedTab.total }],
           actorId: userId,
         })
-      } catch (err) {}
+      } catch {}
     }
 
     return this.getTab(tab.id)

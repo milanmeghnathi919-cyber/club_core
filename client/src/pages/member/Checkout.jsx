@@ -8,7 +8,9 @@ import useToast from '@/components/ui/Toast'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card, { CardContent, CardHeader } from '@/components/ui/Card'
-import { ShoppingBag, Store, Truck, CheckCircle2, ArrowRight, ShieldCheck, CreditCard, AlertCircle } from 'lucide-react'
+import { Store, Truck, CheckCircle2, ShieldCheck, CreditCard, AlertCircle, Download } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import FakePaymentModal from '@/components/common/FakePaymentModal'
 
 export const Checkout = () => {
@@ -43,7 +45,7 @@ export const Checkout = () => {
           fulfilment,
         })
         setQuote(data)
-      } catch (err) {
+      } catch {
         toast.error('Failed to calculate server order quote')
       } finally {
         setLoadingQuote(false)
@@ -94,49 +96,91 @@ export const Checkout = () => {
     }
   }
 
+  const handleDownloadReceiptPdf = (ord) => {
+    if (!ord) return
+    try {
+      const doc = new jsPDF()
+      doc.setFontSize(18)
+      doc.text('THE CHAMPIONS CLUB', 105, 18, { align: 'center' })
+      doc.setFontSize(10)
+      doc.text('Official Pro Shop Equipment Receipt', 105, 24, { align: 'center' })
+      doc.text(`Order No: ${ord.orderNo || ord.order_no || 'ORD'}`, 14, 34)
+      doc.text(`Fulfilment: ${ord.fulfilment === 'delivery' ? 'Home Delivery' : 'Club Reception Pickup'}`, 14, 40)
+      doc.text(`Payment Status: ${(ord.paymentStatus || ord.payment_status || 'Pending').toUpperCase()}`, 14, 46)
+
+      const rows = (ord.items || items || []).map((i) => [
+        i.name || i.productName || 'Pro Item',
+        i.qty || 1,
+        formatCurrency(i.price || i.unitPrice || 0),
+        formatCurrency((i.price || i.unitPrice || 0) * (i.qty || 1)),
+      ])
+
+      autoTable(doc, {
+        startY: 54,
+        head: [['Item Description', 'Qty', 'Unit Rate', 'Line Total']],
+        body: rows.length > 0 ? rows : [['Pro Shop Equipment Item', '1', formatCurrency(ord.total), formatCurrency(ord.total)]],
+        theme: 'grid',
+      })
+
+      const finalY = (doc.lastAutoTable?.finalY ?? 54) + 10
+      doc.text(`Subtotal: ${formatCurrency(ord.subtotal || ord.total)}`, 140, finalY)
+      if (Number(ord.discount) > 0) {
+        doc.text(`Member Discount: -${formatCurrency(ord.discount)}`, 140, finalY + 6)
+      }
+      doc.setFontSize(12)
+      doc.text(`TOTAL: ${formatCurrency(ord.total)}`, 140, finalY + 14)
+
+      doc.save(`Receipt-${ord.orderNo || ord.order_no || 'Order'}.pdf`)
+      toast.success('Order Receipt PDF downloaded')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to generate Receipt PDF')
+    }
+  }
+
   if (orderSuccess) {
     const isPaid =
       orderSuccess.paymentStatus === 'paid' || orderSuccess.payment_status === 'paid'
 
     return (
       <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-6 font-sans">
-        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+        <div className="w-16 h-16 rounded-full bg-[#CCFF00]/10 text-[#CCFF00] border border-[#CCFF00]/30 flex items-center justify-center mx-auto shadow-md">
           <CheckCircle2 className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight">
             {isPaid ? 'Order Confirmed & Paid!' : 'Order Confirmed!'}
           </h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <p className="text-sm text-slate-400 leading-relaxed">
             Your Pro Shop order has been placed. You can view your receipt and status in your past orders history.
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-left space-y-2 text-xs">
+        <div className="p-5 rounded-2xl bg-[#111418] border border-white/10 text-left space-y-2 text-xs">
           <div className="flex justify-between">
-            <span className="text-slate-500">Order Number:</span>
-            <strong className="font-mono text-slate-900 text-sm">
+            <span className="text-slate-400">Order Number:</span>
+            <strong className="font-mono text-white text-sm">
               {orderSuccess.orderNo || orderSuccess.order_no}
             </strong>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">Fulfilment:</span>
-            <strong className="capitalize text-slate-900">{orderSuccess.fulfilment}</strong>
+            <span className="text-slate-400">Fulfilment:</span>
+            <strong className="capitalize text-white">{orderSuccess.fulfilment}</strong>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">Order Total:</span>
-            <strong className="text-[#1B4D2E] text-sm tabular-nums">
+            <span className="text-slate-400">Order Total:</span>
+            <strong className="text-[#CCFF00] text-sm tabular-nums font-mono font-black">
               {formatCurrency(orderSuccess.total)}
             </strong>
           </div>
-          <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
-            <span className="text-slate-500">Payment Status:</span>
+          <div className="flex justify-between items-center pt-1 border-t border-white/10">
+            <span className="text-slate-400">Payment Status:</span>
             <div className="flex items-center gap-2">
               <span
-                className={`font-semibold capitalize px-2 py-0.5 rounded-full text-[11px] ${
+                className={`font-bold capitalize px-2.5 py-0.5 rounded-full text-[11px] ${
                   isPaid
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                    : 'bg-amber-100 text-amber-800 border border-amber-200'
+                    ? 'bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30'
+                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                 }`}
               >
                 {isPaid ? 'Paid' : 'Pending'}
@@ -144,7 +188,7 @@ export const Checkout = () => {
               {!isPaid && (
                 <Button
                   size="xs"
-                  variant="lawn"
+                  variant="volt"
                   className="font-bold cursor-pointer"
                   onClick={() => {
                     setPendingPaymentOrder(orderSuccess)
@@ -159,14 +203,18 @@ export const Checkout = () => {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button
+            variant="volt"
+            className="font-black gap-2"
+            onClick={() => handleDownloadReceiptPdf(orderSuccess)}
+          >
+            <Download className="w-4 h-4" /> Download Receipt (PDF)
+          </Button>
           <Link to="/shop?tab=orders">
-            <Button variant="lawn" className="font-bold">View in Past Orders</Button>
+            <Button variant="outline" className="font-bold">Past Orders</Button>
           </Link>
           <Link to="/shop">
-            <Button variant="outline">Continue Shopping</Button>
-          </Link>
-          <Link to="/app">
-            <Button variant="ghost">Dashboard</Button>
+            <Button variant="ghost">Continue Shopping</Button>
           </Link>
         </div>
 
@@ -180,7 +228,7 @@ export const Checkout = () => {
             sourceType="shop_order"
             sourceId={pendingPaymentOrder.id}
             customerName={user?.name || user?.full_name || 'Valued Member'}
-            onSuccess={(result) => {
+            onSuccess={() => {
               setOrderSuccess((prev) => ({
                 ...(prev || pendingPaymentOrder),
                 paymentStatus: 'paid',
@@ -196,11 +244,11 @@ export const Checkout = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 font-sans">
-      <div className="border-b border-slate-200 pb-5">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#1B4D2E]">
+      <div className="border-b border-white/10 pb-5">
+        <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#CCFF00] text-black">
           Secure Checkout
         </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mt-3">
           Review & Place Order
         </h1>
       </div>
@@ -209,7 +257,7 @@ export const Checkout = () => {
         {/* Left Form: Fulfilment & Payment */}
         <div className="md:col-span-2 space-y-6">
           {/* Fulfilment Toggle */}
-          <Card className="border-slate-200">
+          <Card className="border-white/10 bg-[#111418]">
             <CardHeader title="1. Fulfilment Options" subtitle="Choose how to receive your items" />
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -218,15 +266,15 @@ export const Checkout = () => {
                   onClick={() => dispatch(setFulfilment('pickup'))}
                   className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-2 ${
                     fulfilment === 'pickup'
-                      ? 'border-[#1B4D2E] bg-emerald-50/60 ring-1 ring-[#1B4D2E]'
-                      : 'border-slate-200 hover:bg-slate-50'
+                      ? 'border-[#CCFF00] bg-[#CCFF00]/10 ring-1 ring-[#CCFF00]'
+                      : 'border-white/10 hover:border-white/20 bg-white/5'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Store className="w-4 h-4 text-[#1B4D2E]" />
-                    <span className="font-bold text-xs text-slate-900">Club Reception Pickup</span>
+                    <Store className={`w-4 h-4 ${fulfilment === 'pickup' ? 'text-[#CCFF00]' : 'text-slate-400'}`} />
+                    <span className="font-bold text-xs text-white">Club Reception Pickup</span>
                   </div>
-                  <span className="text-[11px] text-slate-500">Free • Ready in 15 mins</span>
+                  <span className="text-[11px] text-slate-400">Free • Ready in 15 mins</span>
                 </button>
 
                 <button
@@ -234,15 +282,15 @@ export const Checkout = () => {
                   onClick={() => dispatch(setFulfilment('delivery'))}
                   className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-2 ${
                     fulfilment === 'delivery'
-                      ? 'border-[#1B4D2E] bg-emerald-50/60 ring-1 ring-[#1B4D2E]'
-                      : 'border-slate-200 hover:bg-slate-50'
+                      ? 'border-[#CCFF00] bg-[#CCFF00]/10 ring-1 ring-[#CCFF00]'
+                      : 'border-white/10 hover:border-white/20 bg-white/5'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-[#1B4D2E]" />
-                    <span className="font-bold text-xs text-slate-900">Home Delivery</span>
+                    <Truck className={`w-4 h-4 ${fulfilment === 'delivery' ? 'text-[#CCFF00]' : 'text-slate-400'}`} />
+                    <span className="font-bold text-xs text-white">Home Delivery</span>
                   </div>
-                  <span className="text-[11px] text-slate-500">₹50.00 standard delivery</span>
+                  <span className="text-[11px] text-slate-400">₹50.00 standard delivery</span>
                 </button>
               </div>
 
@@ -261,10 +309,10 @@ export const Checkout = () => {
           </Card>
 
           {/* Payment Method */}
-          <Card className="border-slate-200">
+          <Card className="border-white/10 bg-[#111418]">
             <CardHeader title="2. Payment Preference" subtitle="Choose your preferred payment method" />
             <CardContent className="space-y-3">
-              <label className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
@@ -272,19 +320,19 @@ export const Checkout = () => {
                     value="pay_at_club"
                     checked={paymentMethod === 'pay_at_club'}
                     onChange={() => setPaymentMethod('pay_at_club')}
-                    className="text-[#1B4D2E] focus:ring-[#1B4D2E]"
+                    className="accent-[#CCFF00]"
                   />
                   <div>
-                    <span className="font-bold text-xs text-slate-900 block">
+                    <span className="font-bold text-xs text-white block">
                       Pay at Club Reception / On Delivery
                     </span>
-                    <span className="text-[11px] text-slate-500">Cash, Card, or UPI on pickup</span>
+                    <span className="text-[11px] text-slate-400">Cash, Card, or UPI on pickup</span>
                   </div>
                 </div>
                 <CreditCard className="w-4 h-4 text-slate-400" />
               </label>
 
-              <label className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
@@ -292,16 +340,16 @@ export const Checkout = () => {
                     value="online"
                     checked={paymentMethod === 'online'}
                     onChange={() => setPaymentMethod('online')}
-                    className="text-[#1B4D2E] focus:ring-[#1B4D2E]"
+                    className="accent-[#CCFF00]"
                   />
                   <div>
-                    <span className="font-bold text-xs text-slate-900 block">
+                    <span className="font-bold text-xs text-white block">
                       Pay Online (Dummy Simulation Gateway)
                     </span>
-                    <span className="text-[11px] text-slate-500">Instant Card, UPI / QR, NetBanking simulation</span>
+                    <span className="text-[11px] text-slate-400">Instant Card, UPI / QR, NetBanking simulation</span>
                   </div>
                 </div>
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <ShieldCheck className="w-4 h-4 text-[#CCFF00]" />
               </label>
             </CardContent>
           </Card>
@@ -309,27 +357,27 @@ export const Checkout = () => {
 
         {/* Right Side: Order Summary */}
         <div>
-          <Card className="border-slate-200 sticky top-20">
+          <Card className="border-white/10 bg-[#111418] sticky top-20">
             <CardHeader title="Order Summary" subtitle={`${items.length} unique items in bag`} />
             <CardContent className="space-y-4">
-              <div className="divide-y divide-slate-100 max-h-56 overflow-y-auto pr-1">
+              <div className="divide-y divide-white/5 max-h-56 overflow-y-auto pr-1">
                 {items.map((i) => {
                   const line = quote?.lines?.find((l) => l.productId === i.productId)
                   const isOut = line?.isOutOfStock || line?.exceedsStock
                   return (
                     <div key={i.productId} className="py-2.5 flex items-center justify-between text-xs">
                       <div className="min-w-0 pr-2">
-                        <p className="font-bold text-slate-800 truncate">{i.name}</p>
+                        <p className="font-bold text-white truncate">{i.name}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-slate-400">Qty: {i.qty}</span>
                           {isOut && (
-                            <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-1.5 py-0.2 rounded border border-rose-300">
+                            <span className="text-[10px] font-bold text-rose-300 bg-rose-500/20 px-1.5 py-0.2 rounded border border-rose-500/40">
                               Out of stock (Max: {line?.stockQty ?? 0})
                             </span>
                           )}
                         </div>
                       </div>
-                      <span className="font-bold text-slate-900 tabular-nums">
+                      <span className="font-mono font-bold text-[#CCFF00] tabular-nums">
                         {formatCurrency(i.price * i.qty)}
                       </span>
                     </div>
@@ -338,56 +386,54 @@ export const Checkout = () => {
               </div>
 
               {hasOutOfStock && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Items exceed available inventory</p>
-                    <p className="text-[11px] text-rose-700 mt-0.5">
+                    <p className="text-[11px] text-rose-300 mt-0.5">
                       Please adjust your cart before placing this order.
                     </p>
-                    <Link to="/shop" className="text-[11px] font-bold text-rose-900 underline mt-1 block">
+                    <Link to="/shop" className="text-[11px] font-bold text-[#CCFF00] underline mt-1 block">
                       ← Return to Pro Shop
                     </Link>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-1.5 text-xs pt-3 border-t border-slate-200">
-                <div className="flex justify-between text-slate-500">
+              <div className="space-y-1.5 text-xs pt-3 border-t border-white/10">
+                <div className="flex justify-between text-slate-400">
                   <span>Subtotal</span>
-                  <span className="tabular-nums font-medium text-slate-800">
+                  <span className="tabular-nums font-mono font-medium text-white">
                     {formatCurrency(quote?.subtotal || 0)}
                   </span>
                 </div>
                 {quote?.discount > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-semibold">
+                  <div className="flex justify-between text-[#CCFF00] font-semibold">
                     <span>Member Discount ({quote.discountPct}%)</span>
-                    <span className="tabular-nums">-{formatCurrency(quote.discount)}</span>
+                    <span className="tabular-nums font-mono">-{formatCurrency(quote.discount)}</span>
                   </div>
                 )}
                 {fulfilment === 'delivery' && (
-                  <div className="flex justify-between text-slate-500">
+                  <div className="flex justify-between text-slate-400">
                     <span>Delivery Fee</span>
-                    <span className="tabular-nums">{formatCurrency(quote?.deliveryFee || 50)}</span>
+                    <span className="tabular-nums font-mono">{formatCurrency(quote?.deliveryFee || 50)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+                <div className="flex justify-between text-base font-extrabold text-white pt-2 border-t border-white/10">
                   <span>Total Amount</span>
-                  <span className="text-[#1B4D2E] tabular-nums">
+                  <span className="text-[#CCFF00] font-mono tabular-nums font-black">
                     {formatCurrency(quote?.total || 0)}
                   </span>
                 </div>
               </div>
 
               <Button
-                variant="lawn"
+                variant="volt"
                 size="lg"
                 loading={submitting}
                 disabled={loadingQuote || hasOutOfStock}
                 onClick={handlePlaceOrder}
-                className={`w-full font-bold shadow-md ${
-                  hasOutOfStock ? 'opacity-60 cursor-not-allowed bg-slate-400 hover:bg-slate-400' : ''
-                }`}
+                className="w-full font-black shadow-md"
               >
                 {hasOutOfStock ? 'Out of Stock — Adjust Items' : 'Confirm & Place Order'}
               </Button>

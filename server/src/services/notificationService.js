@@ -1,6 +1,5 @@
 import notificationRepository from '../repositories/notificationRepository.js'
 import userRepository from '../repositories/userRepository.js'
-import { sendMail } from '../utils/mailer.js'
 
 export const notificationService = {
   async notify({ roles = [], userIds = [], type, title, body, link }) {

@@ -152,7 +152,9 @@ The platform is designed around 4 distinct, role-tailored portals delivering uni
 │   │   └── server.js           # Server entry point & port listener
 │   └── package.json
 │
-└── README.md                   # Project documentation
+├── dev-docs/                   # Development documentation, design specs, audits & verification logs
+├── docx/                       # Official hackathon context, API contracts & requirements
+└── README.md                   # Project documentation & quick start guide
 ```
 
 ---

@@ -29,7 +29,7 @@ const PG_ERRORS = {
   '23502': (err) => ApiError.badRequest(detailOf(err) ?? 'Required field is missing'),
   '23514': (err) => ApiError.badRequest(detailOf(err) ?? 'Value failed a constraint check'),
   '22P02': (err) => ApiError.badRequest(detailOf(err) ?? 'Invalid input syntax'),
-  '22001': (err) => ApiError.badRequest('Value too long for this column'),
+  '22001': () => ApiError.badRequest('Value too long for this column'),
   '57014': () => ApiError.badRequest('Query cancelled'),
 }
 
@@ -60,7 +60,10 @@ export const query = async (text, params = []) => {
     const result = await pool.query(text, params)
     return result.rows
   } catch (err) {
-    if (['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', '57P01'].includes(err.code)) {
+    if (
+      ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', '57P01'].includes(err.code) ||
+      err.message?.includes('Connection terminated')
+    ) {
       try {
         const retry = await pool.query(text, params)
         return retry.rows

@@ -57,7 +57,7 @@ function extractRoutes(layer, basePath = '') {
     if (src.includes('api\\/v1')) clean = '/api/v1'
     else if (src.includes('api')) clean = '/api'
     else {
-      const match = src.match(/\\\/?([a-zA-Z0-9_\-]+)/)
+      const match = src.match(/\\\/?([a-zA-Z0-9_-]+)/)
       if (match) clean = '/' + match[1]
     }
     for (const subLayer of layer.handle.stack) {

@@ -14,7 +14,7 @@ const PLACEHOLDER = /^(YOUR-|PASTE_|your-|replace-with)/i
 async function main() {
   console.log('\nGoogle SMTP test\n')
 
-  const { user, pass, host, port } = config.mail
+  const { user, pass } = config.mail
 
   if (!user || !pass) {
     console.log('  FAIL  EMAIL_USER / EMAIL_PASS not set in .env')

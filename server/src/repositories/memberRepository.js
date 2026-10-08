@@ -75,7 +75,7 @@ export const memberRepository = {
     ).slice(0, 10)
   },
 
-  async list({ page = 1, limit = 20, search, planId } = {}) {
+  async list({ page = 1, limit = 20, search } = {}) {
     const offset = (page - 1) * limit
     const term = `%${String(search ?? '').toLowerCase()}%`
 
