@@ -40,3 +40,8 @@ Thumbs.db
 # Testing & Coverage
 coverage/
 .nyc_output/
+
+# Local-only reference & development documentation
+dev-docs/
+docx/
+
